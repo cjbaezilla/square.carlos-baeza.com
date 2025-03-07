@@ -14,5 +14,141 @@
     "blockchainBasics": "Fundamentos de Blockchain y Web3",
     "userProfile": "Perfil de Usuario",
     "web3Auth": "Autenticación Web3"
+  },
+  "blockchainGuide": {
+    "title": "Guía de Blockchain y Web3",
+    "intro": "¿Nuevo en la tecnología blockchain? Esta guía explica conceptos clave en términos sencillos para ayudarte a entender el mundo de Web3, criptomonedas y activos digitales.",
+    "selectTopic": "Selecciona un tema para aprender más al respecto",
+    "evolving": "¡Estas tecnologías están en constante evolución! Esta guía proporciona explicaciones básicas para ayudarte a comenzar.",
+    "close": "Cerrar",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "¿Qué es MetaMask?",
+        "description": "MetaMask es como una aplicación de billetera digital para tu navegador web o teléfono móvil. Piensa en ello como una combinación de una billetera digital y una llave especial que te permite acceder a aplicaciones blockchain.",
+        "whatItDoes": "Esto es lo que hace MetaMask:",
+        "items": [
+          "Almacena tus monedas digitales (como Ethereum)",
+          "Te conecta a sitios web y aplicaciones basadas en blockchain",
+          "Actúa como tu inicio de sesión para aplicaciones blockchain (¡no se necesitan nombres de usuario/contraseñas!)"
+        ],
+        "comparison": "Al igual que podrías usar tu cuenta de Google o Facebook para iniciar sesión en varios sitios web, MetaMask te permite usar tu dirección blockchain para interactuar con aplicaciones y servicios blockchain."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "¿Qué es Web3?",
+        "description": "Web3 es la próxima generación de internet que se construye utilizando tecnología blockchain. Está diseñada para ser más abierta, descentralizada y controlada por el usuario que el internet que usamos hoy.",
+        "comparison": "Así es como Web3 difiere del internet actual:",
+        "items": [
+          "<strong>Web1 (años 90):</strong> Sitios web de solo lectura. Solo podías consumir contenido.",
+          "<strong>Web2 (2000-presente):</strong> Sitios web interactivos donde puedes leer y crear contenido, pero grandes empresas controlan tus datos y las plataformas (como Facebook, Google).",
+          "<strong>Web3 (emergente):</strong> Un internet donde eres dueño de tus datos, activos digitales y contenido. Ninguna empresa controla todo, y puedes llevar tu identidad digital a través de diferentes aplicaciones."
+        ],
+        "dapps": "Las aplicaciones Web3 a menudo se denominan \"dApps\" (aplicaciones descentralizadas) porque se ejecutan en redes descentralizadas en lugar de servidores propiedad de una única empresa."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "¿Qué es Ethereum?",
+        "description": "Ethereum es una plataforma blockchain que funciona como una computadora global y descentralizada. Mientras que Bitcoin fue diseñado principalmente como una moneda digital, Ethereum se creó para hacer mucho más.",
+        "keyThings": "Cosas clave que debes saber sobre Ethereum:",
+        "items": [
+          "Tiene su propia criptomoneda llamada Ether (ETH), que se utiliza para pagar transacciones y servicios en la red",
+          "Permite a los desarrolladores construir e implementar \"contratos inteligentes\" — acuerdos de autoejecución con los términos directamente escritos en código",
+          "Impulsa miles de aplicaciones descentralizadas (dApps) en finanzas, arte, juegos, redes sociales y más"
+        ],
+        "platform": "Piensa en Ethereum como una plataforma que permite nuevos tipos de aplicaciones donde ninguna entidad tiene el control — en cambio, las reglas se aplican mediante código que se ejecuta en miles de computadoras en todo el mundo."
+      },
+      "evm": {
+        "title": "EVM (Máquina Virtual de Ethereum)",
+        "heading": "¿Qué es la EVM?",
+        "description": "La Máquina Virtual de Ethereum (EVM) es el motor que impulsa la blockchain de Ethereum. Es un entorno de computación especial que ejecuta contratos inteligentes.",
+        "understanding": "Para entender la EVM:",
+        "items": [
+          "Piensa en ella como una computadora gigante y global distribuida a través de miles de máquinas individuales",
+          "Ejecuta programas (contratos inteligentes) exactamente de la misma manera en cada computadora de la red",
+          "Asegura que las operaciones sean predecibles, verificables y no puedan ser manipuladas"
+        ],
+        "importance": "La EVM es importante porque crea un entorno consistente donde las aplicaciones pueden ejecutarse sin confianza — lo que significa que no necesitas confiar en ninguna empresa o persona para ejecutar el código correctamente, ya que toda la red lo verifica."
+      },
+      "defi": {
+        "title": "DeFi (Finanzas Descentralizadas)",
+        "heading": "¿Qué es DeFi?",
+        "description": "DeFi, o Finanzas Descentralizadas, reimagina los servicios financieros utilizando tecnología blockchain en lugar de bancos e instituciones financieras tradicionales.",
+        "allows": "Las aplicaciones DeFi te permiten:",
+        "items": [
+          "Prestar tus criptomonedas y ganar intereses",
+          "Pedir prestadas criptomonedas utilizando otras criptomonedas como garantía",
+          "Comerciar criptomonedas sin un intercambio o corredor",
+          "Crear cuentas similares a las de ahorro con tasas de interés típicamente más altas que los bancos tradicionales",
+          "Comprar seguros, derivados y otros productos financieros"
+        ],
+        "difference": "La diferencia clave es que DeFi opera sin intermediarios. En lugar de que un banco apruebe y procese tus transacciones, los contratos inteligentes (código automatizado) manejan todo basado en reglas predefinidas. Esto a menudo significa tarifas más bajas, procesamiento más rápido y acceso para cualquier persona con conexión a internet, independientemente de su ubicación o antecedentes."
+      },
+      "nfts": {
+        "title": "NFTs (Tokens No Fungibles)",
+        "heading": "¿Qué son los NFTs?",
+        "description": "Los NFTs (Tokens No Fungibles) son artículos digitales únicos con propiedad gestionada por blockchain. Piensa en ellos como coleccionables digitales con prueba integrada de autenticidad y propiedad.",
+        "nonFungible": "\"No fungible\" simplemente significa que cada uno es único y no puede ser reemplazado por otro artículo idéntico. Esto es diferente de las criptomonedas como Bitcoin donde cada moneda es idéntica a otra (fungible).",
+        "represent": "Los NFTs pueden representar:",
+        "items": [
+          "Arte digital e ilustraciones",
+          "Música y videos",
+          "Terrenos virtuales y objetos en juegos",
+          "Entradas para eventos",
+          "Membresías y pases de acceso",
+          "Incluso representaciones de objetos del mundo real"
+        ],
+        "ownership": "Cuando posees un NFT, la blockchain sirve como un registro público que demuestra que eres el propietario de ese elemento digital específico. Puedes conservarlo, mostrarlo o venderlo a otra persona. Los artistas y creadores a menudo usan NFTs para vender su trabajo directamente a los fans sin necesidad de galerías u otros intermediarios."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "Firmar Mensaje con MetaMask",
+    "walletConnection": "Conexión de Billetera",
+    "connectedAccount": "Cuenta Conectada:",
+    "connect": "Conectar MetaMask",
+    "connecting": "Conectando...",
+    "messageToSign": "Mensaje para Firmar",
+    "regenerate": "Regenerar Mensaje Predeterminado",
+    "signButton": "Firmar Mensaje con MetaMask",
+    "signing": "Firmando...",
+    "signature": "Firma",
+    "information": "Esta característica te permite firmar mensajes con tu billetera Ethereum a través de MetaMask.",
+    "verify": "La firma puede ser utilizada para verificar tu propiedad de la dirección de billetera conectada.",
+    "walletRequired": "Se Requiere Billetera Web3",
+    "metamaskNotInstalled": "MetaMask no está instalado",
+    "requiresMetamask": "Esta función requiere MetaMask o una billetera web3 compatible para firmar mensajes.",
+    "installMetamask": "Instalar MetaMask",
+    "afterInstalling": "Después de instalar MetaMask:",
+    "steps": [
+      "Crea o importa una billetera",
+      "Conéctate a la red Ethereum",
+      "Actualiza esta página"
+    ]
+  },
+  "userProfile": {
+    "loading": "Cargando perfil...",
+    "userNotFound": "Usuario no encontrado",
+    "email": "Correo electrónico",
+    "noEmail": "No se proporcionó correo electrónico",
+    "web3Wallet": "Billetera Web3",
+    "noWallet": "No hay billetera Web3 conectada",
+    "lastSignIn": "Último inicio de sesión",
+    "never": "Nunca ha iniciado sesión",
+    "invalidDate": "Fecha inválida",
+    "timeAgo": {
+      "seconds": "hace {{count}} segundo",
+      "seconds_plural": "hace {{count}} segundos",
+      "minutes": "hace {{count}} minuto",
+      "minutes_plural": "hace {{count}} minutos",
+      "hours": "hace {{count}} hora",
+      "hours_plural": "hace {{count}} horas",
+      "days": "hace {{count}} día",
+      "days_plural": "hace {{count}} días",
+      "months": "hace {{count}} mes",
+      "months_plural": "hace {{count}} meses",
+      "years": "hace {{count}} año",
+      "years_plural": "hace {{count}} años"
+    }
   }
 } 

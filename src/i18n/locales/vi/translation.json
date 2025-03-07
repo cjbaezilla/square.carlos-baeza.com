@@ -14,5 +14,141 @@
     "blockchainBasics": "Cơ bản về Blockchain & Web3",
     "userProfile": "Hồ sơ người dùng",
     "web3Auth": "Xác thực Web3"
+  },
+  "blockchainGuide": {
+    "title": "Hướng dẫn Blockchain & Web3",
+    "intro": "Bạn mới làm quen với công nghệ blockchain? Hướng dẫn này giải thích các khái niệm chính bằng thuật ngữ đơn giản để giúp bạn hiểu thế giới của Web3, tiền điện tử và tài sản kỹ thuật số.",
+    "selectTopic": "Chọn một chủ đề bên trên để tìm hiểu thêm về nó",
+    "evolving": "Những công nghệ này liên tục phát triển! Hướng dẫn này cung cấp những giải thích cơ bản để giúp bạn bắt đầu.",
+    "close": "Đóng",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "MetaMask là gì?",
+        "description": "MetaMask giống như một ứng dụng ví kỹ thuật số cho trình duyệt web hoặc điện thoại di động của bạn. Hãy coi nó như một sự kết hợp của ví kỹ thuật số và chìa khóa đặc biệt cho phép bạn truy cập các ứng dụng blockchain.",
+        "whatItDoes": "Đây là những gì MetaMask làm:",
+        "items": [
+          "Lưu trữ tiền điện tử của bạn (như Ethereum)",
+          "Kết nối bạn với các trang web và ứng dụng dựa trên blockchain",
+          "Hoạt động như đăng nhập của bạn cho các ứng dụng blockchain (không cần tên người dùng/mật khẩu!)"
+        ],
+        "comparison": "Giống như bạn có thể sử dụng tài khoản Google hoặc Facebook để đăng nhập vào nhiều trang web khác nhau, MetaMask cho phép bạn sử dụng địa chỉ blockchain để tương tác với các ứng dụng và dịch vụ blockchain."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "Web3 là gì?",
+        "description": "Web3 là thế hệ internet tiếp theo được xây dựng bằng công nghệ blockchain. Nó được thiết kế để mở, phi tập trung và do người dùng kiểm soát hơn internet mà chúng ta sử dụng hiện nay.",
+        "comparison": "Đây là cách Web3 khác với internet hiện tại:",
+        "items": [
+          "<strong>Web1 (thập niên 1990):</strong> Các trang web chỉ đọc. Bạn chỉ có thể tiêu thụ nội dung.",
+          "<strong>Web2 (thập niên 2000 đến nay):</strong> Các trang web tương tác nơi bạn có thể vừa đọc vừa tạo nội dung, nhưng các công ty lớn kiểm soát dữ liệu và nền tảng của bạn (như Facebook, Google).",
+          "<strong>Web3 (đang nổi lên):</strong> Internet nơi bạn sở hữu dữ liệu, tài sản kỹ thuật số và nội dung của mình. Không một công ty nào kiểm soát mọi thứ, và bạn có thể mang danh tính kỹ thuật số của mình qua các ứng dụng khác nhau."
+        ],
+        "dapps": "Các ứng dụng Web3 thường được gọi là \"dApps\" (ứng dụng phi tập trung) vì chúng chạy trên các mạng phi tập trung thay vì máy chủ thuộc sở hữu của một công ty duy nhất."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "Ethereum là gì?",
+        "description": "Ethereum là một nền tảng blockchain hoạt động như một máy tính toàn cầu, phi tập trung. Trong khi Bitcoin được thiết kế chủ yếu làm tiền kỹ thuật số, Ethereum được tạo ra để làm nhiều hơn thế.",
+        "keyThings": "Những điều quan trọng cần biết về Ethereum:",
+        "items": [
+          "Nó có tiền điện tử riêng gọi là Ether (ETH), được sử dụng để thanh toán giao dịch và dịch vụ trên mạng",
+          "Nó cho phép các nhà phát triển xây dựng và triển khai \"hợp đồng thông minh\" — thỏa thuận tự thực hiện với các điều khoản được viết trực tiếp vào mã",
+          "Nó hỗ trợ hàng nghìn ứng dụng phi tập trung (dApps) trong tài chính, nghệ thuật, trò chơi, mạng xã hội, và nhiều lĩnh vực khác"
+        ],
+        "platform": "Hãy coi Ethereum như một nền tảng tạo điều kiện cho các loại ứng dụng mới mà không có thực thể duy nhất nào kiểm soát — thay vào đó, các quy tắc được thực thi bởi mã chạy trên hàng nghìn máy tính trên toàn thế giới."
+      },
+      "evm": {
+        "title": "EVM (Máy ảo Ethereum)",
+        "heading": "EVM là gì?",
+        "description": "Máy ảo Ethereum (EVM) là động cơ cung cấp năng lượng cho blockchain Ethereum. Đó là một môi trường điện toán đặc biệt chạy các hợp đồng thông minh.",
+        "understanding": "Để hiểu EVM:",
+        "items": [
+          "Hãy coi nó như một máy tính toàn cầu, khổng lồ được phân bố trên hàng nghìn máy riêng lẻ",
+          "Nó thực thi các chương trình (hợp đồng thông minh) chính xác cùng một cách trên mọi máy tính trong mạng",
+          "Nó đảm bảo các hoạt động có thể dự đoán, có thể xác minh và không thể bị xâm phạm"
+        ],
+        "importance": "EVM quan trọng vì nó tạo ra một môi trường nhất quán nơi các ứng dụng có thể chạy mà không cần tin cậy — nghĩa là bạn không cần phải tin tưởng bất kỳ công ty hoặc cá nhân nào để thực thi mã đúng cách, vì toàn bộ mạng sẽ xác minh nó."
+      },
+      "defi": {
+        "title": "DeFi (Tài chính phi tập trung)",
+        "heading": "DeFi là gì?",
+        "description": "DeFi, hay Tài chính phi tập trung, tái tưởng tượng các dịch vụ tài chính sử dụng công nghệ blockchain thay vì các ngân hàng và tổ chức tài chính truyền thống.",
+        "allows": "Các ứng dụng DeFi cho phép bạn:",
+        "items": [
+          "Cho vay tiền điện tử của bạn và kiếm lãi",
+          "Vay tiền điện tử bằng cách sử dụng tiền điện tử khác làm tài sản thế chấp",
+          "Giao dịch tiền điện tử mà không cần sàn giao dịch hoặc môi giới",
+          "Tạo các tài khoản giống như tiết kiệm với lãi suất thường cao hơn ngân hàng truyền thống",
+          "Mua bảo hiểm, công cụ phái sinh và các sản phẩm tài chính khác"
+        ],
+        "difference": "Sự khác biệt chính là DeFi hoạt động mà không có trung gian. Thay vì ngân hàng phê duyệt và xử lý giao dịch của bạn, các hợp đồng thông minh (mã tự động) xử lý mọi thứ dựa trên các quy tắc được xác định trước. Điều này thường có nghĩa là phí thấp hơn, xử lý nhanh hơn và tiếp cận cho bất kỳ ai có kết nối internet, bất kể vị trí hoặc nền tảng của họ."
+      },
+      "nfts": {
+        "title": "NFT (Token không thể thay thế)",
+        "heading": "NFT là gì?",
+        "description": "NFT (Token không thể thay thế) là các mặt hàng kỹ thuật số độc đáo với quyền sở hữu được quản lý bởi blockchain. Hãy coi chúng như các bộ sưu tập kỹ thuật số với bằng chứng tích hợp về tính xác thực và quyền sở hữu.",
+        "nonFungible": "\"Không thể thay thế\" đơn giản có nghĩa là mỗi cái đều là duy nhất và không thể được thay thế bằng một mặt hàng giống hệt khác. Điều này khác với tiền điện tử như Bitcoin nơi mỗi đồng tiền giống hệt nhau (có thể thay thế).",
+        "represent": "NFT có thể đại diện cho:",
+        "items": [
+          "Nghệ thuật kỹ thuật số và minh họa",
+          "Âm nhạc và video",
+          "Đất đai ảo và vật phẩm trong trò chơi",
+          "Vé sự kiện",
+          "Thẻ thành viên và thẻ truy cập",
+          "Thậm chí là đại diện của các vật phẩm trong thế giới thực"
+        ],
+        "ownership": "Khi bạn sở hữu một NFT, blockchain đóng vai trò như một hồ sơ công khai chứng minh bạn là chủ sở hữu của mặt hàng kỹ thuật số cụ thể đó. Bạn có thể giữ nó, trưng bày nó, hoặc bán nó cho người khác. Nghệ sĩ và nhà sáng tạo thường sử dụng NFT để bán tác phẩm của họ trực tiếp cho người hâm mộ mà không cần đến phòng trưng bày hoặc trung gian khác."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "Ký tin nhắn với MetaMask",
+    "walletConnection": "Kết nối ví",
+    "connectedAccount": "Tài khoản đã kết nối:",
+    "connect": "Kết nối MetaMask",
+    "connecting": "Đang kết nối...",
+    "messageToSign": "Tin nhắn để ký",
+    "regenerate": "Tạo lại tin nhắn mặc định",
+    "signButton": "Ký tin nhắn với MetaMask",
+    "signing": "Đang ký...",
+    "signature": "Chữ ký",
+    "information": "Tính năng này cho phép bạn ký tin nhắn bằng ví Ethereum của mình thông qua MetaMask.",
+    "verify": "Chữ ký có thể được sử dụng để xác minh quyền sở hữu của bạn đối với địa chỉ ví đã kết nối.",
+    "walletRequired": "Yêu cầu ví Web3",
+    "metamaskNotInstalled": "MetaMask chưa được cài đặt",
+    "requiresMetamask": "Tính năng này yêu cầu MetaMask hoặc ví web3 tương thích để ký tin nhắn.",
+    "installMetamask": "Cài đặt MetaMask",
+    "afterInstalling": "Sau khi cài đặt MetaMask:",
+    "steps": [
+      "Tạo hoặc nhập ví",
+      "Kết nối với mạng Ethereum",
+      "Làm mới trang này"
+    ]
+  },
+  "userProfile": {
+    "loading": "Đang tải hồ sơ...",
+    "userNotFound": "Không tìm thấy người dùng",
+    "email": "Email",
+    "noEmail": "Không có email được cung cấp",
+    "web3Wallet": "Ví Web3",
+    "noWallet": "Không có ví Web3 được kết nối",
+    "lastSignIn": "Đăng nhập lần cuối",
+    "never": "Chưa từng đăng nhập",
+    "invalidDate": "Ngày không hợp lệ",
+    "timeAgo": {
+      "seconds": "{{count}} giây trước",
+      "seconds_plural": "{{count}} giây trước",
+      "minutes": "{{count}} phút trước",
+      "minutes_plural": "{{count}} phút trước",
+      "hours": "{{count}} giờ trước",
+      "hours_plural": "{{count}} giờ trước",
+      "days": "{{count}} ngày trước",
+      "days_plural": "{{count}} ngày trước",
+      "months": "{{count}} tháng trước",
+      "months_plural": "{{count}} tháng trước",
+      "years": "{{count}} năm trước",
+      "years_plural": "{{count}} năm trước"
+    }
   }
 } 

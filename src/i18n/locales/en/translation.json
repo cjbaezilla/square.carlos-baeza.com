@@ -14,5 +14,141 @@
     "blockchainBasics": "Blockchain & Web3 Basics",
     "userProfile": "User Profile",
     "web3Auth": "Web3 Authentication"
+  },
+  "blockchainGuide": {
+    "title": "Blockchain & Web3 Guide",
+    "intro": "New to blockchain technology? This guide explains key concepts in simple terms to help you understand the world of Web3, cryptocurrencies, and digital assets.",
+    "selectTopic": "Select a topic above to learn more about it",
+    "evolving": "These technologies are constantly evolving! This guide provides basic explanations to help you get started.",
+    "close": "Close",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "What is MetaMask?",
+        "description": "MetaMask is like a digital wallet app for your web browser or mobile phone. Think of it as a combination of a digital wallet and a special key that lets you access blockchain apps.",
+        "whatItDoes": "Here's what MetaMask does:",
+        "items": [
+          "Stores your digital currencies (like Ethereum)",
+          "Connects you to blockchain-based websites and apps",
+          "Acts as your login for blockchain applications (no usernames/passwords needed!)"
+        ],
+        "comparison": "Just like you might use your Google or Facebook account to log into various websites, MetaMask lets you use your blockchain address to interact with blockchain apps and services."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "What is Web3?",
+        "description": "Web3 is the next generation of the internet that's built using blockchain technology. It's designed to be more open, decentralized, and user-controlled than the internet we use today.",
+        "comparison": "Here's how Web3 differs from the current internet:",
+        "items": [
+          "<strong>Web1 (1990s):</strong> Read-only websites. You could only consume content.",
+          "<strong>Web2 (2000s-present):</strong> Interactive websites where you can both read and create content, but large companies control your data and the platforms (like Facebook, Google).",
+          "<strong>Web3 (emerging):</strong> An internet where you own your data, digital assets, and content. No single company controls everything, and you can carry your digital identity across different applications."
+        ],
+        "dapps": "Web3 applications are often called \"dApps\" (decentralized applications) because they run on decentralized networks rather than servers owned by a single company."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "What is Ethereum?",
+        "description": "Ethereum is a blockchain platform that works like a global, decentralized computer. While Bitcoin was designed mainly as a digital currency, Ethereum was created to do much more.",
+        "keyThings": "Key things to know about Ethereum:",
+        "items": [
+          "It has its own cryptocurrency called Ether (ETH), which is used to pay for transactions and services on the network",
+          "It allows developers to build and deploy \"smart contracts\" — self-executing agreements with the terms directly written into code",
+          "It powers thousands of decentralized applications (dApps) across finance, art, gaming, social media, and more"
+        ],
+        "platform": "Think of Ethereum as a platform that enables new kinds of applications where no single entity has control — instead, the rules are enforced by code running across thousands of computers worldwide."
+      },
+      "evm": {
+        "title": "EVM (Ethereum Virtual Machine)",
+        "heading": "What is the EVM?",
+        "description": "The Ethereum Virtual Machine (EVM) is the engine that powers the Ethereum blockchain. It's a special computing environment that runs smart contracts.",
+        "understanding": "To understand the EVM:",
+        "items": [
+          "Think of it as a giant, global computer spread across thousands of individual machines",
+          "It executes programs (smart contracts) exactly the same way on every computer in the network",
+          "It ensures that operations are predictable, verifiable, and can't be tampered with"
+        ],
+        "importance": "The EVM is important because it creates a consistent environment where applications can run trustlessly — meaning you don't need to trust any single company or person to execute the code correctly, as the entire network verifies it."
+      },
+      "defi": {
+        "title": "DeFi (Decentralized Finance)",
+        "heading": "What is DeFi?",
+        "description": "DeFi, or Decentralized Finance, reimagines financial services using blockchain technology instead of traditional banks and financial institutions.",
+        "allows": "DeFi applications allow you to:",
+        "items": [
+          "Lend your crypto and earn interest",
+          "Borrow crypto by using other crypto as collateral",
+          "Trade cryptocurrencies without an exchange or broker",
+          "Create savings-like accounts with typically higher interest rates than traditional banks",
+          "Buy insurance, derivatives, and other financial products"
+        ],
+        "difference": "The key difference is that DeFi operates without middlemen. Instead of a bank approving and processing your transactions, smart contracts (automated code) handle everything based on pre-defined rules. This often means lower fees, faster processing, and access for anyone with an internet connection, regardless of their location or background."
+      },
+      "nfts": {
+        "title": "NFTs (Non-Fungible Tokens)",
+        "heading": "What are NFTs?",
+        "description": "NFTs (Non-Fungible Tokens) are unique digital items with blockchain-managed ownership. Think of them as digital collectibles with built-in proof of authenticity and ownership.",
+        "nonFungible": "\"Non-fungible\" simply means that each one is unique and can't be replaced by another identical item. This is different from cryptocurrencies like Bitcoin where each coin is identical to another (fungible).",
+        "represent": "NFTs can represent:",
+        "items": [
+          "Digital art and illustrations",
+          "Music and videos",
+          "Virtual land and items in games",
+          "Tickets to events",
+          "Memberships and access passes",
+          "Even representations of real-world items"
+        ],
+        "ownership": "When you own an NFT, the blockchain serves as a public record proving you are the owner of that specific digital item. You can keep it, display it, or sell it to someone else. Artists and creators often use NFTs to sell their work directly to fans without needing galleries or other intermediaries."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "Sign Message with MetaMask",
+    "walletConnection": "Wallet Connection",
+    "connectedAccount": "Connected Account:",
+    "connect": "Connect MetaMask",
+    "connecting": "Connecting...",
+    "messageToSign": "Message to Sign",
+    "regenerate": "Regenerate Default Message",
+    "signButton": "Sign Message with MetaMask",
+    "signing": "Signing...",
+    "signature": "Signature",
+    "information": "This feature allows you to sign messages with your Ethereum wallet via MetaMask.",
+    "verify": "The signature can be used to verify your ownership of the connected wallet address.",
+    "walletRequired": "Web3 Wallet Required",
+    "metamaskNotInstalled": "MetaMask is not installed",
+    "requiresMetamask": "This feature requires MetaMask or a compatible web3 wallet to sign messages.",
+    "installMetamask": "Install MetaMask",
+    "afterInstalling": "After installing MetaMask:",
+    "steps": [
+      "Create or import a wallet",
+      "Connect to the Ethereum network",
+      "Refresh this page"
+    ]
+  },
+  "userProfile": {
+    "loading": "Loading profile...",
+    "userNotFound": "User not found",
+    "email": "Email",
+    "noEmail": "No email provided",
+    "web3Wallet": "Web3 Wallet",
+    "noWallet": "No Web3 wallet connected",
+    "lastSignIn": "Last Sign In",
+    "never": "Never signed in",
+    "invalidDate": "Invalid date",
+    "timeAgo": {
+      "seconds": "{{count}} second ago",
+      "seconds_plural": "{{count}} seconds ago",
+      "minutes": "{{count}} minute ago",
+      "minutes_plural": "{{count}} minutes ago",
+      "hours": "{{count}} hour ago",
+      "hours_plural": "{{count}} hours ago",
+      "days": "{{count}} day ago",
+      "days_plural": "{{count}} days ago",
+      "months": "{{count}} month ago",
+      "months_plural": "{{count}} months ago",
+      "years": "{{count}} year ago",
+      "years_plural": "{{count}} years ago"
+    }
   }
 } 

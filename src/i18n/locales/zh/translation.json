@@ -14,5 +14,141 @@
     "blockchainBasics": "区块链和Web3基础",
     "userProfile": "用户资料",
     "web3Auth": "Web3认证"
+  },
+  "blockchainGuide": {
+    "title": "区块链和Web3指南",
+    "intro": "区块链技术新手？本指南用简单的术语解释关键概念，帮助您了解Web3、加密货币和数字资产的世界。",
+    "selectTopic": "选择上面的主题以了解更多信息",
+    "evolving": "这些技术在不断发展！本指南提供基本解释帮助您入门。",
+    "close": "关闭",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "什么是MetaMask？",
+        "description": "MetaMask就像是一个适用于您网络浏览器或手机的数字钱包应用。将其视为数字钱包和特殊密钥的组合，使您能够访问区块链应用程序。",
+        "whatItDoes": "MetaMask的功能：",
+        "items": [
+          "存储您的数字货币（如以太币）",
+          "连接您到基于区块链的网站和应用程序",
+          "作为区块链应用程序的登录方式（无需用户名/密码！）"
+        ],
+        "comparison": "就像您可能使用Google或Facebook账户登录各种网站一样，MetaMask允许您使用区块链地址与区块链应用和服务互动。"
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "什么是Web3？",
+        "description": "Web3是下一代互联网，使用区块链技术构建。它旨在比我们今天使用的互联网更加开放、去中心化和用户控制。",
+        "comparison": "Web3与当前互联网的区别：",
+        "items": [
+          "<strong>Web1（90年代）：</strong> 只读网站。您只能消费内容。",
+          "<strong>Web2（2000年至今）：</strong> 交互式网站，您可以阅读和创建内容，但大公司控制您的数据和平台（如Facebook、Google）。",
+          "<strong>Web3（新兴）：</strong> 您拥有自己数据、数字资产和内容的互联网。没有单一公司控制一切，您可以在不同应用程序之间携带数字身份。"
+        ],
+        "dapps": "Web3应用程序通常被称为\"dApps\"（去中心化应用程序），因为它们在去中心化网络上运行，而不是在单一公司拥有的服务器上。"
+      },
+      "ethereum": {
+        "title": "以太坊",
+        "heading": "什么是以太坊？",
+        "description": "以太坊是一个区块链平台，像全球分布式计算机一样工作。虽然比特币主要设计为数字货币，但以太坊创建的目的是做更多事情。",
+        "keyThings": "关于以太坊的关键知识：",
+        "items": [
+          "它有自己的加密货币叫做以太币（ETH），用于支付网络上的交易和服务",
+          "它允许开发者构建和部署\"智能合约\"—自执行协议，条款直接写入代码",
+          "它支持数千个去中心化应用（dApps），涵盖金融、艺术、游戏、社交媒体等领域"
+        ],
+        "platform": "将以太坊视为一个使新型应用成为可能的平台，这些应用没有单一实体控制—相反，规则由在全球数千台计算机上运行的代码执行。"
+      },
+      "evm": {
+        "title": "EVM（以太坊虚拟机）",
+        "heading": "什么是EVM？",
+        "description": "以太坊虚拟机（EVM）是驱动以太坊区块链的引擎。它是一个执行智能合约的特殊计算环境。",
+        "understanding": "了解EVM：",
+        "items": [
+          "将其视为分布在数千个独立机器上的巨大全球计算机",
+          "在网络中的每台计算机上以完全相同的方式执行程序（智能合约）",
+          "确保操作可预测、可验证且不可篡改"
+        ],
+        "importance": "EVM很重要，因为它创建了一个应用程序可以无需信任运行的一致环境—这意味着您不需要信任任何公司或个人正确执行代码，因为整个网络都会验证它。"
+      },
+      "defi": {
+        "title": "DeFi（去中心化金融）",
+        "heading": "什么是DeFi？",
+        "description": "DeFi，或去中心化金融，使用区块链技术而非传统银行和金融机构重塑金融服务。",
+        "allows": "DeFi应用允许您：",
+        "items": [
+          "借出加密货币并赚取利息",
+          "以其他加密货币作为抵押借入加密货币",
+          "无需交易所或经纪人交换加密货币",
+          "创建类似储蓄的账户，利率通常高于传统银行",
+          "购买保险、衍生品和其他金融产品"
+        ],
+        "difference": "关键区别在于DeFi无需中介运作。银行不再批准和处理交易，智能合约（自动化代码）根据预定义规则处理一切。这通常意味着更低的费用、更快的处理速度，以及无论位置或背景如何，任何有互联网连接的人都可以访问。"
+      },
+      "nfts": {
+        "title": "NFT（非同质化代币）",
+        "heading": "什么是NFTs？",
+        "description": "NFTs（非同质化代币）是由区块链管理所有权的独特数字物品。将它们视为带有内置真实性和所有权证明的数字收藏品。",
+        "nonFungible": "\"非同质化\"简单来说意味着每个都是独特的，不能被另一个相同的物品替代。这与比特币等加密货币不同，其中每枚硬币都与另一枚相同（同质化）。",
+        "represent": "NFTs可以代表：",
+        "items": [
+          "数字艺术和插图",
+          "音乐和视频",
+          "游戏中的虚拟土地和物品",
+          "活动门票",
+          "会员资格和访问通行证",
+          "甚至实物物品的表示"
+        ],
+        "ownership": "当您拥有NFT时，区块链作为公共记录，证明您是特定数字物品的所有者。您可以保存它、展示它或将其出售给他人。艺术家和创作者经常使用NFT直接向粉丝销售作品，无需画廊或其他中介。"
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "使用MetaMask签名消息",
+    "walletConnection": "钱包连接",
+    "connectedAccount": "已连接账户：",
+    "connect": "连接MetaMask",
+    "connecting": "连接中...",
+    "messageToSign": "待签名消息",
+    "regenerate": "重新生成默认消息",
+    "signButton": "使用MetaMask签名消息",
+    "signing": "签名中...",
+    "signature": "签名",
+    "information": "此功能允许您通过MetaMask使用以太坊钱包签名消息。",
+    "verify": "签名可用于验证您对连接的钱包地址的所有权。",
+    "walletRequired": "需要Web3钱包",
+    "metamaskNotInstalled": "MetaMask未安装",
+    "requiresMetamask": "此功能需要MetaMask或兼容的web3钱包来签名消息。",
+    "installMetamask": "安装MetaMask",
+    "afterInstalling": "安装MetaMask后：",
+    "steps": [
+      "创建或导入钱包",
+      "连接到以太坊网络",
+      "刷新此页面"
+    ]
+  },
+  "userProfile": {
+    "loading": "加载个人资料中...",
+    "userNotFound": "未找到用户",
+    "email": "电子邮件",
+    "noEmail": "未提供电子邮件",
+    "web3Wallet": "Web3钱包",
+    "noWallet": "未连接Web3钱包",
+    "lastSignIn": "上次登录",
+    "never": "从未登录",
+    "invalidDate": "无效日期",
+    "timeAgo": {
+      "seconds": "{{count}}秒前",
+      "seconds_plural": "{{count}}秒前",
+      "minutes": "{{count}}分钟前",
+      "minutes_plural": "{{count}}分钟前",
+      "hours": "{{count}}小时前",
+      "hours_plural": "{{count}}小时前",
+      "days": "{{count}}天前",
+      "days_plural": "{{count}}天前",
+      "months": "{{count}}个月前",
+      "months_plural": "{{count}}个月前",
+      "years": "{{count}}年前",
+      "years_plural": "{{count}}年前"
+    }
   }
 } 

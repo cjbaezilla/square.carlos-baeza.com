@@ -1,17 +1,19 @@
 import React from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
+  const { t } = useTranslation();
 
   // Function to format the last sign-in time as "time since"
   const formatLastSignIn = (dateString) => {
-    if (!dateString) return 'Never signed in';
+    if (!dateString) return t('userProfile.never');
     
     const date = new Date(dateString);
     
     // Check if date is valid
-    if (isNaN(date.getTime())) return 'Invalid date';
+    if (isNaN(date.getTime())) return t('userProfile.invalidDate');
     
     const now = new Date();
     const diffInMs = now - date;
@@ -23,17 +25,17 @@ const UserProfileCard = () => {
     const diffInYears = Math.floor(diffInDays / 365);
     
     if (diffInSecs < 60) {
-      return `${diffInSecs} second${diffInSecs !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.seconds', { count: diffInSecs });
     } else if (diffInMins < 60) {
-      return `${diffInMins} minute${diffInMins !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.minutes', { count: diffInMins });
     } else if (diffInHours < 24) {
-      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.hours', { count: diffInHours });
     } else if (diffInDays < 30) {
-      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.days', { count: diffInDays });
     } else if (diffInMonths < 12) {
-      return `${diffInMonths} month${diffInMonths !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.months', { count: diffInMonths });
     } else {
-      return `${diffInYears} year${diffInYears !== 1 ? 's' : ''} ago`;
+      return t('userProfile.timeAgo.years', { count: diffInYears });
     }
   };
 
@@ -56,7 +58,7 @@ const UserProfileCard = () => {
   if (!user) {
     return (
       <div className="bg-gray-800 rounded-lg p-6 shadow-lg text-center text-gray-300">
-        <p>User not found</p>
+        <p>{t('userProfile.userNotFound')}</p>
       </div>
     );
   }
@@ -92,21 +94,21 @@ const UserProfileCard = () => {
 
       <div className="space-y-2 mt-4">
         <div className="flex flex-col">
-          <span className="text-gray-400 text-sm">Email</span>
+          <span className="text-gray-400 text-sm">{t('userProfile.email')}</span>
           <span className="font-medium">
-            {user.primaryEmailAddress?.emailAddress || 'No email provided'}
+            {user.primaryEmailAddress?.emailAddress || t('userProfile.noEmail')}
           </span>
         </div>
         
         <div className="flex flex-col">
-          <span className="text-gray-400 text-sm">Web3 Wallet</span>
+          <span className="text-gray-400 text-sm">{t('userProfile.web3Wallet')}</span>
           <span className="font-medium">
-            {user.primaryWeb3Wallet?.web3Wallet || 'No Web3 wallet connected'}
+            {user.primaryWeb3Wallet?.web3Wallet || t('userProfile.noWallet')}
           </span>
         </div>
         
         <div className="flex flex-col">
-          <span className="text-gray-400 text-sm">Last Sign In</span>
+          <span className="text-gray-400 text-sm">{t('userProfile.lastSignIn')}</span>
           <span className="font-medium">
             {formatLastSignIn(user.lastSignInAt)}
           </span>

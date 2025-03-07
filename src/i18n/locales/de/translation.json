@@ -14,5 +14,141 @@
     "blockchainBasics": "Blockchain & Web3-Grundlagen",
     "userProfile": "Benutzerprofil",
     "web3Auth": "Web3-Authentifizierung"
+  },
+  "blockchainGuide": {
+    "title": "Blockchain & Web3-Leitfaden",
+    "intro": "Neu in der Blockchain-Technologie? Dieser Leitfaden erklärt Schlüsselkonzepte in einfachen Worten, um Ihnen zu helfen, die Welt von Web3, Kryptowährungen und digitalen Vermögenswerten zu verstehen.",
+    "selectTopic": "Wählen Sie oben ein Thema aus, um mehr darüber zu erfahren",
+    "evolving": "Diese Technologien entwickeln sich ständig weiter! Dieser Leitfaden bietet grundlegende Erklärungen, um Ihnen den Einstieg zu erleichtern.",
+    "close": "Schließen",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "Was ist MetaMask?",
+        "description": "MetaMask ist wie eine digitale Wallet-App für Ihren Webbrowser oder Ihr Mobiltelefon. Denken Sie daran als eine Kombination aus einer digitalen Brieftasche und einem speziellen Schlüssel, der Ihnen Zugang zu Blockchain-Apps ermöglicht.",
+        "whatItDoes": "Hier ist, was MetaMask tut:",
+        "items": [
+          "Speichert Ihre digitalen Währungen (wie Ethereum)",
+          "Verbindet Sie mit Blockchain-basierten Websites und Apps",
+          "Fungiert als Ihr Login für Blockchain-Anwendungen (keine Benutzernamen/Passwörter erforderlich!)"
+        ],
+        "comparison": "Genau wie Sie möglicherweise Ihr Google- oder Facebook-Konto verwenden, um sich bei verschiedenen Websites anzumelden, ermöglicht Ihnen MetaMask, Ihre Blockchain-Adresse zu verwenden, um mit Blockchain-Apps und -Diensten zu interagieren."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "Was ist Web3?",
+        "description": "Web3 ist die nächste Generation des Internets, die mit Blockchain-Technologie aufgebaut wird. Es ist darauf ausgelegt, offener, dezentraler und benutzergesteuerter zu sein als das Internet, das wir heute nutzen.",
+        "comparison": "So unterscheidet sich Web3 vom aktuellen Internet:",
+        "items": [
+          "<strong>Web1 (1990er Jahre):</strong> Websites, die nur gelesen werden können. Sie konnten nur Inhalte konsumieren.",
+          "<strong>Web2 (2000er Jahre bis heute):</strong> Interaktive Websites, auf denen Sie sowohl lesen als auch Inhalte erstellen können, aber große Unternehmen kontrollieren Ihre Daten und die Plattformen (wie Facebook, Google).",
+          "<strong>Web3 (im Entstehen):</strong> Ein Internet, in dem Sie Ihre Daten, digitalen Vermögenswerte und Inhalte besitzen. Kein einzelnes Unternehmen kontrolliert alles, und Sie können Ihre digitale Identität über verschiedene Anwendungen hinweg mitnehmen."
+        ],
+        "dapps": "Web3-Anwendungen werden oft als \"dApps\" (dezentralisierte Anwendungen) bezeichnet, weil sie auf dezentralisierten Netzwerken und nicht auf Servern im Besitz eines einzelnen Unternehmens laufen."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "Was ist Ethereum?",
+        "description": "Ethereum ist eine Blockchain-Plattform, die wie ein globaler, dezentraler Computer funktioniert. Während Bitcoin hauptsächlich als digitale Währung konzipiert wurde, wurde Ethereum entwickelt, um viel mehr zu tun.",
+        "keyThings": "Wichtige Dinge, die Sie über Ethereum wissen sollten:",
+        "items": [
+          "Es hat seine eigene Kryptowährung namens Ether (ETH), die verwendet wird, um für Transaktionen und Dienste im Netzwerk zu bezahlen",
+          "Es ermöglicht Entwicklern, \"Smart Contracts\" zu erstellen und einzusetzen — selbstausführende Vereinbarungen, deren Bedingungen direkt in Code geschrieben sind",
+          "Es treibt Tausende von dezentralisierten Anwendungen (dApps) in den Bereichen Finanzen, Kunst, Spiele, soziale Medien und mehr an"
+        ],
+        "platform": "Denken Sie an Ethereum als eine Plattform, die neue Arten von Anwendungen ermöglicht, bei denen keine einzelne Einheit die Kontrolle hat — stattdessen werden die Regeln durch Code durchgesetzt, der auf Tausenden von Computern weltweit läuft."
+      },
+      "evm": {
+        "title": "EVM (Ethereum Virtual Machine)",
+        "heading": "Was ist die EVM?",
+        "description": "Die Ethereum Virtual Machine (EVM) ist die Engine, die die Ethereum-Blockchain antreibt. Es ist eine spezielle Computerumgebung, die Smart Contracts ausführt.",
+        "understanding": "Um die EVM zu verstehen:",
+        "items": [
+          "Denken Sie daran als einen riesigen, globalen Computer, der über Tausende von einzelnen Maschinen verteilt ist",
+          "Sie führt Programme (Smart Contracts) auf genau die gleiche Weise auf jedem Computer im Netzwerk aus",
+          "Sie stellt sicher, dass Operationen vorhersehbar und überprüfbar sind und nicht manipuliert werden können"
+        ],
+        "importance": "Die EVM ist wichtig, weil sie eine konsistente Umgebung schafft, in der Anwendungen vertrauenslos laufen können — das bedeutet, dass Sie keinem einzelnen Unternehmen oder keiner Person vertrauen müssen, um den Code korrekt auszuführen, da das gesamte Netzwerk ihn überprüft."
+      },
+      "defi": {
+        "title": "DeFi (Dezentralisierte Finanzen)",
+        "heading": "Was ist DeFi?",
+        "description": "DeFi oder Dezentralisierte Finanzen denkt Finanzdienstleistungen mit Blockchain-Technologie neu, anstatt traditionelle Banken und Finanzinstitutionen zu nutzen.",
+        "allows": "DeFi-Anwendungen ermöglichen es Ihnen:",
+        "items": [
+          "Ihre Kryptowährungen zu verleihen und Zinsen zu verdienen",
+          "Kryptowährungen zu leihen, indem Sie andere Kryptowährungen als Sicherheit verwenden",
+          "Kryptowährungen ohne Börse oder Broker zu handeln",
+          "Sparähnliche Konten mit typischerweise höheren Zinssätzen als bei traditionellen Banken zu erstellen",
+          "Versicherungen, Derivate und andere Finanzprodukte zu kaufen"
+        ],
+        "difference": "Der Hauptunterschied besteht darin, dass DeFi ohne Zwischenhändler funktioniert. Anstatt dass eine Bank Ihre Transaktionen genehmigt und verarbeitet, handhabt Smart Contracts (automatisierter Code) alles basierend auf vordefinierten Regeln. Dies bedeutet oft niedrigere Gebühren, schnellere Verarbeitung und Zugang für jeden mit einer Internetverbindung, unabhängig von seinem Standort oder Hintergrund."
+      },
+      "nfts": {
+        "title": "NFTs (Non-Fungible Tokens)",
+        "heading": "Was sind NFTs?",
+        "description": "NFTs (Non-Fungible Tokens) sind einzigartige digitale Gegenstände mit Blockchain-verwalteter Eigentümerschaft. Denken Sie an sie als digitale Sammlerstücke mit integriertem Nachweis der Authentizität und Eigentümerschaft.",
+        "nonFungible": "\"Non-fungible\" bedeutet einfach, dass jedes einzelne einzigartig ist und nicht durch einen anderen identischen Gegenstand ersetzt werden kann. Dies unterscheidet sich von Kryptowährungen wie Bitcoin, bei denen jede Münze identisch mit einer anderen ist (fungibel).",
+        "represent": "NFTs können darstellen:",
+        "items": [
+          "Digitale Kunst und Illustrationen",
+          "Musik und Videos",
+          "Virtuelles Land und Gegenstände in Spielen",
+          "Tickets für Veranstaltungen",
+          "Mitgliedschaften und Zugangspässe",
+          "Sogar Darstellungen von realen Gegenständen"
+        ],
+        "ownership": "Wenn Sie ein NFT besitzen, dient die Blockchain als öffentlicher Nachweis, dass Sie der Besitzer dieses bestimmten digitalen Gegenstands sind. Sie können es behalten, ausstellen oder an jemand anderen verkaufen. Künstler und Kreative nutzen NFTs oft, um ihre Werke direkt an Fans zu verkaufen, ohne Galerien oder andere Vermittler zu benötigen."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "Nachricht mit MetaMask signieren",
+    "walletConnection": "Wallet-Verbindung",
+    "connectedAccount": "Verbundenes Konto:",
+    "connect": "MetaMask verbinden",
+    "connecting": "Verbinde...",
+    "messageToSign": "Zu signierende Nachricht",
+    "regenerate": "Standardnachricht neu generieren",
+    "signButton": "Nachricht mit MetaMask signieren",
+    "signing": "Signiere...",
+    "signature": "Signatur",
+    "information": "Diese Funktion ermöglicht es Ihnen, Nachrichten mit Ihrer Ethereum-Wallet über MetaMask zu signieren.",
+    "verify": "Die Signatur kann verwendet werden, um Ihren Besitz der verbundenen Wallet-Adresse zu überprüfen.",
+    "walletRequired": "Web3-Wallet erforderlich",
+    "metamaskNotInstalled": "MetaMask ist nicht installiert",
+    "requiresMetamask": "Diese Funktion erfordert MetaMask oder eine kompatible Web3-Wallet, um Nachrichten zu signieren.",
+    "installMetamask": "MetaMask installieren",
+    "afterInstalling": "Nach der Installation von MetaMask:",
+    "steps": [
+      "Erstellen oder importieren Sie eine Wallet",
+      "Verbinden Sie sich mit dem Ethereum-Netzwerk",
+      "Aktualisieren Sie diese Seite"
+    ]
+  },
+  "userProfile": {
+    "loading": "Profil wird geladen...",
+    "userNotFound": "Benutzer nicht gefunden",
+    "email": "E-Mail",
+    "noEmail": "Keine E-Mail angegeben",
+    "web3Wallet": "Web3-Wallet",
+    "noWallet": "Keine Web3-Wallet verbunden",
+    "lastSignIn": "Letzte Anmeldung",
+    "never": "Nie angemeldet",
+    "invalidDate": "Ungültiges Datum",
+    "timeAgo": {
+      "seconds": "vor {{count}} Sekunde",
+      "seconds_plural": "vor {{count}} Sekunden",
+      "minutes": "vor {{count}} Minute",
+      "minutes_plural": "vor {{count}} Minuten",
+      "hours": "vor {{count}} Stunde",
+      "hours_plural": "vor {{count}} Stunden",
+      "days": "vor {{count}} Tag",
+      "days_plural": "vor {{count}} Tagen",
+      "months": "vor {{count}} Monat",
+      "months_plural": "vor {{count}} Monaten",
+      "years": "vor {{count}} Jahr",
+      "years_plural": "vor {{count}} Jahren"
+    }
   }
 } 

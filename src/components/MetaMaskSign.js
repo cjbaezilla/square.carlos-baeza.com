@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
 
 const MetaMaskSign = () => {
   const { user } = useUser();
+  const { t } = useTranslation();
   const [account, setAccount] = useState('');
   const [message, setMessage] = useState('');
   const [signature, setSignature] = useState('');
@@ -127,27 +129,27 @@ const MetaMaskSign = () => {
   if (!isMetaMaskAvailable) {
     return (
       <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-2xl font-bold text-gray-100 mb-4">Web3 Wallet Required</h2>
+        <h2 className="text-2xl font-bold text-gray-100 mb-4">{t('metamaskSign.walletRequired')}</h2>
         
         <div className="mb-6 p-4 bg-yellow-800 text-yellow-100 rounded">
-          <p className="text-lg font-semibold mb-2">MetaMask is not installed</p>
-          <p className="mb-3">This feature requires MetaMask or a compatible web3 wallet to sign messages.</p>
+          <p className="text-lg font-semibold mb-2">{t('metamaskSign.metamaskNotInstalled')}</p>
+          <p className="mb-3">{t('metamaskSign.requiresMetamask')}</p>
           <a 
             href="https://metamask.io/download/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-block px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded transition duration-300"
           >
-            Install MetaMask
+            {t('metamaskSign.installMetamask')}
           </a>
         </div>
         
         <div className="mt-4 text-gray-400 text-sm">
-          <p>After installing MetaMask:</p>
+          <p>{t('metamaskSign.afterInstalling')}</p>
           <ol className="list-decimal pl-5 mt-2 space-y-1">
-            <li>Create or import a wallet</li>
-            <li>Connect to the Ethereum network</li>
-            <li>Refresh this page</li>
+            <li>{t('metamaskSign.steps.0')}</li>
+            <li>{t('metamaskSign.steps.1')}</li>
+            <li>{t('metamaskSign.steps.2')}</li>
           </ol>
         </div>
       </div>
@@ -156,15 +158,15 @@ const MetaMaskSign = () => {
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl">
-      <h2 className="text-2xl font-bold text-gray-100 mb-4">Sign Message with MetaMask</h2>
+      <h2 className="text-2xl font-bold text-gray-100 mb-4">{t('metamaskSign.title')}</h2>
       
       {/* Wallet Connection */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-200 mb-2">Wallet Connection</h3>
+        <h3 className="text-lg font-semibold text-gray-200 mb-2">{t('metamaskSign.walletConnection')}</h3>
         {account ? (
           <div className="flex flex-col space-y-2">
             <div className="bg-gray-700 p-3 rounded text-gray-200 break-all">
-              <span className="font-semibold">Connected Account:</span> {account}
+              <span className="font-semibold">{t('metamaskSign.connectedAccount')}</span> {account}
             </div>
           </div>
         ) : (
@@ -173,14 +175,14 @@ const MetaMaskSign = () => {
             disabled={isConnecting}
             className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded transition duration-300 disabled:opacity-50"
           >
-            {isConnecting ? 'Connecting...' : 'Connect MetaMask'}
+            {isConnecting ? t('metamaskSign.connecting') : t('metamaskSign.connect')}
           </button>
         )}
       </div>
 
       {/* Message to Sign */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-200 mb-2">Message to Sign</h3>
+        <h3 className="text-lg font-semibold text-gray-200 mb-2">{t('metamaskSign.messageToSign')}</h3>
         <div className="flex flex-col space-y-2">
           <textarea
             value={message}
@@ -192,7 +194,7 @@ const MetaMaskSign = () => {
             onClick={generateMessage}
             className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition duration-300"
           >
-            Regenerate Default Message
+            {t('metamaskSign.regenerate')}
           </button>
         </div>
       </div>
@@ -204,14 +206,14 @@ const MetaMaskSign = () => {
           disabled={!account || !message || isSigning}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition duration-300 disabled:opacity-50 w-full"
         >
-          {isSigning ? 'Signing...' : 'Sign Message with MetaMask'}
+          {isSigning ? t('metamaskSign.signing') : t('metamaskSign.signButton')}
         </button>
       </div>
 
       {/* Display Signature */}
       {signature && (
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-200 mb-2">Signature</h3>
+          <h3 className="text-lg font-semibold text-gray-200 mb-2">{t('metamaskSign.signature')}</h3>
           <div className="bg-gray-700 p-3 rounded text-gray-200 break-all">
             {signature}
           </div>
@@ -233,8 +235,8 @@ const MetaMaskSign = () => {
       
       {/* Information */}
       <div className="mt-6 text-gray-400 text-sm">
-        <p>This feature allows you to sign messages with your Ethereum wallet via MetaMask.</p>
-        <p className="mt-2">The signature can be used to verify your ownership of the connected wallet address.</p>
+        <p>{t('metamaskSign.information')}</p>
+        <p className="mt-2">{t('metamaskSign.verify')}</p>
       </div>
     </div>
   );

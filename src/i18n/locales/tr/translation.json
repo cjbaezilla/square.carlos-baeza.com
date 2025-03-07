@@ -14,5 +14,141 @@
     "blockchainBasics": "Blockchain ve Web3 Temelleri",
     "userProfile": "Kullanıcı Profili",
     "web3Auth": "Web3 Kimlik Doğrulama"
+  },
+  "blockchainGuide": {
+    "title": "Blockchain ve Web3 Rehberi",
+    "intro": "Blockchain teknolojisinde yeni misiniz? Bu rehber Web3, kripto para birimleri ve dijital varlıklar dünyasını anlamanıza yardımcı olmak için temel kavramları basit terimlerle açıklar.",
+    "selectTopic": "Hakkında daha fazla bilgi edinmek için yukarıdaki bir konuyu seçin",
+    "evolving": "Bu teknolojiler sürekli gelişiyor! Bu rehber, başlamanıza yardımcı olmak için temel açıklamalar sunar.",
+    "close": "Kapat",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "MetaMask nedir?",
+        "description": "MetaMask, web tarayıcınız veya cep telefonunuz için dijital cüzdan uygulaması gibidir. Dijital cüzdan ve blockchain uygulamalarına erişmenizi sağlayan özel bir anahtarın birleşimi olarak düşünün.",
+        "whatItDoes": "İşte MetaMask'ın yaptıkları:",
+        "items": [
+          "Dijital para birimlerinizi (Ethereum gibi) saklar",
+          "Blockchain tabanlı web sitelerine ve uygulamalara bağlanmanızı sağlar",
+          "Blockchain uygulamaları için giriş kimliğiniz olarak görev yapar (kullanıcı adı/şifre gerekmez!)"
+        ],
+        "comparison": "Google veya Facebook hesabınızı çeşitli web sitelerinde oturum açmak için kullanabileceğiniz gibi, MetaMask da blockchain adresinizi kullanarak blockchain uygulamaları ve hizmetleriyle etkileşim kurmanızı sağlar."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "Web3 nedir?",
+        "description": "Web3, blockchain teknolojisi kullanılarak oluşturulan bir sonraki nesil internettir. Bugün kullandığımız internetten daha açık, merkezi olmayan ve kullanıcı kontrollü olacak şekilde tasarlanmıştır.",
+        "comparison": "Web3'ün mevcut internetten farkı:",
+        "items": [
+          "<strong>Web1 (1990'lar):</strong> Sadece okuma amaçlı web siteleri. Sadece içerik tüketebilirdiniz.",
+          "<strong>Web2 (2000'ler-günümüz):</strong> Hem okuyabileceğiniz hem de içerik oluşturabileceğiniz interaktif web siteleri, ancak büyük şirketler verilerinizi ve platformları kontrol ediyor (Facebook, Google gibi).",
+          "<strong>Web3 (gelişen):</strong> Verilerinize, dijital varlıklarınıza ve içeriğinize sahip olduğunuz bir internet. Hiçbir şirket her şeyi kontrol etmez ve dijital kimliğinizi farklı uygulamalar arasında taşıyabilirsiniz."
+        ],
+        "dapps": "Web3 uygulamaları genellikle \"dApps\" (merkezi olmayan uygulamalar) olarak adlandırılır çünkü tek bir şirketin sahip olduğu sunucular yerine merkezi olmayan ağlarda çalışırlar."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "Ethereum nedir?",
+        "description": "Ethereum, küresel, merkezi olmayan bir bilgisayar gibi çalışan bir blockchain platformudur. Bitcoin esas olarak dijital para birimi olarak tasarlanırken, Ethereum çok daha fazlasını yapmak için oluşturulmuştur.",
+        "keyThings": "Ethereum hakkında bilinmesi gereken anahtar bilgiler:",
+        "items": [
+          "Ağdaki işlem ve hizmetleri ödemek için kullanılan Ether (ETH) adlı kendi kripto para birimine sahiptir",
+          "Geliştiricilerin \"akıllı sözleşmeler\" oluşturmasına ve dağıtmasına olanak tanır — koşulları doğrudan koda yazılmış kendi kendine yürütülen anlaşmalardır",
+          "Finans, sanat, oyun, sosyal medya ve daha fazlası alanında binlerce merkezi olmayan uygulama (dApps) destekler"
+        ],
+        "platform": "Ethereum'u, tek bir kurumun kontrol etmediği yeni tür uygulamaları mümkün kılan bir platform olarak düşünün — bunun yerine, kurallar dünya çapında binlerce bilgisayarda çalışan kod tarafından uygulanır."
+      },
+      "evm": {
+        "title": "EVM (Ethereum Sanal Makinesi)",
+        "heading": "EVM nedir?",
+        "description": "Ethereum Sanal Makinesi (EVM), Ethereum blockchain'ini çalıştıran motordur. Akıllı sözleşmeleri çalıştıran özel bir bilgi işlem ortamıdır.",
+        "understanding": "EVM'yi anlamak için:",
+        "items": [
+          "Binlerce bireysel makinede dağıtılmış devasa, küresel bir bilgisayar gibi düşünün",
+          "Programları (akıllı sözleşmeleri) ağdaki her bilgisayarda tam olarak aynı şekilde çalıştırır",
+          "İşlemlerin öngörülebilir, doğrulanabilir olduğunu ve kurcalanamadığını sağlar"
+        ],
+        "importance": "EVM önemlidir çünkü uygulamaların güvensiz çalışabileceği tutarlı bir ortam oluşturur — yani kodu doğru şekilde yürütmek için herhangi bir şirkete veya kişiye güvenmenize gerek yoktur, çünkü tüm ağ bunu doğrular."
+      },
+      "defi": {
+        "title": "DeFi (Merkezi Olmayan Finans)",
+        "heading": "DeFi nedir?",
+        "description": "DeFi veya Merkezi Olmayan Finans, geleneksel bankalar ve finansal kurumlar yerine blockchain teknolojisi kullanarak finansal hizmetleri yeniden tasarlar.",
+        "allows": "DeFi uygulamaları şunları yapmanıza olanak tanır:",
+        "items": [
+          "Kripto paranızı ödünç vererek faiz kazanmak",
+          "Diğer kripto paraları teminat olarak kullanarak kripto para ödünç almak",
+          "Bir borsa veya aracı olmadan kripto para birimleri alıp satmak",
+          "Geleneksel bankalardan tipik olarak daha yüksek faiz oranlarına sahip tasarruf benzeri hesaplar oluşturmak",
+          "Sigorta, türevler ve diğer finansal ürünleri satın almak"
+        ],
+        "difference": "Temel fark, DeFi'nin aracılarsız çalışmasıdır. Bir banka işlemlerinizi onaylamak ve işlemek yerine, akıllı sözleşmeler (otomatik kod) önceden tanımlanmış kurallara göre her şeyi halleder. Bu genellikle daha düşük ücretler, daha hızlı işlem ve konumları veya geçmişleri ne olursa olsun internet bağlantısı olan herkes için erişim anlamına gelir."
+      },
+      "nfts": {
+        "title": "NFT'ler (Değiştirilemez Tokenlar)",
+        "heading": "NFT'ler nedir?",
+        "description": "NFT'ler (Değiştirilemez Tokenlar), blockchain yönetimli sahipliğe sahip benzersiz dijital öğelerdir. Bunları, yerleşik orijinallik ve sahiplik kanıtına sahip dijital koleksiyonlar olarak düşünün.",
+        "nonFungible": "\"Değiştirilemez\" basitçe her birinin benzersiz olduğu ve başka bir aynı öğeyle değiştirilemeyeceği anlamına gelir. Bu, her madeni paranın diğeriyle aynı olduğu (değiştirilebilir) Bitcoin gibi kripto para birimlerinden farklıdır.",
+        "represent": "NFT'ler şunları temsil edebilir:",
+        "items": [
+          "Dijital sanat ve illüstrasyonlar",
+          "Müzik ve videolar",
+          "Oyunlardaki sanal araziler ve eşyalar",
+          "Etkinlik biletleri",
+          "Üyelikler ve erişim geçişleri",
+          "Hatta gerçek dünyadaki öğelerin temsilleri"
+        ],
+        "ownership": "Bir NFT'ye sahip olduğunuzda, blockchain o belirli dijital öğenin sahibi olduğunuzu kanıtlayan bir kamu kaydı görevi görür. Onu tutabilir, gösterebilir veya başkasına satabilirsiniz. Sanatçılar ve yaratıcılar, galeriler veya diğer aracılara ihtiyaç duymadan çalışmalarını doğrudan hayranlarına satmak için sıklıkla NFT'leri kullanırlar."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "MetaMask ile Mesaj İmzalama",
+    "walletConnection": "Cüzdan Bağlantısı",
+    "connectedAccount": "Bağlı Hesap:",
+    "connect": "MetaMask'e Bağlan",
+    "connecting": "Bağlanıyor...",
+    "messageToSign": "İmzalanacak Mesaj",
+    "regenerate": "Varsayılan Mesajı Yeniden Oluştur",
+    "signButton": "MetaMask ile Mesaj İmzala",
+    "signing": "İmzalanıyor...",
+    "signature": "İmza",
+    "information": "Bu özellik, MetaMask aracılığıyla Ethereum cüzdanınızla mesajlar imzalamanıza olanak tanır.",
+    "verify": "İmza, bağlı cüzdan adresinin sahipliğini doğrulamak için kullanılabilir.",
+    "walletRequired": "Web3 Cüzdanı Gerekli",
+    "metamaskNotInstalled": "MetaMask kurulu değil",
+    "requiresMetamask": "Bu özellik, mesajları imzalamak için MetaMask veya uyumlu bir web3 cüzdanı gerektirir.",
+    "installMetamask": "MetaMask'i Kur",
+    "afterInstalling": "MetaMask'i kurduktan sonra:",
+    "steps": [
+      "Bir cüzdan oluşturun veya içe aktarın",
+      "Ethereum ağına bağlanın",
+      "Bu sayfayı yenileyin"
+    ]
+  },
+  "userProfile": {
+    "loading": "Profil yükleniyor...",
+    "userNotFound": "Kullanıcı bulunamadı",
+    "email": "E-posta",
+    "noEmail": "E-posta bilgisi yok",
+    "web3Wallet": "Web3 Cüzdanı",
+    "noWallet": "Web3 cüzdanı bağlı değil",
+    "lastSignIn": "Son Giriş",
+    "never": "Hiç giriş yapılmadı",
+    "invalidDate": "Geçersiz tarih",
+    "timeAgo": {
+      "seconds": "{{count}} saniye önce",
+      "seconds_plural": "{{count}} saniye önce",
+      "minutes": "{{count}} dakika önce",
+      "minutes_plural": "{{count}} dakika önce",
+      "hours": "{{count}} saat önce",
+      "hours_plural": "{{count}} saat önce",
+      "days": "{{count}} gün önce",
+      "days_plural": "{{count}} gün önce",
+      "months": "{{count}} ay önce",
+      "months_plural": "{{count}} ay önce",
+      "years": "{{count}} yıl önce",
+      "years_plural": "{{count}} yıl önce"
+    }
   }
 } 
