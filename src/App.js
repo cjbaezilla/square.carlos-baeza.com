@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SignedIn, SignedOut, UserButton, SignInButton, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import './App.css';
@@ -11,7 +11,50 @@ import UserRewardsPage from './rewards/UserRewardsPage';
 import PointsBadge from './rewards/PointsBadge';
 import MascotsPage from './mascots/MascotsPage';
 import ItemsPage from './items/ItemsPage';
+import MascotProfile from './mascots/MascotProfile';
 import MascotService, { MASCOT_UPDATED_EVENT } from './mascots/MascotService';
+import ItemService, { ITEM_UPDATED_EVENT, ITEM_RARITIES } from './items/ItemService';
+
+// Custom CSS in JSX for ensuring SVGs are visible
+const svgStyles = {
+  '.item-svg-container svg': {
+    width: '100%',
+    height: '100%',
+    stroke: 'currentColor',
+    strokeWidth: '2px',
+    minWidth: '24px',
+    minHeight: '24px'
+  },
+  '.item-svg-container svg *': {
+    stroke: 'currentColor',
+    strokeWidth: '2px'
+  }
+};
+
+// Helper function to ensure user has some sample items if empty
+const ensureUserHasSampleItems = (userId) => {
+  const items = ItemService.getUserItems(userId);
+  console.log('Current user items before ensuring samples:', items);
+  
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    console.log('User has no items, adding samples...');
+    // Add a few sample items if the user doesn't have any
+    const sampleItems = ItemService.getSampleItems();
+    console.log('Sample items generated:', sampleItems);
+    
+    if (sampleItems && Array.isArray(sampleItems) && sampleItems.length > 0) {
+      for (let i = 0; i < Math.min(3, sampleItems.length); i++) {
+        console.log('Adding sample item to inventory:', sampleItems[i]);
+        ItemService.addItemToUserInventory(userId, sampleItems[i]);
+      }
+      
+      const updatedItems = ItemService.getUserItems(userId);
+      console.log('Updated items after adding samples:', updatedItems);
+      return updatedItems;
+    }
+  }
+  return items;
+};
 
 function App() {
   // eslint-disable-next-line no-unused-vars
@@ -20,20 +63,33 @@ function App() {
   const [currentRoute, setCurrentRoute] = useState(window.location.hash || '#/');
   const [userMascots, setUserMascots] = useState([]);
   const [activeMascot, setActiveMascot] = useState(null);
+  const [userItems, setUserItems] = useState([]);
   
-  // Simple routing based on hash
-  useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentRoute(window.location.hash || '#/');
-    };
-    
-    window.addEventListener('hashchange', handleHashChange);
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
+  // Fetch and update items - extracted as a separate function to reuse
+  const fetchAndUpdateItems = useCallback(() => {
+    if (isSignedIn && user) {
+      try {
+        // Force initialization of user items data structure if it doesn't exist
+        ItemService.initUserItemsData(user.id);
+        
+        // Get user's items, adding samples if needed
+        const items = ensureUserHasSampleItems(user.id);
+        console.log('Loaded user items:', items);
+        
+        if (items && Array.isArray(items)) {
+          setUserItems(items);
+        } else {
+          console.warn('Items not available or not an array:', items);
+          setUserItems([]);
+        }
+      } catch (error) {
+        console.error('Error fetching items:', error);
+        setUserItems([]);
+      }
+    }
+  }, [isSignedIn, user]);
 
-  // Load user's mascots
+  // Load user's data on initial render
   useEffect(() => {
     if (isSignedIn && user) {
       // Get user's mascots
@@ -43,8 +99,11 @@ function App() {
       // Get user's active mascot
       const active = MascotService.getUserActiveMascot(user.id);
       setActiveMascot(active);
+      
+      // Fetch items
+      fetchAndUpdateItems();
     }
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user, fetchAndUpdateItems]);
 
   // Listen for mascot updates
   useEffect(() => {
@@ -64,6 +123,64 @@ function App() {
       document.removeEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
     };
   }, [isSignedIn, user]);
+
+  // Listen for item updates
+  useEffect(() => {
+    const handleItemUpdate = (event) => {
+      console.log('Item update event received:', event.detail);
+      if (isSignedIn && user) {
+        fetchAndUpdateItems();
+      }
+    };
+    
+    document.addEventListener(ITEM_UPDATED_EVENT, handleItemUpdate);
+    
+    return () => {
+      document.removeEventListener(ITEM_UPDATED_EVENT, handleItemUpdate);
+    };
+  }, [isSignedIn, user, fetchAndUpdateItems]);
+
+  // Simple routing based on hash
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentRoute(window.location.hash || '#/');
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  // Apply custom styles for SVG rendering
+  useEffect(() => {
+    // Create a style element if it doesn't exist
+    let styleElement = document.getElementById('custom-svg-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'custom-svg-styles';
+      document.head.appendChild(styleElement);
+    }
+    
+    // Add the CSS rules
+    let cssRules = '';
+    for (const [selector, rules] of Object.entries(svgStyles)) {
+      cssRules += `${selector} { `;
+      for (const [property, value] of Object.entries(rules)) {
+        cssRules += `${property}: ${value}; `;
+      }
+      cssRules += '} ';
+    }
+    
+    styleElement.textContent = cssRules;
+    
+    // Cleanup
+    return () => {
+      if (styleElement && document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement);
+      }
+    };
+  }, []);
 
   const renderContent = () => {
     switch (currentRoute) {
@@ -105,20 +222,26 @@ function App() {
               {/* User Profile Card */}
               <UserProfileCard />
               
-              {/* Badges Quick View */}
+              {/* Active Mascot */}
               <div className="bg-gray-900 p-4 rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('badges.recent', 'Recent Badges')}</h3>
-                <p className="text-gray-400 mb-2">{t('badges.quick_view', 'Quick view of your earned badges')}</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-block px-3 py-1 bg-blue-900 text-blue-100 rounded-full text-xs">Web3</span>
-                  <span className="inline-block px-3 py-1 bg-purple-900 text-purple-100 rounded-full text-xs">Blockchain</span>
-                  <span className="inline-block px-3 py-1 bg-green-900 text-green-100 rounded-full text-xs">Active User</span>
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('mascots.active_robot', 'Active Mascot')}</h3>
+               
+                <div className="mt-3 w-full">
+                  <MascotProfile />
                 </div>
-                <div className="mt-3">
-                  <a href="#/badges" className="text-blue-400 text-sm hover:underline">
-                    {t('badges.view_all', 'View all badges')} →
-                  </a>
-                </div>
+
+                {/* Mascot Link */}
+                <a 
+                  href="#/mascots" 
+                  className="text-green-400 hover:text-green-300 text-sm mt-2 transition-colors duration-200"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.hash = '#/mascots';
+                  }}
+                >
+                  {t('mascot.manage', 'Manage mascots')}
+                </a>
+               
               </div>
             </div>
             
@@ -207,35 +330,117 @@ function App() {
               <div className="bg-gray-900 p-4 rounded-lg shadow">
                 <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('items.robot_items', 'Robot Items')}</h3>
                 <p className="text-gray-400 mb-2">{t('items.description', 'Collect special items to upgrade your mascots')}</p>
-                <div className="flex justify-center gap-4 my-2">
-                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-green-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="5" />
-                      <circle cx="12" cy="12" r="2" />
-                      <line x1="12" y1="7" x2="12" y2="3" />
-                      <line x1="12" y1="21" x2="12" y2="17" />
-                      <line x1="7" y1="12" x2="3" y2="12" />
-                      <line x1="21" y1="12" x2="17" y2="12" />
-                    </svg>
+                
+                {userItems && userItems.length > 0 ? (
+                  <div className="flex flex-col gap-3">
+                    {userItems.slice(0, 3).map(item => {
+                      // Check if the item is equipped using either equippedTo or equipped property
+                      const isEquipped = item.equippedTo !== undefined ? 
+                        item.equippedTo !== null : 
+                        (item.equipped === true);
+                        
+                      return (
+                        <div 
+                          key={item.instanceId || item.id}
+                          className="bg-gray-800 rounded-lg p-2.5 flex items-center gap-3 hover:bg-gray-750 transition-colors"
+                        >
+                          {/* Item Icon */}
+                          <div 
+                            className="w-12 h-12 flex-shrink-0 flex items-center justify-center item-svg-container overflow-hidden rounded relative"
+                            style={{ 
+                              borderColor: ITEM_RARITIES[item.rarity]?.color || '#ffffff',
+                              borderWidth: '2px',
+                              borderStyle: 'solid',
+                              backgroundColor: 'rgba(0,0,0,0.2)',
+                              color: ITEM_RARITIES[item.rarity]?.color || '#ffffff' 
+                            }}
+                          >
+                            <div 
+                              className="w-full h-full flex items-center justify-center"
+                              dangerouslySetInnerHTML={{ __html: item.svg }} 
+                            />
+                            
+                            {/* Show equipped indicator on the icon */}
+                            {isEquipped && (
+                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full w-4 h-4 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white" className="w-3 h-3">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Item Details */}
+                          <div className="flex-grow min-w-0">
+                            <div className="font-medium text-gray-200 truncate">{item.name}</div>
+                            <div className="flex items-center justify-between text-xs mt-0.5">
+                              <span 
+                                className="rounded px-1.5 py-0.5 text-[10px] font-medium" 
+                                style={{ 
+                                  backgroundColor: `${ITEM_RARITIES[item.rarity]?.color}20`, 
+                                  color: ITEM_RARITIES[item.rarity]?.color || '#ffffff'
+                                }}
+                              >
+                                {ITEM_RARITIES[item.rarity]?.name || 'Unknown'}
+                              </span>
+                              
+                              {isEquipped ? (
+                                <span className="text-green-400 flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  Equipped
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">Not equipped</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-blue-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="6" y="6" width="12" height="12" />
-                      <line x1="6" y1="10" x2="18" y2="10" />
-                      <line x1="6" y1="14" x2="18" y2="14" />
-                      <line x1="10" y1="6" x2="10" y2="18" />
-                      <line x1="14" y1="6" x2="14" y2="18" />
-                    </svg>
+                ) : (
+                  <div className="flex justify-center gap-4 my-2">
+                    <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-green-400 p-2 item-svg-container">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <circle cx="12" cy="12" r="2" />
+                        <line x1="12" y1="7" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="17" />
+                        <line x1="7" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="17" y2="12" />
+                      </svg>
+                    </div>
+                    <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-blue-400 p-2 item-svg-container">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="6" y="6" width="12" height="12" />
+                        <line x1="6" y1="10" x2="18" y2="10" />
+                        <line x1="6" y1="14" x2="18" y2="14" />
+                        <line x1="10" y1="6" x2="10" y2="18" />
+                        <line x1="14" y1="6" x2="14" y2="18" />
+                      </svg>
+                    </div>
+                    <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-yellow-400 p-2 item-svg-container">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 3 L20 7 L20 13 C20 17.4183 16.4183 21 12 21 C7.58172 21 4 17.4183 4 13 L4 7 L12 3Z" />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-yellow-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 3 L20 7 L20 13 C20 17.4183 16.4183 21 12 21 C7.58172 21 4 17.4183 4 13 L4 7 L12 3Z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <a href="#/items" className="text-blue-400 text-sm hover:underline">
-                    {t('items.manage', 'Manage items')} →
+                )}
+                
+                <div className="mt-4 text-center">
+                  <a href="#/items" className="text-blue-400 text-sm hover:underline inline-flex items-center justify-center">
+                    {userItems && userItems.length > 0 
+                      ? (
+                        <>
+                          {t('items.manage', 'Manage all items')} 
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </>
+                      ) 
+                      : t('items.get_items', 'Get items') + ' →'}
                   </a>
                 </div>
               </div>

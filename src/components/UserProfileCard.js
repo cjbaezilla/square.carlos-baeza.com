@@ -5,7 +5,6 @@ import BadgeDisplay from '../badges/BadgeDisplay';
 import BadgeService from '../badges/BadgeService';
 import PointsService from '../rewards/PointsService';
 import PointsBadge from '../rewards/PointsBadge';
-import MascotProfile from '../mascots/MascotProfile';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
@@ -122,10 +121,6 @@ const UserProfileCard = () => {
           {user.fullName || 'User'}
         </h2>
         
-        {/* Active Mascot */}
-        <div className="mt-3 w-full">
-          <MascotProfile />
-        </div>
         
         {/* Badges Section */}
         <div className="mt-4 w-full">
@@ -159,17 +154,7 @@ const UserProfileCard = () => {
           </a>
         )}
         
-        {/* Mascot Link */}
-        <a 
-          href="#/mascots" 
-          className="text-green-400 hover:text-green-300 text-sm mt-2 transition-colors duration-200"
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.hash = '#/mascots';
-          }}
-        >
-          {t('mascot.manage', 'Manage mascots')}
-        </a>
+        
       </div>
 
       <div className="space-y-2 mt-4">

@@ -358,9 +358,16 @@ class ItemService {
     localStorage.setItem(this.userItemsKey, JSON.stringify(data));
     
     // Dispatch a custom event when items are updated
+    // Include both the full data object and information about which user was updated
+    const updatedUserIds = Object.keys(data);
     const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-      detail: { itemsData: data }
+      detail: { 
+        itemsData: data,
+        updatedUserIds: updatedUserIds,
+        timestamp: Date.now()
+      }
     });
+    console.log('Dispatching item update event:', updatedUserIds);
     document.dispatchEvent(event);
   }
   
@@ -375,18 +382,34 @@ class ItemService {
   
   // Add item to user's inventory
   addItemToUserInventory(userId, item) {
+    console.log(`Adding item to user ${userId} inventory:`, item);
+    
     const itemsData = this.getAllUserItemsData();
     if (!itemsData[userId]) {
+      console.log(`Initializing items data for user ${userId}`);
       this.initUserItemsData(userId);
     }
     
     // Generate a unique instance ID for the item
     const itemInstance = {
       ...item,
-      instanceId: `${item.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+      instanceId: `${item.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      equippedTo: null
     };
     
+    console.log(`Created item instance:`, itemInstance);
+    
+    // Ensure inventory array exists
+    if (!itemsData[userId].inventory) {
+      console.log(`Creating inventory array for user ${userId}`);
+      itemsData[userId].inventory = [];
+    }
+    
+    // Add item to inventory
     itemsData[userId].inventory.push(itemInstance);
+    console.log(`Updated inventory (${itemsData[userId].inventory.length} items)`);
+    
+    // Save updated data
     this.saveUserItemsData(itemsData);
     
     return itemInstance;
@@ -574,6 +597,64 @@ class ItemService {
     });
     
     return totalStats;
+  }
+  
+  // Get user's points
+  getUserPoints(userId) {
+    // Get user's items
+    const userItems = this.getUserItems(userId);
+    
+    // Calculate total value of all items
+    let totalPoints = 0;
+    for (const item of userItems) {
+      totalPoints += this.getItemValue(item);
+    }
+    
+    return totalPoints;
+  }
+  
+  // Get value of an item based on rarity
+  getItemValue(item) {
+    const rarityValues = {
+      'COMMON': 10,
+      'UNCOMMON': 25,
+      'RARE': 50,
+      'EPIC': 100,
+      'LEGENDARY': 250
+    };
+    
+    return rarityValues[item.rarity] || 0;
+  }
+  
+  // Get sample items for new users
+  getSampleItems() {
+    // Return first 10 items from the ITEMS array as samples
+    return ITEMS.slice(0, 10).map(item => {
+      // Add width/height/viewBox attributes if missing from the SVG
+      let enhancedSVG = item.svg;
+      
+      // Ensure the SVG has width and height attributes
+      if (!enhancedSVG.includes('width=') || !enhancedSVG.includes('height=')) {
+        enhancedSVG = enhancedSVG.replace('<svg', '<svg width="100%" height="100%"');
+      }
+      
+      // For better visibility, add fill attribute if it's "none"
+      if (enhancedSVG.includes('fill="none"')) {
+        enhancedSVG = enhancedSVG.replace('fill="none"', `fill="none" stroke-width="2"`);
+      }
+      
+      return {
+        ...item,
+        svg: enhancedSVG,
+        instanceId: `sample-${item.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        equippedTo: null
+      };
+    });
+  }
+  
+  // Create a random item instance
+  createRandomItemInstance() {
+    // ... existing code ...
   }
 }
 
