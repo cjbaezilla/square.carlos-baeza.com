@@ -122,17 +122,17 @@ const UserProfileCard = () => {
         </h2>
         
         {/* Badges Section */}
-        <div className="mt-3 flex flex-wrap justify-center">
+        <div className="mt-4 w-full">
           <BadgeDisplay 
             userId={user.id} 
             size="sm" 
             limit={5} 
-            className="mt-1"
+            className="flex flex-wrap justify-center gap-3 mx-auto"
           />
         </div>
         
         {/* Points Display */}
-        <div className="mt-3">
+        <div className="mt-4">
           <PointsBadge />
         </div>
         
