@@ -11,9 +11,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center py-12">
-      <div className="max-w-3xl w-full px-6 py-8 bg-white shadow-md rounded-lg">
-        <div className="absolute top-4 right-4">
+    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center py-12 transition-colors duration-200">
+      <div className="max-w-3xl w-full px-6 py-8 bg-gray-800 shadow-md rounded-lg transition-colors duration-200">
+        <div className="absolute top-4 right-4 flex items-center space-x-4">
           <SignedIn>
             {/* Mount UserButton component only if user is signed in */}
             <UserButton />
@@ -21,20 +21,20 @@ function App() {
           <SignedOut>
             {/* Mount sign in button only if user is signed out */}
             <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">
+              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition duration-300">
                 Sign in
               </button>
             </SignInButton>
           </SignedOut>
         </div>
 
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        <h1 className="text-3xl font-bold text-center text-gray-100 mb-8 transition-colors duration-200">
           Welcome to My React App
         </h1>
         
         <SignedIn>
-          <div className="text-gray-700 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">User Information</h2>
+          <div className="text-gray-300 mb-6 transition-colors duration-200">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">User Information</h2>
             
             {!isLoaded ? (
               <p>Loading user information...</p>
@@ -49,44 +49,44 @@ function App() {
                     />
                   )}
                   <div>
-                    <h3 className="text-xl font-medium">{user.fullName || 'No name provided'}</h3>
-                    <p className="text-gray-500">{user.primaryEmailAddress?.emailAddress || 'No email provided'}</p>
+                    <h3 className="text-xl font-medium text-gray-100">{user.fullName || 'No name provided'}</h3>
+                    <p className="text-gray-400">{user.primaryEmailAddress?.emailAddress || 'No email provided'}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Basic Information</h4>
+                  <div className="bg-gray-700 p-4 rounded-lg transition-colors duration-200">
+                    <h4 className="font-medium mb-2 text-gray-100">Basic Information</h4>
                     <ul className="space-y-2">
-                      <li><span className="font-semibold">User ID:</span> {user.id}</li>
-                      <li><span className="font-semibold">Username:</span> {user.username || 'Not set'}</li>
-                      <li><span className="font-semibold">First Name:</span> {user.firstName || 'Not provided'}</li>
-                      <li><span className="font-semibold">Last Name:</span> {user.lastName || 'Not provided'}</li>
-                      <li><span className="font-semibold">Created:</span> {user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}</li>
-                      <li><span className="font-semibold">Updated:</span> {user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'N/A'}</li>
+                      <li><span className="font-semibold text-gray-300">User ID:</span> <span className="text-gray-400">{user.id}</span></li>
+                      <li><span className="font-semibold text-gray-300">Username:</span> <span className="text-gray-400">{user.username || 'Not set'}</span></li>
+                      <li><span className="font-semibold text-gray-300">First Name:</span> <span className="text-gray-400">{user.firstName || 'Not provided'}</span></li>
+                      <li><span className="font-semibold text-gray-300">Last Name:</span> <span className="text-gray-400">{user.lastName || 'Not provided'}</span></li>
+                      <li><span className="font-semibold text-gray-300">Created:</span> <span className="text-gray-400">{user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}</span></li>
+                      <li><span className="font-semibold text-gray-300">Updated:</span> <span className="text-gray-400">{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'N/A'}</span></li>
                     </ul>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Contact Information</h4>
+                  <div className="bg-gray-700 p-4 rounded-lg transition-colors duration-200">
+                    <h4 className="font-medium mb-2 text-gray-100">Contact Information</h4>
                     <ul className="space-y-2">
                       <li>
-                        <span className="font-semibold">Primary Email:</span> {user.primaryEmailAddress?.emailAddress || 'None'}
+                        <span className="font-semibold text-gray-300">Primary Email:</span> <span className="text-gray-400">{user.primaryEmailAddress?.emailAddress || 'None'}</span>
                         {user.primaryEmailAddress?.verification?.status && 
-                          <span className={`ml-2 px-2 py-1 text-xs rounded ${user.primaryEmailAddress.verification.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          <span className={`ml-2 px-2 py-1 text-xs rounded ${user.primaryEmailAddress.verification.status === 'verified' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'}`}>
                             {user.primaryEmailAddress.verification.status}
                           </span>
                         }
                       </li>
                       <li>
-                        <span className="font-semibold">Email Addresses:</span>
-                        <ul className="pl-4">
+                        <span className="font-semibold text-gray-300">Email Addresses:</span>
+                        <ul className="pl-4 text-gray-400">
                           {user.emailAddresses && user.emailAddresses.length > 0 ? (
                             user.emailAddresses.map(email => (
                               <li key={email.id}>
                                 {email.emailAddress}
                                 {email.verification?.status && 
-                                  <span className={`ml-2 px-2 py-1 text-xs rounded ${email.verification.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                  <span className={`ml-2 px-2 py-1 text-xs rounded ${email.verification.status === 'verified' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'}`}>
                                     {email.verification.status}
                                   </span>
                                 }
@@ -98,14 +98,14 @@ function App() {
                         </ul>
                       </li>
                       <li>
-                        <span className="font-semibold">Phone Numbers:</span>
-                        <ul className="pl-4">
+                        <span className="font-semibold text-gray-300">Phone Numbers:</span>
+                        <ul className="pl-4 text-gray-400">
                           {user.phoneNumbers && user.phoneNumbers.length > 0 ? (
                             user.phoneNumbers.map(phone => (
                               <li key={phone.id}>
                                 {phone.phoneNumber}
                                 {phone.verification?.status && 
-                                  <span className={`ml-2 px-2 py-1 text-xs rounded ${phone.verification.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                  <span className={`ml-2 px-2 py-1 text-xs rounded ${phone.verification.status === 'verified' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'}`}>
                                     {phone.verification.status}
                                   </span>
                                 }
@@ -122,45 +122,47 @@ function App() {
                 
                 {/* External Accounts/OAuth */}
                 {user.externalAccounts && user.externalAccounts.length > 0 && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">External Accounts</h4>
+                  <div className="bg-gray-700 p-4 rounded-lg transition-colors duration-200">
+                    <h4 className="font-medium mb-2 text-gray-100">External Accounts</h4>
                     <ul className="space-y-2">
                       {user.externalAccounts.map(account => (
                         <li key={account.id}>
-                          <span className="font-semibold">{account.provider}:</span> {account.username || account.emailAddress || 'N/A'}
+                          <span className="font-semibold text-gray-300">{account.provider}:</span> {account.username || account.emailAddress || 'N/A'}
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
-                
-                {/* Display all raw user data for complete information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">Complete User Data (JSON)</h4>
-                  <div className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto" style={{ maxHeight: '300px' }}>
-                    <pre>{formatUserData(user)}</pre>
-                  </div>
-                </div>
               </div>
             ) : (
-              <p className="text-red-500">Error loading user data. Please try signing in again.</p>
+              <p>No user information available</p>
             )}
+          </div>
+          
+          <div className="mt-8 p-4 bg-gray-700 rounded-lg transition-colors duration-200">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">Raw User Data</h2>
+            <pre className="bg-gray-800 p-4 rounded overflow-auto text-sm text-gray-300">
+              {formatUserData(user)}
+            </pre>
           </div>
         </SignedIn>
         
         <SignedOut>
-          <p className="text-gray-600 text-center mb-6">
-            Sign in to see all your account information from Clerk.
-          </p>
-          <div className="flex justify-center">
+          <div className="text-center p-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">Hello there!</h2>
+            <p className="mb-6 text-gray-300">Please sign in to view your profile information.</p>
             <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">
-                Sign In
+              <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300">
+                Sign in with Clerk
               </button>
             </SignInButton>
           </div>
         </SignedOut>
       </div>
+      
+      <footer className="mt-8 text-center text-gray-400">
+        <p>© {new Date().getFullYear()} My App. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
