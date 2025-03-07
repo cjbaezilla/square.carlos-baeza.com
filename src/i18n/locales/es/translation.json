@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "Bienvenido a Mi Aplicación React",
+    "signIn": "Iniciar sesión",
+    "signInWithClerk": "Iniciar sesión con Clerk",
+    "signInMessage": "Por favor, inicia sesión para ver la información de tu perfil.",
+    "footer": "© {{year}} Mi Aplicación. Todos los derechos reservados.",
+    "hello": "¡Hola!"
+  },
+  "navbar": {
+    "selectLanguage": "Seleccionar idioma"
+  },
+  "sections": {
+    "blockchainBasics": "Fundamentos de Blockchain y Web3",
+    "userProfile": "Perfil de Usuario",
+    "web3Auth": "Autenticación Web3"
+  }
+} 

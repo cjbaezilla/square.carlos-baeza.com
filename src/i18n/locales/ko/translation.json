@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "내 React 앱에 오신 것을 환영합니다",
+    "signIn": "로그인",
+    "signInWithClerk": "Clerk으로 로그인",
+    "signInMessage": "프로필 정보를 보려면 로그인하세요.",
+    "footer": "© {{year}} 내 앱. 모든 권리 보유.",
+    "hello": "안녕하세요!"
+  },
+  "navbar": {
+    "selectLanguage": "언어 선택"
+  },
+  "sections": {
+    "blockchainBasics": "블록체인 및 Web3 기초",
+    "userProfile": "사용자 프로필",
+    "web3Auth": "Web3 인증"
+  }
+} 

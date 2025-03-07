@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "私のReactアプリへようこそ",
+    "signIn": "サインイン",
+    "signInWithClerk": "Clerkでサインイン",
+    "signInMessage": "プロフィール情報を表示するにはサインインしてください。",
+    "footer": "© {{year}} マイアプリ。全著作権所有。",
+    "hello": "こんにちは！"
+  },
+  "navbar": {
+    "selectLanguage": "言語を選択"
+  },
+  "sections": {
+    "blockchainBasics": "ブロックチェーンとWeb3の基礎",
+    "userProfile": "ユーザープロフィール",
+    "web3Auth": "Web3認証"
+  }
+} 

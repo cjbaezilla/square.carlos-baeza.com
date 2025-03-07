@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "Willkommen bei Meiner React-App",
+    "signIn": "Anmelden",
+    "signInWithClerk": "Mit Clerk anmelden",
+    "signInMessage": "Bitte melden Sie sich an, um Ihre Profilinformationen anzuzeigen.",
+    "footer": "© {{year}} Meine App. Alle Rechte vorbehalten.",
+    "hello": "Hallo!"
+  },
+  "navbar": {
+    "selectLanguage": "Sprache auswählen"
+  },
+  "sections": {
+    "blockchainBasics": "Blockchain & Web3-Grundlagen",
+    "userProfile": "Benutzerprofil",
+    "web3Auth": "Web3-Authentifizierung"
+  }
+} 

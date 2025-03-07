@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "React Uygulamama Hoş Geldiniz",
+    "signIn": "Giriş yap",
+    "signInWithClerk": "Clerk ile giriş yap",
+    "signInMessage": "Profil bilgilerinizi görmek için lütfen giriş yapın.",
+    "footer": "© {{year}} Uygulamam. Tüm hakları saklıdır.",
+    "hello": "Merhaba!"
+  },
+  "navbar": {
+    "selectLanguage": "Dil seçin"
+  },
+  "sections": {
+    "blockchainBasics": "Blockchain ve Web3 Temelleri",
+    "userProfile": "Kullanıcı Profili",
+    "web3Auth": "Web3 Kimlik Doğrulama"
+  }
+} 

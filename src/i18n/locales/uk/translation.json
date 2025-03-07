@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "Ласкаво просимо до Мого React Додатку",
+    "signIn": "Увійти",
+    "signInWithClerk": "Увійти через Clerk",
+    "signInMessage": "Будь ласка, увійдіть, щоб переглянути інформацію свого профілю.",
+    "footer": "© {{year}} Мій Додаток. Усі права захищені.",
+    "hello": "Привіт!"
+  },
+  "navbar": {
+    "selectLanguage": "Вибрати мову"
+  },
+  "sections": {
+    "blockchainBasics": "Основи Blockchain і Web3",
+    "userProfile": "Профіль Користувача",
+    "web3Auth": "Web3 Аутентифікація"
+  }
+} 

@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "Benvenuto nella Mia App React",
+    "signIn": "Accedi",
+    "signInWithClerk": "Accedi con Clerk",
+    "signInMessage": "Accedi per visualizzare le informazioni del tuo profilo.",
+    "footer": "© {{year}} La Mia App. Tutti i diritti riservati.",
+    "hello": "Ciao!"
+  },
+  "navbar": {
+    "selectLanguage": "Seleziona lingua"
+  },
+  "sections": {
+    "blockchainBasics": "Fondamenti di Blockchain e Web3",
+    "userProfile": "Profilo Utente",
+    "web3Auth": "Autenticazione Web3"
+  }
+} 

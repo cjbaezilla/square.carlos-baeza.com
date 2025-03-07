@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "Chào mừng đến với Ứng dụng React của tôi",
+    "signIn": "Đăng nhập",
+    "signInWithClerk": "Đăng nhập với Clerk",
+    "signInMessage": "Vui lòng đăng nhập để xem thông tin hồ sơ của bạn.",
+    "footer": "© {{year}} Ứng dụng của tôi. Đã đăng ký bản quyền.",
+    "hello": "Xin chào!"
+  },
+  "navbar": {
+    "selectLanguage": "Chọn ngôn ngữ"
+  },
+  "sections": {
+    "blockchainBasics": "Cơ bản về Blockchain & Web3",
+    "userProfile": "Hồ sơ người dùng",
+    "web3Auth": "Xác thực Web3"
+  }
+} 

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { ClerkProvider } from '@clerk/clerk-react';
+// Import i18n configuration
+import './i18n';
 
 // Get the publishable key from environment variables
 const publishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;

@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "مرحبًا بك في تطبيق React الخاص بي",
+    "signIn": "تسجيل الدخول",
+    "signInWithClerk": "تسجيل الدخول باستخدام Clerk",
+    "signInMessage": "يرجى تسجيل الدخول لعرض معلومات ملفك الشخصي.",
+    "footer": "© {{year}} تطبيقي. جميع الحقوق محفوظة.",
+    "hello": "مرحبًا!"
+  },
+  "navbar": {
+    "selectLanguage": "اختر اللغة"
+  },
+  "sections": {
+    "blockchainBasics": "أساسيات البلوكتشين والويب3",
+    "userProfile": "الملف الشخصي للمستخدم",
+    "web3Auth": "مصادقة الويب3"
+  }
+} 

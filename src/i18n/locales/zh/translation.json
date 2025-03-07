@@ -1,0 +1,18 @@
+{
+  "common": {
+    "welcome": "欢迎使用我的React应用",
+    "signIn": "登录",
+    "signInWithClerk": "使用Clerk登录",
+    "signInMessage": "请登录以查看您的个人资料信息。",
+    "footer": "© {{year}} 我的应用。保留所有权利。",
+    "hello": "你好！"
+  },
+  "navbar": {
+    "selectLanguage": "选择语言"
+  },
+  "sections": {
+    "blockchainBasics": "区块链和Web3基础",
+    "userProfile": "用户资料",
+    "web3Auth": "Web3认证"
+  }
+} 
