@@ -294,34 +294,152 @@ const ItemsPage = () => {
   // Render the item shop tab
   const renderShopTab = () => (
     <div className="mb-4">
-      <div className="flex items-center mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-100">
-            {t('items.mystery_item', 'Mystery Item')}
-          </h3>
-          <p className="text-gray-300 text-sm">
-            {t('items.shop_description', 'Spend your points to get a random robot part. Who knows what you\'ll get!')}
-          </p>
-        </div>
-        <div className="text-right">
-          <div className="text-yellow-400 font-bold mb-1">
-            {userPoints} {t('points', 'Points')}
+      <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm border border-gray-700 rounded-xl p-6 shadow-xl">
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
+          {/* Shop header and points display */}
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold text-gray-100 mb-2">
+              {t('items.mystery_item', 'Robot Parts Shop')}
+            </h3>
+            <p className="text-gray-300">
+              {t('items.shop_description', 'Unlock powerful robot parts to enhance your mascots and dominate the arena!')}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {Object.entries(ITEM_RARITIES).map(([key, rarity]) => (
+                <div 
+                  key={key} 
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs"
+                  style={{ backgroundColor: `${rarity.color}20`, color: rarity.color, border: `1px solid ${rarity.color}40` }}
+                >
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: rarity.color }}></span>
+                  <span>{rarity.name}</span>
+                  <span className="opacity-70">{rarity.weight}%</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <button 
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
-            onClick={handlePurchaseItem}
-            disabled={userPoints < 50}
-          >
-            {t('items.purchase', 'Purchase')} (50 {t('points', 'Points')})
-          </button>
+          
+          {/* Points and purchase button */}
+          <div className="w-full md:w-auto flex flex-col items-center">
+            <div className="bg-gray-900 border border-yellow-500/20 rounded-xl p-4 mb-4 w-full md:w-auto">
+              <div className="text-center">
+                <div className="text-sm text-gray-400 mb-1">{t('items.your_balance', 'YOUR BALANCE')}</div>
+                <div className="text-3xl font-bold text-yellow-400 flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {userPoints}
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handlePurchaseItem}
+              disabled={userPoints < 50}
+              className={`w-full px-6 py-4 rounded-xl font-bold text-white shadow-lg transition-all duration-300 ${
+                userPoints >= 50 
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:scale-105 hover:shadow-indigo-500/30' 
+                  : 'bg-gray-700 cursor-not-allowed opacity-70'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clipRule="evenodd" />
+                </svg>
+                {t('items.purchase_mystery_item', 'Unlock Mystery Item')} (50 {t('points', 'Points')})
+              </div>
+            </button>
+          </div>
         </div>
+        
+        {/* Mystery crate section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gray-900 bg-opacity-70 rounded-xl p-5 border border-gray-700">
+            <h4 className="text-lg font-semibold text-gray-100 mb-3">
+              {t('items.what_you_get', 'What You Might Get')}
+            </h4>
+            <div className="space-y-3">
+              <div className="flex gap-2 items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border-2 border-yellow-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium">{t('items.type_head_armor', 'Head Armor')}</div>
+                  <div className="text-xs text-gray-400">{t('items.increases_defense', 'Increases defense stats')}</div>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border-2 border-purple-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium">{t('items.type_power_core', 'Power Core')}</div>
+                  <div className="text-xs text-gray-400">{t('items.increases_energy', 'Boosts energy and attack power')}</div>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border-2 border-blue-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h4.59l-2.1 1.95a.75.75 0 001.02 1.1l3.5-3.25a.75.75 0 000-1.1l-3.5-3.25a.75.75 0 10-1.02 1.1l2.1 1.95H6.75z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium">{t('items.type_cpu', 'CPU')}</div>
+                  <div className="text-xs text-gray-400">{t('items.increases_logic', 'Enhances logical capabilities')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-900 bg-opacity-70 rounded-xl p-5 border border-gray-700">
+            <h4 className="text-lg font-semibold text-gray-100 mb-3">
+              {t('items.why_unlock', 'Why Unlock Items?')}
+            </h4>
+            <ul className="space-y-2 text-gray-300">
+              <li className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>{t('items.benefit_stronger', 'Make your mascots stronger in battles')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>{t('items.benefit_rare', 'Collect rare and legendary pieces for your collection')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>{t('items.benefit_customize', 'Customize and build unique mascot loadouts')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>{t('items.benefit_achieve', 'Complete achievements and collections')}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        {userPoints < 50 && (
+          <div className="mt-6 p-4 bg-gradient-to-r from-amber-900/30 to-yellow-700/20 border border-yellow-600/30 rounded-lg flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <div>
+              <h4 className="font-semibold text-yellow-400">{t('items.need_more_points', 'Need more points?')}</h4>
+              <p className="text-sm text-gray-300">{t('items.earn_points_message', 'Complete activities and tasks to earn more points and unlock exciting items for your collection!')}</p>
+            </div>
+          </div>
+        )}
       </div>
-      
-      {userPoints < 50 && (
-        <div className="p-2 bg-gray-800 text-yellow-400 rounded">
-          {t('items.not_enough_points', 'You don\'t have enough points to purchase an item. Complete activities to earn more!')}
-        </div>
-      )}
     </div>
   );
 
@@ -332,47 +450,89 @@ const ItemsPage = () => {
     const rarityInfo = ITEM_RARITIES[newItem.rarity];
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div className="bg-gray-900 border-2 border-gray-700 rounded-lg p-6 max-w-md w-full">
-          <h3 className="text-2xl font-bold text-center mb-4 text-white">
-            {t('items.you_got', 'You Got!')}
+      <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-gray-900 border-2 rounded-2xl p-8 max-w-md w-full relative overflow-hidden"
+             style={{ borderColor: rarityInfo.color }}>
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden opacity-20">
+            <div className="absolute top-0 left-0 w-40 h-40 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 filter blur-xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-0 w-60 h-60 rounded-full bg-gradient-to-r from-red-500 to-yellow-500 filter blur-xl animate-pulse"></div>
+          </div>
+          
+          {/* Rarity beam effect above item */}
+          <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-transparent to-transparent"
+               style={{ background: `radial-gradient(ellipse at 50% 0%, ${rarityInfo.color}30 0%, transparent 70%)` }}>
+          </div>
+          
+          <h3 className="text-3xl font-bold text-center mb-6 relative">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">{t('items.you_got', 'You Got!')}</span>
           </h3>
           
-          <div className="text-center">
-            <div 
-              className="mx-auto w-32 h-32 mb-4 p-4 rounded-full" 
-              style={{ backgroundColor: 'rgba(0,0,0,0.3)', border: `2px solid ${rarityInfo.color}` }}
-              dangerouslySetInnerHTML={{ __html: newItem.svg }}
-            />
-            
-            <div className="text-xl font-bold mb-1" style={{ color: rarityInfo.color }}>
-              {newItem.name}
+          <div className="text-center relative z-10">
+            {/* Item container with glow effect */}
+            <div className="relative mb-6 transition-all duration-500 animate-float">
+              <div 
+                className="mx-auto w-40 h-40 mb-2 p-4 rounded-full bg-gray-800 flex items-center justify-center relative transform transition-transform hover:scale-105" 
+                style={{ 
+                  boxShadow: `0 0 40px ${rarityInfo.color}40`,
+                  border: `2px solid ${rarityInfo.color}` 
+                }}
+              >
+                <div className="w-full h-full" dangerouslySetInnerHTML={{ __html: newItem.svg }} />
+              </div>
+              
+              {/* Rarity indicator */}
+              <div 
+                className="absolute -top-2 -right-2 px-3 py-1 rounded-full text-xs font-bold animate-pulse"
+                style={{ backgroundColor: rarityInfo.color, color: '#111' }}
+              >
+                {rarityInfo.name}
+              </div>
             </div>
             
-            <div className="text-sm text-gray-300 mb-2">
-              {rarityInfo.name} {newItem.type}
+            <div className="mb-6">
+              <div className="text-2xl font-bold mb-1" style={{ color: rarityInfo.color }}>
+                {newItem.name}
+              </div>
+              
+              <div className="inline-block px-3 py-1 rounded-lg text-sm mb-2 bg-gray-800 text-gray-300">
+                {newItem.type}
+              </div>
+              
+              <div className="text-gray-400 mb-5 text-sm">
+                {newItem.description}
+              </div>
             </div>
             
-            <div className="text-gray-400 mb-4">
-              {newItem.description}
-            </div>
-            
-            <div className="grid grid-cols-3 gap-2 text-sm mb-4">
+            {/* Stats with improved visuals */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm mb-6">
               {Object.entries(newItem.stats).map(([stat, value]) => (
                 value !== 0 ? (
-                  <div key={stat} className={`py-1 rounded ${value > 0 ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}>
-                    {stat.toUpperCase()}: {value > 0 ? `+${value}` : value}
+                  <div 
+                    key={stat} 
+                    className={`py-2 rounded-lg flex flex-col items-center justify-center transition-transform hover:scale-105 ${
+                      value > 0 ? 'bg-green-900/50 text-green-200' : 'bg-red-900/50 text-red-200'
+                    }`}
+                  >
+                    <span className="text-xs uppercase opacity-70">{stat}</span>
+                    <span className="text-lg font-bold">{value > 0 ? `+${value}` : value}</span>
                   </div>
                 ) : null
               ))}
             </div>
             
-            <button 
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
-              onClick={handleClosePurchase}
-            >
-              {t('items.awesome', 'Awesome!')}
-            </button>
+            <div className="flex flex-col items-center">
+              <button 
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-blue-500/30 font-medium"
+                onClick={handleClosePurchase}
+              >
+                {t('items.awesome', 'Awesome!')}
+              </button>
+              
+              <div className="mt-4 text-xs text-gray-500">
+                {t('items.auto_inventory', 'Item automatically added to your inventory')}
+              </div>
+            </div>
           </div>
         </div>
       </div>
