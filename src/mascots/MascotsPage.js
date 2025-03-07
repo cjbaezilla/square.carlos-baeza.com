@@ -422,12 +422,6 @@ const MascotsPage = () => {
                             isActive={mascot.id === activeMascotId}
                             onActivate={handleActivate}
                           />
-                          <button
-                            className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-full"
-                            onClick={() => handleTrainMascot(mascot)}
-                          >
-                            {t('mascot.train', 'Train')}
-                          </button>
                         </div>
                       ))}
                     </div>
