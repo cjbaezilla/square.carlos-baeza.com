@@ -332,8 +332,8 @@ function App() {
                 <p className="text-gray-400 mb-2">{t('items.description', 'Collect special items to upgrade your mascots')}</p>
                 
                 {userItems && userItems.length > 0 ? (
-                  <div className="flex flex-col gap-3">
-                    {userItems.slice(0, 3).map(item => {
+                  <div className="flex flex-row gap-3 overflow-x-auto pb-2">
+                    {userItems.slice(0, 5).map(item => {
                       // Check if the item is equipped using the ItemService method
                       const isEquipped = isSignedIn && user ? 
                         ItemService.isItemEquipped(user.id, item.instanceId) : 
@@ -342,11 +342,11 @@ function App() {
                       return (
                         <div 
                           key={item.instanceId || item.id}
-                          className="bg-gray-800 rounded-lg p-2.5 flex items-center gap-3 hover:bg-gray-750 transition-colors"
+                          className="bg-gray-800 rounded-lg p-3 flex flex-col items-center hover:bg-gray-750 transition-colors min-w-[100px] w-[100px]"
                         >
                           {/* Item Icon */}
                           <div 
-                            className="w-12 h-12 flex-shrink-0 flex items-center justify-center item-svg-container overflow-hidden rounded relative"
+                            className="w-12 h-12 flex-shrink-0 flex items-center justify-center item-svg-container overflow-hidden rounded relative mb-2"
                             style={{ 
                               borderColor: ITEM_RARITIES[item.rarity]?.color || '#ffffff',
                               borderWidth: '2px',
@@ -371,11 +371,11 @@ function App() {
                           </div>
                           
                           {/* Item Details */}
-                          <div className="flex-grow min-w-0">
-                            <div className="font-medium text-gray-200 truncate">{item.name}</div>
-                            <div className="flex items-center justify-between text-xs mt-0.5">
+                          <div className="w-full text-center">
+                            <div className="font-medium text-gray-200 text-sm truncate">{item.name}</div>
+                            <div className="flex flex-col items-center mt-1 gap-1">
                               <span 
-                                className="rounded px-1.5 py-0.5 text-[10px] font-medium" 
+                                className="rounded px-1.5 py-0.5 text-[10px] font-medium w-full text-center" 
                                 style={{ 
                                   backgroundColor: `${ITEM_RARITIES[item.rarity]?.color}20`, 
                                   color: ITEM_RARITIES[item.rarity]?.color || '#ffffff'
@@ -384,15 +384,13 @@ function App() {
                                 {ITEM_RARITIES[item.rarity]?.name || 'Unknown'}
                               </span>
                               
-                              {isEquipped ? (
-                                <span className="text-green-400 flex items-center">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                              {isEquipped && (
+                                <span className="text-green-400 text-[10px] flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 mr-0.5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                   Equipped
                                 </span>
-                              ) : (
-                                <span className="text-gray-400">Not equipped</span>
                               )}
                             </div>
                           </div>
@@ -401,7 +399,7 @@ function App() {
                     })}
                   </div>
                 ) : (
-                  <div className="flex justify-center gap-4 my-2">
+                  <div className="flex flex-row gap-3 justify-center my-2">
                     <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-green-400 p-2 item-svg-container">
                       <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="5" />
