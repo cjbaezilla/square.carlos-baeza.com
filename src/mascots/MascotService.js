@@ -155,6 +155,26 @@ export const MASCOTS = [
           <path d="M48 20 L56 30 L48 40" stroke="#f39c12" />
           <circle cx="32" cy="12" r="2" stroke="#f39c12" fill="#e74c3c" />
         </svg>`
+  },
+  {
+    id: 'nexus-guardian',
+    name: 'Nexus Guardian',
+    description: 'An ancient AI defender with crystalline armor and dimensional manipulation abilities.',
+    price: 550,
+    stats: { hp: 90, mp: 120, agility: 7, power: 8, defense: 10 },
+    rarity: 'legendary',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <polygon points="32,4 40,10 48,16 40,22 32,28 24,22 16,16 24,10" stroke="#8e44ad" fill="#d2b4de" />
+          <rect x="24" y="24" width="16" height="20" rx="0" stroke="#8e44ad" fill="#d2b4de" />
+          <circle cx="28" cy="30" r="3" stroke="#8e44ad" fill="#f5eef8" />
+          <circle cx="36" cy="30" r="3" stroke="#8e44ad" fill="#f5eef8" />
+          <path d="M20 44 L28 54 L36 54 L44 44" stroke="#8e44ad" fill="#d2b4de" />
+          <path d="M12 30 L20 26 M52 30 L44 26" stroke="#8e44ad" />
+          <line x1="24" y1="36" x2="40" y2="36" stroke="#8e44ad" />
+          <path d="M24 16 L40 16" stroke="#8e44ad" stroke-dasharray="2 1" />
+          <path d="M20 44 L12 52 M44 44 L52 52" stroke="#8e44ad" stroke-dasharray="2 1" />
+          <circle cx="32" cy="16" r="4" stroke="#8e44ad" fill="#a569bd" />
+        </svg>`
   }
 ];
 
