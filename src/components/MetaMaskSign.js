@@ -11,11 +11,22 @@ const MetaMaskSign = () => {
   const [success, setSuccess] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
+  const [isMetaMaskAvailable, setIsMetaMaskAvailable] = useState(false);
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = () => {
     return typeof window !== 'undefined' && window.ethereum !== undefined;
   };
+
+  // Check for MetaMask on component mount
+  useEffect(() => {
+    setIsMetaMaskAvailable(isMetaMaskInstalled());
+    
+    // Generate message once user is loaded, if MetaMask is available
+    if (user && isMetaMaskInstalled()) {
+      generateMessage();
+    }
+  }, [user]);
 
   // Connect to MetaMask
   const connectWallet = async () => {
@@ -60,6 +71,11 @@ const MetaMaskSign = () => {
     setError('');
     setSuccess('');
     setSignature('');
+    
+    if (!isMetaMaskInstalled()) {
+      setError('MetaMask is not installed. Please install MetaMask to continue.');
+      return;
+    }
     
     if (!account) {
       setError('Please connect your wallet first');
@@ -107,12 +123,36 @@ const MetaMaskSign = () => {
     }
   };
 
-  // Generate message when user is available
-  useEffect(() => {
-    if (user) {
-      generateMessage();
-    }
-  }, [user]);
+  // Render the MetaMask installation message if MetaMask is not available
+  if (!isMetaMaskAvailable) {
+    return (
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 className="text-2xl font-bold text-gray-100 mb-4">Web3 Wallet Required</h2>
+        
+        <div className="mb-6 p-4 bg-yellow-800 text-yellow-100 rounded">
+          <p className="text-lg font-semibold mb-2">MetaMask is not installed</p>
+          <p className="mb-3">This feature requires MetaMask or a compatible web3 wallet to sign messages.</p>
+          <a 
+            href="https://metamask.io/download/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded transition duration-300"
+          >
+            Install MetaMask
+          </a>
+        </div>
+        
+        <div className="mt-4 text-gray-400 text-sm">
+          <p>After installing MetaMask:</p>
+          <ol className="list-decimal pl-5 mt-2 space-y-1">
+            <li>Create or import a wallet</li>
+            <li>Connect to the Ethereum network</li>
+            <li>Refresh this page</li>
+          </ol>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl">
