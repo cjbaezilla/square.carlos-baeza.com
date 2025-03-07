@@ -4,7 +4,7 @@ import { useUser } from '@clerk/clerk-react';
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
 
-  // Function to format the last sign-in time in a human-readable format
+  // Function to format the last sign-in time as "time since"
   const formatLastSignIn = (dateString) => {
     if (!dateString) return 'Never signed in';
     
@@ -13,17 +13,28 @@ const UserProfileCard = () => {
     // Check if date is valid
     if (isNaN(date.getTime())) return 'Invalid date';
     
-    // Options for formatting
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInSecs = Math.floor(diffInMs / 1000);
+    const diffInMins = Math.floor(diffInSecs / 60);
+    const diffInHours = Math.floor(diffInMins / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInMonths = Math.floor(diffInDays / 30);
+    const diffInYears = Math.floor(diffInDays / 365);
     
-    return date.toLocaleDateString(undefined, options);
+    if (diffInSecs < 60) {
+      return `${diffInSecs} second${diffInSecs !== 1 ? 's' : ''} ago`;
+    } else if (diffInMins < 60) {
+      return `${diffInMins} minute${diffInMins !== 1 ? 's' : ''} ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    } else if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    } else if (diffInMonths < 12) {
+      return `${diffInMonths} month${diffInMonths !== 1 ? 's' : ''} ago`;
+    } else {
+      return `${diffInYears} year${diffInYears !== 1 ? 's' : ''} ago`;
+    }
   };
 
   // Octagonal clip-path for the avatar
