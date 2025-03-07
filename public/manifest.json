@@ -1,0 +1,9 @@
+{
+  "short_name": "Carlos Baeza",
+  "name": "Carlos Baeza Square",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
