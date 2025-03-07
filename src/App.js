@@ -11,11 +11,15 @@ import UserRewardsPage from './rewards/UserRewardsPage';
 import PointsBadge from './rewards/PointsBadge';
 import MascotsPage from './mascots/MascotsPage';
 import ItemsPage from './items/ItemsPage';
+import MascotService, { MASCOT_UPDATED_EVENT } from './mascots/MascotService';
 
 function App() {
+  // eslint-disable-next-line no-unused-vars
   const { user, isLoaded, isSignedIn } = useUser();
   const { t } = useTranslation();
   const [currentRoute, setCurrentRoute] = useState(window.location.hash || '#/');
+  const [userMascots, setUserMascots] = useState([]);
+  const [activeMascot, setActiveMascot] = useState(null);
   
   // Simple routing based on hash
   useEffect(() => {
@@ -28,6 +32,38 @@ function App() {
       window.removeEventListener('hashchange', handleHashChange);
     };
   }, []);
+
+  // Load user's mascots
+  useEffect(() => {
+    if (isSignedIn && user) {
+      // Get user's mascots
+      const mascots = MascotService.getUserMascots(user.id);
+      setUserMascots(mascots);
+      
+      // Get user's active mascot
+      const active = MascotService.getUserActiveMascot(user.id);
+      setActiveMascot(active);
+    }
+  }, [isSignedIn, user]);
+
+  // Listen for mascot updates
+  useEffect(() => {
+    const handleMascotUpdate = (event) => {
+      if (isSignedIn && user && event.detail.userId === user.id) {
+        const mascots = MascotService.getUserMascots(user.id);
+        setUserMascots(mascots);
+        
+        const active = MascotService.getUserActiveMascot(user.id);
+        setActiveMascot(active);
+      }
+    };
+    
+    document.addEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
+    
+    return () => {
+      document.removeEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
+    };
+  }, [isSignedIn, user]);
 
   const renderContent = () => {
     switch (currentRoute) {
@@ -105,22 +141,62 @@ function App() {
               {/* Mascots Quick View */}
               <div className="bg-gray-900 p-4 rounded-lg shadow">
                 <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('mascots.your_mascots', 'Your Mascots')}</h3>
-                <p className="text-gray-400 mb-2">{t('mascots.description', 'Collect and train robot mascots')}</p>
-                <div className="flex justify-center my-2">
-                  <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="#3498db" strokeWidth="2">
-                      <rect x="18" y="14" width="28" height="22" rx="2" />
-                      <circle cx="28" cy="22" r="3" />
-                      <circle cx="36" cy="22" r="3" />
-                      <rect x="26" y="36" width="12" height="12" rx="1" />
-                      <line x1="22" y1="22" x2="14" y2="24" />
-                      <line x1="42" y1="22" x2="50" y2="24" />
-                    </svg>
+                <p className="text-gray-400 mb-2">
+                  {userMascots.length > 0 
+                    ? `${t('mascots.you_have', 'You have')} ${userMascots.length} ${userMascots.length === 1 ? t('mascots.mascot', 'mascot') : t('mascots.mascots', 'mascots')}`
+                    : t('mascots.description', 'Collect and train robot mascots')}
+                </p>
+                
+                {userMascots.length > 0 ? (
+                  <div className="flex flex-col items-center my-2">
+                    {activeMascot ? (
+                      <>
+                        <div 
+                          className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center p-2 mb-2"
+                          dangerouslySetInnerHTML={{ __html: activeMascot.svg }}
+                        />
+                        <div className="text-sm font-medium text-gray-200 mb-1">{activeMascot.name}</div>
+                        <div className="text-xs text-green-400">
+                          {t('mascots.active_mascot', 'Active Mascot')}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {userMascots.slice(0, 3).map(mascot => (
+                          <div 
+                            key={mascot.id}
+                            className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center p-1"
+                            dangerouslySetInnerHTML={{ __html: mascot.svg }}
+                          />
+                        ))}
+                        {userMascots.length > 3 && (
+                          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
+                            <span className="text-gray-400 text-sm">+{userMascots.length - 3}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <div className="flex justify-center my-2">
+                    <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="#3498db" strokeWidth="2">
+                        <rect x="18" y="14" width="28" height="22" rx="2" />
+                        <circle cx="28" cy="22" r="3" />
+                        <circle cx="36" cy="22" r="3" />
+                        <rect x="26" y="36" width="12" height="12" rx="1" />
+                        <line x1="22" y1="22" x2="14" y2="24" />
+                        <line x1="42" y1="22" x2="50" y2="24" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="mt-3">
                   <a href="#/mascots" className="text-blue-400 text-sm hover:underline">
-                    {t('mascots.manage', 'Manage mascots')} →
+                    {userMascots.length > 0 
+                      ? t('mascots.manage', 'Manage mascots')
+                      : t('mascots.get_mascots', 'Get mascots')} →
                   </a>
                 </div>
               </div>
@@ -226,6 +302,16 @@ function App() {
             </div>
             <div className="flex items-center gap-4">
               <LanguageSelector />
+              <SignedIn>
+                <div className="px-3 py-1.5 bg-gray-800 rounded-lg flex items-center">
+                  <span className="text-yellow-400 mr-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </span>
+                  <PointsBadge compact={true} />
+                </div>
+              </SignedIn>
               <SignedIn>
                 <UserButton afterSignOutUrl="/" />
               </SignedIn>
