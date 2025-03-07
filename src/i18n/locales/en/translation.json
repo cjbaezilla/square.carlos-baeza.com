@@ -12,13 +12,15 @@
   },
   "nav": {
     "home": "Home",
-    "badges": "Badges"
+    "badges": "Badges",
+    "rewards": "Rewards"
   },
   "sections": {
     "blockchainBasics": "Blockchain & Web3 Basics",
     "userProfile": "User Profile",
     "web3Auth": "Web3 Authentication",
-    "badges": "User Badges"
+    "badges": "User Badges",
+    "rewards": "Rewards & Points"
   },
   "badges": {
     "title": "User Badges",
@@ -205,5 +207,25 @@
       "years": "{{count}} year ago",
       "years_plural": "{{count}} years ago"
     }
+  },
+  "rewards": {
+    "points": "Points",
+    "level": "Level",
+    "pointsToNextLevel": "points to next level",
+    "viewGuide": "View Guide",
+    "viewGuideDesc": "Learn about blockchain basics",
+    "completeProfile": "Complete Profile",
+    "completeProfileDesc": "Fill in your user profile",
+    "viewed": "viewed",
+    "notViewed": "Not viewed",
+    "completed": "Completed",
+    "incomplete": "Incomplete",
+    "recentActivity": "Recent Activity",
+    "dailyLogin": "Daily Login",
+    "viewedGuide": "Viewed Guide",
+    "profileCompleted": "Profile Completed",
+    "noActivityYet": "No activity yet. Start earning points!",
+    "signInPrompt": "Sign in to track your rewards",
+    "pointsDescription": "Earn points by completing actions and reach new levels!"
   }
 } 

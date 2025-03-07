@@ -32,7 +32,9 @@ const BadgesPage = () => {
     );
   }
   
-  const userBadgeIds = BadgeService.getUserBadges(user.id);
+  const userBadges = BadgeService.getUserBadges(user.id);
+  const userBadgeIds = userBadges.map(badge => badge.id);
+  
   const earnedBadges = Object.values(BADGES).filter(badge => 
     userBadgeIds.includes(badge.id)
   );
@@ -43,6 +45,11 @@ const BadgesPage = () => {
   const displayBadges = activeTab === 'earned' ? earnedBadges : 
                        activeTab === 'available' ? availableBadges : 
                        Object.values(BADGES);
+  
+  // Helper function to check if user has earned a badge
+  const hasEarnedBadge = (badgeId) => {
+    return userBadgeIds.includes(badgeId);
+  };
   
   return (
     <div className="space-y-6">
@@ -100,7 +107,7 @@ const BadgesPage = () => {
             <div 
               key={badge.id} 
               className={`p-4 rounded-lg ${
-                activeTab === 'earned' || (activeTab === 'all' && userBadgeIds.includes(badge.id)) 
+                activeTab === 'earned' || (activeTab === 'all' && hasEarnedBadge(badge.id)) 
                   ? 'bg-gray-700' 
                   : 'bg-gray-750 opacity-80'
               }`}
@@ -111,7 +118,7 @@ const BadgesPage = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">{badge.name}</h3>
-                  {userBadgeIds.includes(badge.id) && (
+                  {hasEarnedBadge(badge.id) && (
                     <span className="text-xs bg-green-600 text-white px-2 py-1 rounded-full">
                       {t('badges.earned', 'Earned')}
                     </span>
@@ -119,7 +126,7 @@ const BadgesPage = () => {
                 </div>
               </div>
               <p className="text-gray-300 text-sm mb-4">{badge.description}</p>
-              {!userBadgeIds.includes(badge.id) && (
+              {!hasEarnedBadge(badge.id) && (
                 <div className="text-xs text-gray-400">
                   {t('badges.keepParticipating', 'Keep participating to earn this badge!')}
                 </div>

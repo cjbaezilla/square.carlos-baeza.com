@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import BadgeDisplay from '../badges/BadgeDisplay';
 import BadgeService from '../badges/BadgeService';
+import PointsService from '../rewards/PointsService';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
@@ -12,8 +13,27 @@ const UserProfileCard = () => {
     // Check for badges to award whenever the user profile loads
     if (user) {
       BadgeService.checkAndAwardBadges(user);
+      
+      // Check if user has completed their profile to award points
+      const isProfileComplete = checkProfileCompletion(user);
+      if (isProfileComplete) {
+        PointsService.awardProfileCompletionPoints(user.id);
+      }
     }
   }, [user]);
+
+  // Check if user has completed important profile fields
+  const checkProfileCompletion = (user) => {
+    if (!user) return false;
+    
+    // Consider profile complete if user has filled out these fields
+    return Boolean(
+      user.firstName && 
+      user.lastName && 
+      user.emailAddresses?.length > 0 && 
+      user.imageUrl
+    );
+  };
 
   // Function to format the last sign-in time as "time since"
   const formatLastSignIn = (dateString) => {

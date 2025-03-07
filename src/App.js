@@ -7,6 +7,8 @@ import MetaMaskSign from './components/MetaMaskSign';
 import BlockchainGuide from './components/BlockchainGuide';
 import LanguageSelector from './components/LanguageSelector';
 import BadgesPage from './badges/BadgesPage';
+import UserRewardsPage from './rewards/UserRewardsPage';
+import PointsBadge from './rewards/PointsBadge';
 
 function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -32,6 +34,13 @@ function App() {
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.badges', 'User Badges')}</h2>
             <BadgesPage />
+          </div>
+        );
+      case '#/rewards':
+        return (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.rewards', 'Rewards & Points')}</h2>
+            <UserRewardsPage />
           </div>
         );
       default:
@@ -94,6 +103,14 @@ function App() {
               {t('nav.badges', 'Badges')}
             </a>
           </li>
+          <li>
+            <a 
+              href="#/rewards" 
+              className={`hover:text-white transition-colors ${currentRoute === '#/rewards' ? 'text-white font-medium' : ''}`}
+            >
+              {t('nav.rewards', 'Rewards')}
+            </a>
+          </li>
         </SignedIn>
       </ul>
     </nav>
@@ -103,6 +120,9 @@ function App() {
     <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center py-12 transition-colors duration-200">
       <div className="max-w-3xl w-full px-6 py-8 bg-gray-800 shadow-md rounded-lg transition-colors duration-200">
         <div className="absolute top-4 right-4 flex items-center space-x-4">
+          <SignedIn>
+            <PointsBadge compact={true} />
+          </SignedIn>
           <LanguageSelector />
           <SignedIn>
             {/* Mount UserButton component only if user is signed in */}

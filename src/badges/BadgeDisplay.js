@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BadgeService, { BADGES } from './BadgeService';
+import BadgeService from './BadgeService';
 import { useTranslation } from 'react-i18next';
 
 // Size classes object moved outside to be accessible by both components
@@ -13,7 +13,8 @@ const sizeClasses = {
 // Component to display a single badge
 const Badge = ({ badge, size = 'md', showTooltip = true }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const { t } = useTranslation();
+  // Using t for translations in the tooltip
+  const { t: translate } = useTranslation();
   
   const badgeSize = sizeClasses[size] || sizeClasses.md;
   
@@ -47,9 +48,13 @@ const BadgeDisplay = ({ userId, size = 'md', showEmpty = true, limit = null, cla
   
   useEffect(() => {
     if (userId) {
-      const userBadgeIds = BadgeService.getUserBadges(userId);
-      const userBadges = userBadgeIds.map(id => BadgeService.getBadgeDetails(id)).filter(Boolean);
-      setBadges(userBadges);
+      const userBadges = BadgeService.getUserBadges(userId);
+      // Map badge objects to their details
+      const badgeDetails = userBadges.map(badge => ({
+        ...BadgeService.getBadgeDetails(badge.id),
+        dateAwarded: badge.dateAwarded
+      })).filter(Boolean);
+      setBadges(badgeDetails);
     }
   }, [userId]);
   

@@ -1,5 +1,6 @@
 import React from 'react';
 import i18next from 'i18next';
+import PointsService from '../rewards/PointsService';
 
 // Badge definitions with metadata - using translation keys
 export const BADGES = {
@@ -109,20 +110,36 @@ class BadgeService {
     return storedBadges ? JSON.parse(storedBadges) : [];
   }
 
+  // Add the isValidBadgeId method
+  static isValidBadgeId(badgeId) {
+    // Check if the badge exists in our BADGES object
+    return Object.values(BADGES).some(badge => badge.id === badgeId);
+  }
+
   // Award a badge to a user
   static awardBadge(userId, badgeId) {
-    if (!userId || !badgeId) return false;
-    
-    const userBadges = this.getUserBadges(userId);
-    
-    // Check if user already has this badge
-    if (!userBadges.includes(badgeId)) {
-      userBadges.push(badgeId);
-      localStorage.setItem(`user_badges_${userId}`, JSON.stringify(userBadges));
-      return true;
+    if (!userId || !badgeId || !this.isValidBadgeId(badgeId)) {
+      return false;
     }
-    
-    return false;
+
+    // Check if user already has this badge
+    if (this.hasBadge(userId, badgeId)) {
+      return false; // User already has the badge
+    }
+
+    const userBadges = this.getUserBadges(userId);
+    userBadges.push({
+      id: badgeId,
+      dateAwarded: new Date().toISOString()
+    });
+
+    // Save updated badges
+    localStorage.setItem(`user_badges_${userId}`, JSON.stringify(userBadges));
+
+    // Award points for earning a badge
+    PointsService.awardBadgePoints(userId);
+
+    return true;
   }
 
   // Check if a user has a specific badge
@@ -130,7 +147,8 @@ class BadgeService {
     if (!userId || !badgeId) return false;
     
     const userBadges = this.getUserBadges(userId);
-    return userBadges.includes(badgeId);
+    // Check if the user has a badge with the given ID
+    return userBadges.some(badge => badge.id === badgeId);
   }
 
   // Remove a badge from a user
@@ -138,7 +156,7 @@ class BadgeService {
     if (!userId || !badgeId) return false;
     
     const userBadges = this.getUserBadges(userId);
-    const updatedBadges = userBadges.filter(id => id !== badgeId);
+    const updatedBadges = userBadges.filter(badge => badge.id !== badgeId);
     
     if (updatedBadges.length !== userBadges.length) {
       localStorage.setItem(`user_badges_${userId}`, JSON.stringify(updatedBadges));

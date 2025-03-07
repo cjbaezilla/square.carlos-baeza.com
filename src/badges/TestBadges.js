@@ -51,7 +51,13 @@ const TestBadges = () => {
   };
   
   // Get list of badges this user has
-  const userBadgeIds = BadgeService.getUserBadges(userId);
+  const userBadges = BadgeService.getUserBadges(userId);
+  const userBadgeIds = userBadges.map(badge => badge.id);
+  
+  // Helper function to check if user has a badge
+  const hasBadge = (badgeId) => {
+    return userBadgeIds.includes(badgeId);
+  };
   
   return (
     <div className="bg-gray-800 p-6 rounded-lg">
@@ -71,7 +77,7 @@ const TestBadges = () => {
             <div 
               key={badge.id} 
               className={`p-3 rounded-lg flex flex-col items-center ${
-                userBadgeIds.includes(badge.id) ? 'bg-gray-700' : 'bg-gray-750'
+                hasBadge(badge.id) ? 'bg-gray-700' : 'bg-gray-750'
               }`}
             >
               <div className="w-12 h-12 mb-2">
@@ -82,9 +88,9 @@ const TestBadges = () => {
               <div className="flex space-x-2 mt-auto">
                 <button
                   onClick={() => handleAwardBadge(badge.id)}
-                  disabled={userBadgeIds.includes(badge.id)}
+                  disabled={hasBadge(badge.id)}
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    userBadgeIds.includes(badge.id)
+                    hasBadge(badge.id)
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   }`}
@@ -94,9 +100,9 @@ const TestBadges = () => {
                 
                 <button
                   onClick={() => handleRemoveBadge(badge.id)}
-                  disabled={!userBadgeIds.includes(badge.id)}
+                  disabled={!hasBadge(badge.id)}
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    !userBadgeIds.includes(badge.id)
+                    !hasBadge(badge.id)
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       : 'bg-red-600 hover:bg-red-700 text-white'
                   }`}

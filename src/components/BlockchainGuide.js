@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@clerk/clerk-react';
+import PointsService from '../rewards/PointsService';
 
 const BlockchainGuide = () => {
   const { t } = useTranslation();
   const [activeTopic, setActiveTopic] = useState(null);
+  const { user, isSignedIn } = useUser();
+
+  // Award points for viewing a topic
+  useEffect(() => {
+    if (isSignedIn && user && activeTopic) {
+      // Award points for viewing the guide
+      PointsService.awardGuideViewPoints(user.id);
+    }
+  }, [activeTopic, isSignedIn, user]);
 
   const topics = [
     {
