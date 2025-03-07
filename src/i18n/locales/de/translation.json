@@ -1,19 +1,46 @@
 {
   "common": {
-    "welcome": "Willkommen bei Meiner React-App",
+    "welcome": "Willkommen zu Meiner React App",
     "signIn": "Anmelden",
     "signInWithClerk": "Mit Clerk anmelden",
-    "signInMessage": "Bitte melden Sie sich an, um Ihre Profilinformationen anzuzeigen.",
+    "signInMessage": "Bitte melde dich an, um deine Profilinformationen zu sehen.",
     "footer": "© {{year}} Meine App. Alle Rechte vorbehalten.",
     "hello": "Hallo!"
   },
   "navbar": {
     "selectLanguage": "Sprache auswählen"
   },
+  "nav": {
+    "home": "Startseite",
+    "badges": "Abzeichen"
+  },
   "sections": {
-    "blockchainBasics": "Blockchain & Web3-Grundlagen",
+    "blockchainBasics": "Blockchain & Web3 Grundlagen",
     "userProfile": "Benutzerprofil",
-    "web3Auth": "Web3-Authentifizierung"
+    "web3Auth": "Web3 Authentifizierung",
+    "badges": "Benutzerabzeichen"
+  },
+  "badges": {
+    "title": "Benutzerabzeichen",
+    "noBadges": "Noch keine Abzeichen verdient",
+    "earned": "Erhalten",
+    "available": "Verfügbar",
+    "all": "Alle Abzeichen",
+    "earnedDescription": "Diese Abzeichen zeigen deine Erfolge und deine Teilnahme.",
+    "availableDescription": "Mach weiter, um diese Abzeichen zu verdienen.",
+    "allDescription": "Überblick über alle auf unserer Plattform verfügbaren Abzeichen.",
+    "viewAll": "Alle Abzeichen anzeigen",
+    "signInToView": "Bitte melde dich an, um deine Abzeichen zu sehen",
+    "keepParticipating": "Mach weiter, um dieses Abzeichen zu verdienen!",
+    "noEarnedBadges": "Du hast noch keine Abzeichen verdient. Mach weiter so!",
+    "noBadgesInCategory": "Keine Abzeichen in dieser Kategorie.",
+    "showTestPanel": "Test-Panel anzeigen",
+    "hideTestPanel": "Test-Panel ausblenden",
+    "testPanel": "Abzeichen-Test-Panel",
+    "testDescription": "Mit diesem Panel kannst du das Abzeichen-System testen, indem du manuell Abzeichen verleihst und entfernst.",
+    "availableBadges": "Abzeichen verleihen",
+    "award": "Verleihen",
+    "remove": "Entfernen"
   },
   "blockchainGuide": {
     "title": "Blockchain & Web3-Leitfaden",

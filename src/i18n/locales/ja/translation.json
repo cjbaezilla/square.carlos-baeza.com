@@ -4,16 +4,43 @@
     "signIn": "サインイン",
     "signInWithClerk": "Clerkでサインイン",
     "signInMessage": "プロフィール情報を表示するにはサインインしてください。",
-    "footer": "© {{year}} マイアプリ。全著作権所有。",
+    "footer": "© {{year}} 私のアプリ。全ての権利を保有。",
     "hello": "こんにちは！"
   },
   "navbar": {
     "selectLanguage": "言語を選択"
   },
+  "nav": {
+    "home": "ホーム",
+    "badges": "バッジ"
+  },
   "sections": {
-    "blockchainBasics": "ブロックチェーンとWeb3の基礎",
+    "blockchainBasics": "ブロックチェーンとWeb3の基本",
     "userProfile": "ユーザープロフィール",
-    "web3Auth": "Web3認証"
+    "web3Auth": "Web3認証",
+    "badges": "ユーザーバッジ"
+  },
+  "badges": {
+    "title": "ユーザーバッジ",
+    "noBadges": "まだバッジを獲得していません",
+    "earned": "獲得済み",
+    "available": "利用可能",
+    "all": "すべてのバッジ",
+    "earnedDescription": "これらのバッジはあなたの成果と参加を示しています。",
+    "availableDescription": "これらのバッジを獲得するには引き続き参加してください。",
+    "allDescription": "私たちのプラットフォームで利用可能なすべてのバッジの概要。",
+    "viewAll": "すべてのバッジを表示",
+    "signInToView": "バッジを表示するにはサインインしてください",
+    "keepParticipating": "このバッジを獲得するには引き続き参加してください！",
+    "noEarnedBadges": "まだバッジを獲得していません。引き続き参加してください！",
+    "noBadgesInCategory": "このカテゴリーにバッジはありません。",
+    "showTestPanel": "テストパネルを表示",
+    "hideTestPanel": "テストパネルを非表示",
+    "testPanel": "バッジテストパネル",
+    "testDescription": "このパネルでは、手動でバッジを付与および削除してバッジシステムをテストできます。",
+    "availableBadges": "バッジを付与",
+    "award": "付与",
+    "remove": "削除"
   },
   "blockchainGuide": {
     "title": "ブロックチェーンとWeb3ガイド",

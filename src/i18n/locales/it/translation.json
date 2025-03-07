@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "Seleziona lingua"
   },
+  "nav": {
+    "home": "Home",
+    "badges": "Badge"
+  },
   "sections": {
-    "blockchainBasics": "Fondamenti di Blockchain e Web3",
+    "blockchainBasics": "Blockchain e Web3 - Concetti Base",
     "userProfile": "Profilo Utente",
-    "web3Auth": "Autenticazione Web3"
+    "web3Auth": "Autenticazione Web3",
+    "badges": "Badge Utente"
+  },
+  "badges": {
+    "title": "Badge Utente",
+    "noBadges": "Nessun badge guadagnato finora",
+    "earned": "Guadagnati",
+    "available": "Disponibili",
+    "all": "Tutti i Badge",
+    "earnedDescription": "Questi badge evidenziano i tuoi risultati e la tua partecipazione.",
+    "availableDescription": "Continua a partecipare per guadagnare questi badge.",
+    "allDescription": "Panoramica di tutti i badge disponibili sulla nostra piattaforma.",
+    "viewAll": "Visualizza tutti i badge",
+    "signInToView": "Accedi per visualizzare i tuoi badge",
+    "keepParticipating": "Continua a partecipare per guadagnare questo badge!",
+    "noEarnedBadges": "Non hai ancora guadagnato badge. Continua a partecipare!",
+    "noBadgesInCategory": "Non ci sono badge in questa categoria.",
+    "showTestPanel": "Mostra Pannello di Test",
+    "hideTestPanel": "Nascondi Pannello di Test",
+    "testPanel": "Pannello di Test Badge",
+    "testDescription": "Questo pannello ti permette di testare il sistema di badge assegnando e rimuovendo badge manualmente.",
+    "availableBadges": "Assegna Badge",
+    "award": "Assegna",
+    "remove": "Rimuovi"
   },
   "blockchainGuide": {
     "title": "Guida Blockchain e Web3",

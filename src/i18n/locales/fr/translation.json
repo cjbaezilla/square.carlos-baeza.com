@@ -8,12 +8,39 @@
     "hello": "Bonjour !"
   },
   "navbar": {
-    "selectLanguage": "Sélectionner la langue"
+    "selectLanguage": "Choisir la langue"
+  },
+  "nav": {
+    "home": "Accueil",
+    "badges": "Badges"
   },
   "sections": {
-    "blockchainBasics": "Bases de la Blockchain et du Web3",
+    "blockchainBasics": "Fondamentaux de la Blockchain et du Web3",
     "userProfile": "Profil Utilisateur",
-    "web3Auth": "Authentification Web3"
+    "web3Auth": "Authentification Web3",
+    "badges": "Badges Utilisateur"
+  },
+  "badges": {
+    "title": "Badges Utilisateur",
+    "noBadges": "Aucun badge gagné pour l'instant",
+    "earned": "Obtenus",
+    "available": "Disponibles",
+    "all": "Tous les Badges",
+    "earnedDescription": "Ces badges mettent en valeur vos réalisations et votre participation.",
+    "availableDescription": "Continuez à participer pour gagner ces badges.",
+    "allDescription": "Aperçu de tous les badges disponibles sur notre plateforme.",
+    "viewAll": "Voir tous les badges",
+    "signInToView": "Veuillez vous connecter pour voir vos badges",
+    "keepParticipating": "Continuez à participer pour gagner ce badge !",
+    "noEarnedBadges": "Vous n'avez pas encore gagné de badges. Continuez à participer !",
+    "noBadgesInCategory": "Aucun badge dans cette catégorie.",
+    "showTestPanel": "Afficher le Panneau de Test",
+    "hideTestPanel": "Masquer le Panneau de Test",
+    "testPanel": "Panneau de Test des Badges",
+    "testDescription": "Ce panneau vous permet de tester le système de badges en attribuant et en retirant manuellement des badges.",
+    "availableBadges": "Attribuer des Badges",
+    "award": "Attribuer",
+    "remove": "Retirer"
   },
   "blockchainGuide": {
     "title": "Guide Blockchain et Web3",

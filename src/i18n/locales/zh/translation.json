@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "选择语言"
   },
+  "nav": {
+    "home": "首页",
+    "badges": "徽章"
+  },
   "sections": {
     "blockchainBasics": "区块链和Web3基础",
     "userProfile": "用户资料",
-    "web3Auth": "Web3认证"
+    "web3Auth": "Web3认证",
+    "badges": "用户徽章"
+  },
+  "badges": {
+    "title": "用户徽章",
+    "noBadges": "尚未获得徽章",
+    "earned": "已获得",
+    "available": "可获得",
+    "all": "所有徽章",
+    "earnedDescription": "这些徽章展示了您的成就和参与。",
+    "availableDescription": "继续参与以获得这些徽章。",
+    "allDescription": "我们平台上所有可用徽章的概览。",
+    "viewAll": "查看所有徽章",
+    "signInToView": "请登录以查看您的徽章",
+    "keepParticipating": "继续参与以获得此徽章！",
+    "noEarnedBadges": "您尚未获得任何徽章。继续参与！",
+    "noBadgesInCategory": "此类别中没有徽章。",
+    "showTestPanel": "显示测试面板",
+    "hideTestPanel": "隐藏测试面板",
+    "testPanel": "徽章测试面板",
+    "testDescription": "此面板允许您通过手动授予和移除徽章来测试徽章系统。",
+    "availableBadges": "授予徽章",
+    "award": "授予",
+    "remove": "移除"
   },
   "blockchainGuide": {
     "title": "区块链和Web3指南",

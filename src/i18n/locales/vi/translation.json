@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "Chọn ngôn ngữ"
   },
+  "nav": {
+    "home": "Trang chủ",
+    "badges": "Huy hiệu"
+  },
   "sections": {
     "blockchainBasics": "Cơ bản về Blockchain & Web3",
     "userProfile": "Hồ sơ người dùng",
-    "web3Auth": "Xác thực Web3"
+    "web3Auth": "Xác thực Web3",
+    "badges": "Huy hiệu Người dùng"
+  },
+  "badges": {
+    "title": "Huy hiệu Người dùng",
+    "noBadges": "Chưa có huy hiệu nào được nhận",
+    "earned": "Đã nhận",
+    "available": "Khả dụng",
+    "all": "Tất cả Huy hiệu",
+    "earnedDescription": "Những huy hiệu này thể hiện thành tựu và sự tham gia của bạn.",
+    "availableDescription": "Tiếp tục tham gia để nhận những huy hiệu này.",
+    "allDescription": "Tổng quan về tất cả các huy hiệu có sẵn trên nền tảng của chúng tôi.",
+    "viewAll": "Xem tất cả huy hiệu",
+    "signInToView": "Vui lòng đăng nhập để xem huy hiệu của bạn",
+    "keepParticipating": "Tiếp tục tham gia để nhận huy hiệu này!",
+    "noEarnedBadges": "Bạn chưa nhận được huy hiệu nào. Hãy tiếp tục tham gia!",
+    "noBadgesInCategory": "Không có huy hiệu trong danh mục này.",
+    "showTestPanel": "Hiển thị Bảng Kiểm tra",
+    "hideTestPanel": "Ẩn Bảng Kiểm tra",
+    "testPanel": "Bảng Kiểm tra Huy hiệu",
+    "testDescription": "Bảng này cho phép bạn kiểm tra hệ thống huy hiệu bằng cách gán và xóa huy hiệu thủ công.",
+    "availableBadges": "Cấp Huy hiệu",
+    "award": "Cấp",
+    "remove": "Xóa"
   },
   "blockchainGuide": {
     "title": "Hướng dẫn Blockchain & Web3",

@@ -2,7 +2,7 @@
   "common": {
     "welcome": "내 React 앱에 오신 것을 환영합니다",
     "signIn": "로그인",
-    "signInWithClerk": "Clerk으로 로그인",
+    "signInWithClerk": "Clerk로 로그인",
     "signInMessage": "프로필 정보를 보려면 로그인하세요.",
     "footer": "© {{year}} 내 앱. 모든 권리 보유.",
     "hello": "안녕하세요!"
@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "언어 선택"
   },
+  "nav": {
+    "home": "홈",
+    "badges": "배지"
+  },
   "sections": {
     "blockchainBasics": "블록체인 및 Web3 기초",
     "userProfile": "사용자 프로필",
-    "web3Auth": "Web3 인증"
+    "web3Auth": "Web3 인증",
+    "badges": "사용자 배지"
+  },
+  "badges": {
+    "title": "사용자 배지",
+    "noBadges": "아직 획득한 배지가 없습니다",
+    "earned": "획득함",
+    "available": "이용 가능",
+    "all": "모든 배지",
+    "earnedDescription": "이 배지들은 귀하의 성과와 참여를 보여줍니다.",
+    "availableDescription": "이 배지를 획득하려면 계속 참여하세요.",
+    "allDescription": "우리 플랫폼에서 사용 가능한 모든 배지의 개요입니다.",
+    "viewAll": "모든 배지 보기",
+    "signInToView": "배지를 보려면 로그인하세요",
+    "keepParticipating": "이 배지를 획득하려면 계속 참여하세요!",
+    "noEarnedBadges": "아직 획득한 배지가 없습니다. 계속 참여하세요!",
+    "noBadgesInCategory": "이 카테고리에 배지가 없습니다.",
+    "showTestPanel": "테스트 패널 표시",
+    "hideTestPanel": "테스트 패널 숨기기",
+    "testPanel": "배지 테스트 패널",
+    "testDescription": "이 패널을 사용하면 배지를 수동으로 부여하고 제거하여 배지 시스템을 테스트할 수 있습니다.",
+    "availableBadges": "배지 부여",
+    "award": "부여",
+    "remove": "제거"
   },
   "blockchainGuide": {
     "title": "블록체인 및 Web3 가이드",

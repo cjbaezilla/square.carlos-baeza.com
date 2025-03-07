@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "Select language"
   },
+  "nav": {
+    "home": "Home",
+    "badges": "Badges"
+  },
   "sections": {
     "blockchainBasics": "Blockchain & Web3 Basics",
     "userProfile": "User Profile",
-    "web3Auth": "Web3 Authentication"
+    "web3Auth": "Web3 Authentication",
+    "badges": "User Badges"
+  },
+  "badges": {
+    "title": "User Badges",
+    "noBadges": "No badges earned yet",
+    "earned": "Earned",
+    "available": "Available",
+    "all": "All Badges",
+    "earnedDescription": "These badges highlight your achievements and participation.",
+    "availableDescription": "Continue participating to earn these badges.",
+    "allDescription": "Overview of all badges available on our platform.",
+    "viewAll": "View all badges",
+    "signInToView": "Please sign in to view your badges",
+    "keepParticipating": "Keep participating to earn this badge!",
+    "noEarnedBadges": "You haven't earned any badges yet. Keep participating!",
+    "noBadgesInCategory": "No badges in this category.",
+    "showTestPanel": "Show Test Panel",
+    "hideTestPanel": "Hide Test Panel",
+    "testPanel": "Badge Test Panel",
+    "testDescription": "This panel allows you to test the badge system by manually awarding and removing badges.",
+    "availableBadges": "Award Badges",
+    "award": "Award",
+    "remove": "Remove"
   },
   "blockchainGuide": {
     "title": "Blockchain & Web3 Guide",

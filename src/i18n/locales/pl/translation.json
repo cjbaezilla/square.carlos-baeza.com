@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "Wybierz język"
   },
+  "nav": {
+    "home": "Strona główna",
+    "badges": "Odznaki"
+  },
   "sections": {
     "blockchainBasics": "Podstawy Blockchain i Web3",
     "userProfile": "Profil Użytkownika",
-    "web3Auth": "Uwierzytelnianie Web3"
+    "web3Auth": "Uwierzytelnianie Web3",
+    "badges": "Odznaki Użytkownika"
+  },
+  "badges": {
+    "title": "Odznaki Użytkownika",
+    "noBadges": "Jeszcze nie zdobyto żadnych odznak",
+    "earned": "Zdobyte",
+    "available": "Dostępne",
+    "all": "Wszystkie Odznaki",
+    "earnedDescription": "Te odznaki podkreślają Twoje osiągnięcia i uczestnictwo.",
+    "availableDescription": "Kontynuuj uczestnictwo, aby zdobyć te odznaki.",
+    "allDescription": "Przegląd wszystkich odznak dostępnych na naszej platformie.",
+    "viewAll": "Zobacz wszystkie odznaki",
+    "signInToView": "Zaloguj się, aby zobaczyć swoje odznaki",
+    "keepParticipating": "Kontynuuj uczestnictwo, aby zdobyć tę odznakę!",
+    "noEarnedBadges": "Nie zdobyłeś jeszcze żadnych odznak. Kontynuuj uczestnictwo!",
+    "noBadgesInCategory": "Brak odznak w tej kategorii.",
+    "showTestPanel": "Pokaż Panel Testowy",
+    "hideTestPanel": "Ukryj Panel Testowy",
+    "testPanel": "Panel Testowy Odznak",
+    "testDescription": "Ten panel pozwala przetestować system odznak poprzez ręczne przyznawanie i usuwanie odznak.",
+    "availableBadges": "Przyznaj Odznaki",
+    "award": "Przyznaj",
+    "remove": "Usuń"
   },
   "blockchainGuide": {
     "title": "Przewodnik po Blockchain i Web3",

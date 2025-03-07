@@ -10,10 +10,37 @@
   "navbar": {
     "selectLanguage": "Seleccionar idioma"
   },
+  "nav": {
+    "home": "Inicio",
+    "badges": "Insignias"
+  },
   "sections": {
     "blockchainBasics": "Fundamentos de Blockchain y Web3",
     "userProfile": "Perfil de Usuario",
-    "web3Auth": "Autenticación Web3"
+    "web3Auth": "Autenticación Web3",
+    "badges": "Insignias de Usuario"
+  },
+  "badges": {
+    "title": "Insignias de Usuario",
+    "noBadges": "Aún no has ganado insignias",
+    "earned": "Obtenidas",
+    "available": "Disponibles",
+    "all": "Todas las Insignias",
+    "earnedDescription": "Estas insignias destacan tus logros y participación.",
+    "availableDescription": "Continúa participando para ganar estas insignias.",
+    "allDescription": "Visión general de todas las insignias disponibles en nuestra plataforma.",
+    "viewAll": "Ver todas las insignias",
+    "signInToView": "Por favor, inicia sesión para ver tus insignias",
+    "keepParticipating": "¡Sigue participando para ganar esta insignia!",
+    "noEarnedBadges": "Aún no has ganado ninguna insignia. ¡Sigue participando!",
+    "noBadgesInCategory": "No hay insignias en esta categoría.",
+    "showTestPanel": "Mostrar Panel de Pruebas",
+    "hideTestPanel": "Ocultar Panel de Pruebas",
+    "testPanel": "Panel de Prueba de Insignias",
+    "testDescription": "Este panel te permite probar el sistema de insignias otorgando y quitando insignias manualmente.",
+    "availableBadges": "Otorgar Insignias",
+    "award": "Otorgar",
+    "remove": "Quitar"
   },
   "blockchainGuide": {
     "title": "Guía de Blockchain y Web3",

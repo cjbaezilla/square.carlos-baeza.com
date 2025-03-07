@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
+import BadgeDisplay from '../badges/BadgeDisplay';
+import BadgeService from '../badges/BadgeService';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    // Check for badges to award whenever the user profile loads
+    if (user) {
+      BadgeService.checkAndAwardBadges(user);
+    }
+  }, [user]);
 
   // Function to format the last sign-in time as "time since"
   const formatLastSignIn = (dateString) => {
@@ -90,6 +99,33 @@ const UserProfileCard = () => {
         <h2 className="text-xl font-bold">
           {user.fullName || 'User'}
         </h2>
+        
+        {/* Badges Section */}
+        <div className="mt-3 flex flex-wrap justify-center">
+          <BadgeDisplay 
+            userId={user.id} 
+            size="sm" 
+            limit={5} 
+            className="mt-1"
+          />
+        </div>
+        
+        {/* Badge Link - Only show if user has badges */}
+        {BadgeService.getUserBadges(user.id).length > 0 && (
+          <a 
+            href="#/badges" 
+            className="text-blue-400 hover:text-blue-300 text-sm mt-2 transition-colors duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              // This would normally navigate to a badges page
+              // For now, we'll just log it
+              console.log('Navigate to badges page');
+              window.location.hash = '#/badges';
+            }}
+          >
+            {t('badges.viewAll', 'View all badges')}
+          </a>
+        )}
       </div>
 
       <div className="space-y-2 mt-4">

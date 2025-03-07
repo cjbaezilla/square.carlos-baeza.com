@@ -4,16 +4,43 @@
     "signIn": "Giriş yap",
     "signInWithClerk": "Clerk ile giriş yap",
     "signInMessage": "Profil bilgilerinizi görmek için lütfen giriş yapın.",
-    "footer": "© {{year}} Uygulamam. Tüm hakları saklıdır.",
+    "footer": "© {{year}} Benim Uygulamam. Tüm hakları saklıdır.",
     "hello": "Merhaba!"
   },
   "navbar": {
     "selectLanguage": "Dil seçin"
   },
+  "nav": {
+    "home": "Ana Sayfa",
+    "badges": "Rozetler"
+  },
   "sections": {
     "blockchainBasics": "Blockchain ve Web3 Temelleri",
     "userProfile": "Kullanıcı Profili",
-    "web3Auth": "Web3 Kimlik Doğrulama"
+    "web3Auth": "Web3 Kimlik Doğrulama",
+    "badges": "Kullanıcı Rozetleri"
+  },
+  "badges": {
+    "title": "Kullanıcı Rozetleri",
+    "noBadges": "Henüz rozet kazanılmadı",
+    "earned": "Kazanılanlar",
+    "available": "Mevcut",
+    "all": "Tüm Rozetler",
+    "earnedDescription": "Bu rozetler başarılarınızı ve katılımınızı gösterir.",
+    "availableDescription": "Bu rozetleri kazanmak için katılmaya devam edin.",
+    "allDescription": "Platformumuzda bulunan tüm rozetlere genel bakış.",
+    "viewAll": "Tüm rozetleri görüntüle",
+    "signInToView": "Rozetlerinizi görmek için lütfen giriş yapın",
+    "keepParticipating": "Bu rozeti kazanmak için katılmaya devam edin!",
+    "noEarnedBadges": "Henüz rozet kazanmadınız. Katılmaya devam edin!",
+    "noBadgesInCategory": "Bu kategoride rozet yok.",
+    "showTestPanel": "Test Panelini Göster",
+    "hideTestPanel": "Test Panelini Gizle",
+    "testPanel": "Rozet Test Paneli",
+    "testDescription": "Bu panel, rozetleri manuel olarak vererek ve kaldırarak rozet sistemini test etmenizi sağlar.",
+    "availableBadges": "Rozet Ver",
+    "award": "Ver",
+    "remove": "Kaldır"
   },
   "blockchainGuide": {
     "title": "Blockchain ve Web3 Rehberi",
