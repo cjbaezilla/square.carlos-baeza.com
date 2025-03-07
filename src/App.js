@@ -3,6 +3,7 @@ import { SignedIn, SignedOut, UserButton, SignInButton, useUser } from '@clerk/c
 import './App.css';
 import UserProfileCard from './components/UserProfileCard';
 import MetaMaskSign from './components/MetaMaskSign';
+import BlockchainGuide from './components/BlockchainGuide';
 
 function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -28,6 +29,12 @@ function App() {
         <h1 className="text-3xl font-bold text-center text-gray-100 mb-8 transition-colors duration-200">
           Welcome to My React App
         </h1>
+        
+        {/* Blockchain Guide Section - Always visible regardless of sign-in status */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-100">Blockchain & Web3 Basics</h2>
+          <BlockchainGuide />
+        </div>
         
         <SignedIn>
           {/* User Profile Card Component */}

@@ -1,1 +1,35 @@
-/* App-specific styles can be added here */ 
+/* App-specific styles can be added here */
+
+/* Animation for blockchain guide content */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Styles for blockchain guide content */
+.blockchain-guide-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #f0f9ff;
+}
+
+.blockchain-guide-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.blockchain-guide-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.blockchain-guide-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+} 
