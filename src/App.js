@@ -46,25 +46,31 @@ function App() {
       default:
         return (
           <>
-            {/* Blockchain Guide Section - Always visible regardless of sign-in status */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.blockchainBasics')}</h2>
-              <BlockchainGuide />
-            </div>
-            
-            <SignedIn>
-              {/* User Profile Card Component */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.userProfile')}</h2>
-                <UserProfileCard />
+            <div className="flex flex-wrap">
+              <div className="w-full md:w-1/2 md:pr-4">
+                <SignedIn>
+                  {/* User Profile Card Component - Moved to top left */}
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.userProfile')}</h2>
+                    <UserProfileCard />
+                  </div>
+                  
+                  {/* MetaMask Signing Component */}
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.web3Auth')}</h2>
+                    <MetaMaskSign />
+                  </div>
+                </SignedIn>
               </div>
               
-              {/* MetaMask Signing Component */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.web3Auth')}</h2>
-                <MetaMaskSign />
+              <div className="w-full md:w-1/2 md:pl-4">
+                {/* Blockchain Guide Section - Moved to right side */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.blockchainBasics')}</h2>
+                  <BlockchainGuide />
+                </div>
               </div>
-            </SignedIn>
+            </div>
             
             <SignedOut>
               <div className="text-center p-8">
@@ -117,37 +123,53 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center py-12 transition-colors duration-200">
-      <div className="max-w-3xl w-full px-6 py-8 bg-gray-800 shadow-md rounded-lg transition-colors duration-200">
-        <div className="absolute top-4 right-4 flex items-center space-x-4">
-          <SignedIn>
-            <PointsBadge compact={true} />
-          </SignedIn>
-          <LanguageSelector />
-          <SignedIn>
-            {/* Mount UserButton component only if user is signed in */}
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            {/* Mount sign in button only if user is signed out */}
-            <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition duration-300">
-                {t('common.signIn')}
-              </button>
-            </SignInButton>
-          </SignedOut>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <header className="bg-gray-800 shadow-md">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-blue-400">Carlos DApp</h1>
+          
+          <div className="flex items-center space-x-4">
+            <LanguageSelector />
+            
+            <SignedIn>
+              <PointsBadge compact={true} />
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            
+            <SignedOut>
+              <SignInButton mode="modal" />
+            </SignedOut>
+          </div>
         </div>
-
-        <h1 className="text-3xl font-bold text-center text-gray-100 mb-4 transition-colors duration-200">
-          {t('common.welcome')}
-        </h1>
-        
-        <Navigation />
-        
-        {renderContent()}
-      </div>
+      </header>
       
-      <footer className="mt-8 text-center text-gray-400">
+      <nav className="bg-gray-800 border-t border-gray-700 shadow-sm">
+        <div className="container mx-auto px-4 py-2">
+          <ul className="flex space-x-6">
+            <li>
+              <a href="#/" className={`${currentRoute === '#/' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
+                {t('nav.home', 'Home')}
+              </a>
+            </li>
+            <li>
+              <a href="#/badges" className={`${currentRoute === '#/badges' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
+                {t('nav.badges', 'Badges')}
+              </a>
+            </li>
+            <li>
+              <a href="#/rewards" className={`${currentRoute === '#/rewards' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
+                {t('nav.rewards', 'Rewards')}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      
+      <main className="container mx-auto px-4 py-8">
+        {renderContent()}
+      </main>
+      
+      <footer className="bg-gray-800 mt-12 py-6 border-t border-gray-700">
         <p>{t('common.footer', { year: new Date().getFullYear() })}</p>
       </footer>
     </div>

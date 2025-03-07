@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import BadgeDisplay from '../badges/BadgeDisplay';
 import BadgeService from '../badges/BadgeService';
 import PointsService from '../rewards/PointsService';
+import PointsBadge from '../rewards/PointsBadge';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
@@ -128,6 +129,11 @@ const UserProfileCard = () => {
             limit={5} 
             className="mt-1"
           />
+        </div>
+        
+        {/* Points Display */}
+        <div className="mt-3">
+          <PointsBadge />
         </div>
         
         {/* Badge Link - Only show if user has badges */}
