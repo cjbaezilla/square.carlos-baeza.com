@@ -10,6 +10,7 @@ import BadgesPage from './badges/BadgesPage';
 import UserRewardsPage from './rewards/UserRewardsPage';
 import PointsBadge from './rewards/PointsBadge';
 import MascotsPage from './mascots/MascotsPage';
+import ItemsPage from './items/ItemsPage';
 
 function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -51,147 +52,217 @@ function App() {
             <MascotsPage />
           </div>
         );
+      case '#/items':
+        return (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.items', 'Robot Items')}</h2>
+            <ItemsPage />
+          </div>
+        );
       default:
         return (
-          <>
-            <div className="flex flex-wrap">
-              <div className="w-full md:w-1/2 md:pr-4">
-                <SignedIn>
-                  {/* User Profile Card Component - Moved to top left */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.userProfile')}</h2>
-                    <UserProfileCard />
-                  </div>
-                  
-                  {/* MetaMask Signing Component */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.web3Auth')}</h2>
-                    <MetaMaskSign />
-                  </div>
-                </SignedIn>
-              </div>
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.overview', 'Profile Overview')}</h2>
+            
+            {/* Profile and Badges Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* User Profile Card */}
+              <UserProfileCard />
               
-              <div className="w-full md:w-1/2 md:pl-4">
-                {/* Blockchain Guide Section - Moved to right side */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.blockchainBasics')}</h2>
-                  <BlockchainGuide />
+              {/* Badges Quick View */}
+              <div className="bg-gray-900 p-4 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('badges.recent', 'Recent Badges')}</h3>
+                <p className="text-gray-400 mb-2">{t('badges.quick_view', 'Quick view of your earned badges')}</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="inline-block px-3 py-1 bg-blue-900 text-blue-100 rounded-full text-xs">Web3</span>
+                  <span className="inline-block px-3 py-1 bg-purple-900 text-purple-100 rounded-full text-xs">Blockchain</span>
+                  <span className="inline-block px-3 py-1 bg-green-900 text-green-100 rounded-full text-xs">Active User</span>
+                </div>
+                <div className="mt-3">
+                  <a href="#/badges" className="text-blue-400 text-sm hover:underline">
+                    {t('badges.view_all', 'View all badges')} →
+                  </a>
                 </div>
               </div>
             </div>
             
-            <SignedOut>
-              <div className="text-center p-8">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('common.hello')}</h2>
-                <p className="mb-6 text-gray-300">{t('common.signInMessage')}</p>
-                <SignInButton mode="modal">
-                  <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300">
-                    {t('common.signInWithClerk')}
-                  </button>
-                </SignInButton>
+            {/* Rewards and Mascots Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Rewards Quick View */}
+              <div className="bg-gray-900 p-4 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('rewards.points', 'Your Points')}</h3>
+                <div className="mb-3">
+                  <PointsBadge />
+                </div>
+                <p className="text-gray-400 mb-2">{t('rewards.description', 'Earn points by completing actions')}</p>
+                <div className="mt-3">
+                  <a href="#/rewards" className="text-blue-400 text-sm hover:underline">
+                    {t('rewards.manage', 'Manage rewards')} →
+                  </a>
+                </div>
               </div>
-            </SignedOut>
-          </>
+              
+              {/* Mascots Quick View */}
+              <div className="bg-gray-900 p-4 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('mascots.your_mascots', 'Your Mascots')}</h3>
+                <p className="text-gray-400 mb-2">{t('mascots.description', 'Collect and train robot mascots')}</p>
+                <div className="flex justify-center my-2">
+                  <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="#3498db" strokeWidth="2">
+                      <rect x="18" y="14" width="28" height="22" rx="2" />
+                      <circle cx="28" cy="22" r="3" />
+                      <circle cx="36" cy="22" r="3" />
+                      <rect x="26" y="36" width="12" height="12" rx="1" />
+                      <line x1="22" y1="22" x2="14" y2="24" />
+                      <line x1="42" y1="22" x2="50" y2="24" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <a href="#/mascots" className="text-blue-400 text-sm hover:underline">
+                    {t('mascots.manage', 'Manage mascots')} →
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            {/* Items Quick View */}
+            <div className="grid grid-cols-1 gap-4 mb-6">
+              <div className="bg-gray-900 p-4 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('items.robot_items', 'Robot Items')}</h3>
+                <p className="text-gray-400 mb-2">{t('items.description', 'Collect special items to upgrade your mascots')}</p>
+                <div className="flex justify-center gap-4 my-2">
+                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-green-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="5" />
+                      <circle cx="12" cy="12" r="2" />
+                      <line x1="12" y1="7" x2="12" y2="3" />
+                      <line x1="12" y1="21" x2="12" y2="17" />
+                      <line x1="7" y1="12" x2="3" y2="12" />
+                      <line x1="21" y1="12" x2="17" y2="12" />
+                    </svg>
+                  </div>
+                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-blue-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="6" y="6" width="12" height="12" />
+                      <line x1="6" y1="10" x2="18" y2="10" />
+                      <line x1="6" y1="14" x2="18" y2="14" />
+                      <line x1="10" y1="6" x2="10" y2="18" />
+                      <line x1="14" y1="6" x2="14" y2="18" />
+                    </svg>
+                  </div>
+                  <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center text-yellow-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 3 L20 7 L20 13 C20 17.4183 16.4183 21 12 21 C7.58172 21 4 17.4183 4 13 L4 7 L12 3Z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <a href="#/items" className="text-blue-400 text-sm hover:underline">
+                    {t('items.manage', 'Manage items')} →
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            {/* Blockchain Tools */}
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('blockchain.tools', 'Blockchain Tools')}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <MetaMaskSign />
+                <BlockchainGuide />
+              </div>
+            </div>
+          </div>
         );
     }
   };
 
-  // Simple navigation menu component
   const Navigation = () => (
-    <nav className="mb-8 mt-4">
-      <ul className="flex space-x-4 text-gray-300">
-        <li>
-          <a 
-            href="#/" 
-            className={`hover:text-white transition-colors ${currentRoute === '#/' ? 'text-white font-medium' : ''}`}
-          >
-            {t('nav.home', 'Home')}
-          </a>
-        </li>
-        <SignedIn>
-          <li>
-            <a 
-              href="#/badges" 
-              className={`hover:text-white transition-colors ${currentRoute === '#/badges' ? 'text-white font-medium' : ''}`}
-            >
-              {t('nav.badges', 'Badges')}
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#/rewards" 
-              className={`hover:text-white transition-colors ${currentRoute === '#/rewards' ? 'text-white font-medium' : ''}`}
-            >
-              {t('nav.rewards', 'Rewards')}
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#/mascots" 
-              className={`hover:text-white transition-colors ${currentRoute === '#/mascots' ? 'text-white font-medium' : ''}`}
-            >
-              {t('nav.mascots', 'Mascots')}
-            </a>
-          </li>
-        </SignedIn>
-      </ul>
+    <nav className="mb-6">
+      <div className="flex flex-wrap gap-2">
+        <a 
+          href="#/" 
+          className={`px-3 py-2 rounded-lg transition ${currentRoute === '#/' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+          {t('nav.home', 'Home')}
+        </a>
+        <a 
+          href="#/badges" 
+          className={`px-3 py-2 rounded-lg transition ${currentRoute === '#/badges' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+          {t('nav.badges', 'Badges')}
+        </a>
+        <a 
+          href="#/rewards" 
+          className={`px-3 py-2 rounded-lg transition ${currentRoute === '#/rewards' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+          {t('nav.rewards', 'Rewards')}
+        </a>
+        <a 
+          href="#/mascots" 
+          className={`px-3 py-2 rounded-lg transition ${currentRoute === '#/mascots' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+          {t('nav.mascots', 'Mascots')}
+        </a>
+        <a 
+          href="#/items" 
+          className={`px-3 py-2 rounded-lg transition ${currentRoute === '#/items' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+        >
+          {t('nav.items', 'Items')}
+        </a>
+      </div>
     </nav>
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800 shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-400">Carlos DApp</h1>
-          
-          <div className="flex items-center space-x-4">
-            <LanguageSelector />
-            
-            <SignedIn>
-              <PointsBadge compact={true} />
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-            
-            <SignedOut>
-              <SignInButton mode="modal" />
-            </SignedOut>
+    <div className="min-h-screen bg-gray-950 text-white">
+      <header className="bg-gray-900 shadow-md">
+        <div className="max-w-5xl mx-auto p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="font-bold text-xl text-blue-400 mr-2">Square</span>
+              <span className="text-sm text-gray-400">Web3 Profile</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <LanguageSelector />
+              <SignedIn>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition">
+                    {t('auth.sign_in', 'Sign In')}
+                  </button>
+                </SignInButton>
+              </SignedOut>
+            </div>
           </div>
         </div>
       </header>
       
-      <nav className="bg-gray-800 border-t border-gray-700 shadow-sm">
-        <div className="container mx-auto px-4 py-2">
-          <ul className="flex space-x-6">
-            <li>
-              <a href="#/" className={`${currentRoute === '#/' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
-                {t('nav.home', 'Home')}
-              </a>
-            </li>
-            <li>
-              <a href="#/badges" className={`${currentRoute === '#/badges' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
-                {t('nav.badges', 'Badges')}
-              </a>
-            </li>
-            <li>
-              <a href="#/rewards" className={`${currentRoute === '#/rewards' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
-                {t('nav.rewards', 'Rewards')}
-              </a>
-            </li>
-            <li>
-              <a href="#/mascots" className={`${currentRoute === '#/mascots' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
-                {t('nav.mascots', 'Mascots')}
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-      
-      <main className="container mx-auto px-4 py-8">
-        {renderContent()}
+      <main className="max-w-5xl mx-auto p-4">
+        <SignedIn>
+          <Navigation />
+          {renderContent()}
+        </SignedIn>
+        <SignedOut>
+          <div className="text-center mt-12">
+            <h2 className="text-2xl font-bold mb-4">{t('auth.welcome', 'Welcome to Square')}</h2>
+            <p className="text-gray-400 mb-6">{t('auth.description', 'Please sign in to access your Web3 profile')}</p>
+            <SignInButton mode="modal">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition">
+                {t('auth.sign_in', 'Sign In')}
+              </button>
+            </SignInButton>
+          </div>
+        </SignedOut>
       </main>
       
-      <footer className="bg-gray-800 mt-12 py-6 border-t border-gray-700">
-        <p>{t('common.footer', { year: new Date().getFullYear() })}</p>
+      <footer className="bg-gray-900 mt-12">
+        <div className="max-w-5xl mx-auto p-4 text-center text-gray-500 text-sm">
+          <p>Square Web3 Profile &copy; {new Date().getFullYear()}</p>
+        </div>
       </footer>
     </div>
   );
