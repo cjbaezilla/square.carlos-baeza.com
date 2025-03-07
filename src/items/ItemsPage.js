@@ -671,10 +671,23 @@ const ItemsPage = () => {
             return (
               <div 
                 key={item.instanceId} 
-                className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex flex-col"
+                className="bg-gray-800 backdrop-blur-sm bg-opacity-70 border-2 rounded-xl p-4 flex flex-col relative overflow-hidden transition-all duration-300 hover:shadow-lg"
+                style={{ 
+                  borderColor: `${rarityInfo.color}50`
+                }}
               >
+                {/* Rarity indicator */}
                 <div 
-                  className="w-full h-20 mb-2 flex items-center justify-center"
+                  className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rotate-45 opacity-10"
+                  style={{ backgroundColor: rarityInfo.color }}
+                />
+                
+                <div 
+                  className="w-full h-24 mb-3 flex items-center justify-center item-svg-container p-2 rounded-lg"
+                  style={{ 
+                    backgroundColor: `${rarityInfo.color}20`,
+                    color: rarityInfo.color
+                  }}
                   dangerouslySetInnerHTML={{ __html: item.svg }}
                 />
                 
@@ -690,22 +703,23 @@ const ItemsPage = () => {
                   {item.description}
                 </div>
                 
-                <div className="grid grid-cols-5 gap-1 text-xs mb-2">
+                <div className="flex flex-wrap gap-1.5 text-xs mb-3">
                   {Object.entries(item.stats).map(([stat, value]) => (
                     value !== 0 ? (
                       <div 
                         key={stat} 
-                        className={`py-1 text-center rounded ${value > 0 ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}
+                        className={`px-2 py-1 rounded-lg flex items-center ${value > 0 ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}
                         title={`${stat.toUpperCase()}: ${value}`}
                       >
-                        {stat.substring(0, 2).toUpperCase()}: {value > 0 ? `+${value}` : value}
+                        <span className="font-bold mr-1">{stat.substring(0, 2).toUpperCase()}</span>
+                        <span>{value > 0 ? `+${value}` : value}</span>
                       </div>
                     ) : null
                   ))}
                 </div>
                 
                 <button 
-                  className="w-full px-2 py-1 bg-red-700 hover:bg-red-800 text-white rounded text-sm transition"
+                  className="w-full px-3 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition-colors"
                   onClick={() => handleUnequipItem(item.instanceId)}
                 >
                   {t('items.unequip', 'Unequip')}
