@@ -599,7 +599,34 @@ class ItemService {
     return totalStats;
   }
   
-  // Get user's points
+  // Check if an item is equipped to any mascot
+  isItemEquipped(userId, itemInstanceId) {
+    try {
+      const data = localStorage.getItem(this.mascotItemsKey);
+      if (!data) return false;
+      
+      const mascotItemsData = JSON.parse(data);
+      
+      // If user doesn't have any mascot items data
+      if (!mascotItemsData[userId]) return false;
+      
+      // Check all mascots for this user
+      for (const mascotId in mascotItemsData[userId]) {
+        // Check if this item is equipped to this mascot
+        const found = mascotItemsData[userId][mascotId].some(
+          equippedItem => equippedItem.instanceId === itemInstanceId
+        );
+        if (found) return true;
+      }
+      
+      return false;
+    } catch (err) {
+      console.error('Error checking if item is equipped:', err);
+      return false;
+    }
+  }
+  
+  // Get user points
   getUserPoints(userId) {
     // Get user's items
     const userItems = this.getUserItems(userId);

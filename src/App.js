@@ -334,11 +334,11 @@ function App() {
                 {userItems && userItems.length > 0 ? (
                   <div className="flex flex-col gap-3">
                     {userItems.slice(0, 3).map(item => {
-                      // Check if the item is equipped using either equippedTo or equipped property
-                      const isEquipped = item.equippedTo !== undefined ? 
-                        item.equippedTo !== null : 
-                        (item.equipped === true);
-                        
+                      // Check if the item is equipped using the ItemService method
+                      const isEquipped = isSignedIn && user ? 
+                        ItemService.isItemEquipped(user.id, item.instanceId) : 
+                        false;
+                      
                       return (
                         <div 
                           key={item.instanceId || item.id}
