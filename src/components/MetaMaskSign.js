@@ -36,7 +36,7 @@ const MetaMaskSign = () => {
     setSuccess('');
     
     if (!isMetaMaskInstalled()) {
-      setError('MetaMask is not installed. Please install MetaMask to continue.');
+      setError(t('metamaskSign.errors.notInstalled', 'MetaMask is not installed. Please install MetaMask to continue.'));
       return;
     }
 
@@ -47,13 +47,13 @@ const MetaMaskSign = () => {
       
       if (accounts.length > 0) {
         setAccount(accounts[0]);
-        setSuccess('Wallet connected successfully!');
+        setSuccess(t('metamaskSign.success.connected', 'Wallet connected successfully!'));
       } else {
-        setError('No accounts found.');
+        setError(t('metamaskSign.errors.noAccounts', 'No accounts found.'));
       }
     } catch (err) {
       console.error('Error connecting wallet:', err);
-      setError(err.message || 'Failed to connect wallet');
+      setError(err.message || t('metamaskSign.errors.connectionFailed', 'Failed to connect wallet'));
     } finally {
       setIsConnecting(false);
     }
@@ -64,7 +64,10 @@ const MetaMaskSign = () => {
     if (!user) return;
     
     const timestamp = new Date().toISOString();
-    const defaultMessage = `I, user with Clerk ID ${user.id}, authorize this action at ${timestamp}`;
+    const defaultMessage = t('metamaskSign.defaultMessage', 'I, user with Clerk ID {{userId}}, authorize this action at {{timestamp}}', {
+      userId: user.id,
+      timestamp: timestamp
+    });
     setMessage(defaultMessage);
   };
 
@@ -75,17 +78,17 @@ const MetaMaskSign = () => {
     setSignature('');
     
     if (!isMetaMaskInstalled()) {
-      setError('MetaMask is not installed. Please install MetaMask to continue.');
+      setError(t('metamaskSign.errors.notInstalled', 'MetaMask is not installed. Please install MetaMask to continue.'));
       return;
     }
     
     if (!account) {
-      setError('Please connect your wallet first');
+      setError(t('metamaskSign.errors.connectFirst', 'Please connect your wallet first'));
       return;
     }
 
     if (!message) {
-      setError('Please generate a message to sign');
+      setError(t('metamaskSign.errors.noMessage', 'Please generate a message to sign'));
       return;
     }
 
@@ -95,7 +98,7 @@ const MetaMaskSign = () => {
       const signer = provider.getSigner();
       const signature = await signer.signMessage(message);
       setSignature(signature);
-      setSuccess('Message signed successfully!');
+      setSuccess(t('metamaskSign.success.signed', 'Message signed successfully!'));
 
       // Here you could send the signature to your backend for verification
       // or store it in Clerk user metadata
@@ -119,7 +122,7 @@ const MetaMaskSign = () => {
       }
     } catch (err) {
       console.error('Error signing message:', err);
-      setError(err.message || 'Failed to sign message');
+      setError(err.message || t('metamaskSign.errors.signingFailed', 'Failed to sign message'));
     } finally {
       setIsSigning(false);
     }
@@ -188,7 +191,7 @@ const MetaMaskSign = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="w-full h-24 p-3 bg-gray-700 text-gray-200 rounded border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            placeholder="Enter a message to sign"
+            placeholder={t('metamaskSign.messagePlaceholder', 'Enter a message to sign')}
           />
           <button
             onClick={generateMessage}

@@ -133,24 +133,25 @@
     "title": "MetaMaskでメッセージに署名",
     "walletConnection": "ウォレット接続",
     "connectedAccount": "接続済みアカウント：",
-    "connect": "MetaMaskに接続",
+    "connect": "MetaMaskを接続",
     "connecting": "接続中...",
     "messageToSign": "署名するメッセージ",
+    "messagePlaceholder": "署名するメッセージを入力してください",
     "regenerate": "デフォルトメッセージを再生成",
     "signButton": "MetaMaskでメッセージに署名",
     "signing": "署名中...",
     "signature": "署名",
-    "information": "この機能を使用すると、MetaMaskを介してイーサリアムウォレットでメッセージに署名できます。",
+    "information": "この機能を使用すると、MetaMaskを介してEthereumウォレットでメッセージに署名できます。",
     "verify": "署名は、接続されたウォレットアドレスの所有権を確認するために使用できます。",
     "walletRequired": "Web3ウォレットが必要",
     "metamaskNotInstalled": "MetaMaskがインストールされていません",
-    "requiresMetamask": "この機能は、メッセージに署名するためにMetaMaskまたは互換性のあるweb3ウォレットが必要です。",
+    "requiresMetamask": "この機能を使用するには、メッセージに署名するためにMetaMaskまたは互換性のあるWeb3ウォレットが必要です。",
     "installMetamask": "MetaMaskをインストール",
     "afterInstalling": "MetaMaskをインストールした後：",
     "steps": [
-      "ウォレットを作成またはインポートする",
-      "イーサリアムネットワークに接続する",
-      "このページを更新する"
+      "ウォレットを作成またはインポート",
+      "Ethereumネットワークに接続",
+      "このページを更新"
     ]
   },
   "userProfile": {

@@ -1,11 +1,12 @@
 import React from 'react';
+import i18next from 'i18next';
 
-// Badge definitions with metadata
+// Badge definitions with metadata - using translation keys
 export const BADGES = {
   EARLY_ADOPTER: {
     id: 'early_adopter',
-    name: 'Early Adopter',
-    description: 'Joined during our platform launch phase',
+    nameKey: 'badges.badgeNames.earlyAdopter',
+    descriptionKey: 'badges.badgeDescriptions.earlyAdopter',
     color: '#5E60CE',
     svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -14,11 +15,14 @@ export const BADGES = {
         <text x="50" y="80" textAnchor="middle" fill="#FFFFFF" fontSize="12" fontFamily="Arial, sans-serif">Early Adopter</text>
       </svg>
     ),
+    // Keep original English values for fallback
+    name: 'Early Adopter',
+    description: 'Joined during our platform launch phase',
   },
   WEB3_EXPLORER: {
     id: 'web3_explorer',
-    name: 'Web3 Explorer',
-    description: 'Connected a Web3 wallet to their account',
+    nameKey: 'badges.badgeNames.web3Explorer',
+    descriptionKey: 'badges.badgeDescriptions.web3Explorer',
     color: '#06D6A0',
     svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -31,11 +35,14 @@ export const BADGES = {
         <path d="M35,55 L30,60 L35,65" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
       </svg>
     ),
+    // Keep original English values for fallback
+    name: 'Web3 Explorer',
+    description: 'Connected a Web3 wallet to their account',
   },
   BLOCKCHAIN_MASTER: {
     id: 'blockchain_master', 
-    name: 'Blockchain Master',
-    description: 'Demonstrated deep knowledge of blockchain concepts',
+    nameKey: 'badges.badgeNames.blockchainMaster',
+    descriptionKey: 'badges.badgeDescriptions.blockchainMaster',
     color: '#FF9F1C',
     svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -48,11 +55,14 @@ export const BADGES = {
         <text x="50" y="80" textAnchor="middle" fill="#FFFFFF" fontSize="10" fontFamily="Arial, sans-serif">Blockchain Master</text>
       </svg>
     ),
+    // Keep original English values for fallback
+    name: 'Blockchain Master',
+    description: 'Demonstrated deep knowledge of blockchain concepts',
   },
   COMMUNITY_PILLAR: {
     id: 'community_pillar',
-    name: 'Community Pillar', 
-    description: 'Active contributor to our growing community',
+    nameKey: 'badges.badgeNames.communityPillar',
+    descriptionKey: 'badges.badgeDescriptions.communityPillar',
     color: '#5271FF',
     svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -66,11 +76,14 @@ export const BADGES = {
         <text x="50" y="85" textAnchor="middle" fill="#FFFFFF" fontSize="10" fontFamily="Arial, sans-serif">Community Pillar</text>
       </svg>
     ),
+    // Keep original English values for fallback
+    name: 'Community Pillar',
+    description: 'Active contributor to our growing community',
   },
   CRYPTO_WIZARD: {
     id: 'crypto_wizard',
-    name: 'Crypto Wizard',
-    description: 'Successfully completed advanced crypto transactions',
+    nameKey: 'badges.badgeNames.cryptoWizard',
+    descriptionKey: 'badges.badgeDescriptions.cryptoWizard',
     color: '#9B5DE5',
     svg: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -80,6 +93,9 @@ export const BADGES = {
         <text x="50" y="90" textAnchor="middle" fill="#FFFFFF" fontSize="8" fontFamily="Arial, sans-serif">Crypto Wizard</text>
       </svg>
     ),
+    // Keep original English values for fallback
+    name: 'Crypto Wizard',
+    description: 'Successfully completed advanced crypto transactions',
   },
 };
 
@@ -134,7 +150,19 @@ class BadgeService {
 
   // Get badge details by ID
   static getBadgeDetails(badgeId) {
-    return Object.values(BADGES).find(badge => badge.id === badgeId);
+    const badge = Object.values(BADGES).find(badge => badge.id === badgeId);
+    
+    if (badge) {
+      // Create a copy of the badge with translated name and description
+      return {
+        ...badge,
+        // Use i18next to translate the name and description, falling back to the original values
+        name: i18next.t(badge.nameKey, badge.name),
+        description: i18next.t(badge.descriptionKey, badge.description)
+      };
+    }
+    
+    return null;
   }
 
   // Method to automatically check and award badges based on user actions/state

@@ -40,7 +40,21 @@
     "testDescription": "This panel allows you to test the badge system by manually awarding and removing badges.",
     "availableBadges": "Award Badges",
     "award": "Award",
-    "remove": "Remove"
+    "remove": "Remove",
+    "badgeNames": {
+      "earlyAdopter": "Early Adopter",
+      "web3Explorer": "Web3 Explorer",
+      "blockchainMaster": "Blockchain Master",
+      "communityPillar": "Community Pillar",
+      "cryptoWizard": "Crypto Wizard"
+    },
+    "badgeDescriptions": {
+      "earlyAdopter": "Joined during our platform launch phase",
+      "web3Explorer": "Connected a Web3 wallet to their account",
+      "blockchainMaster": "Demonstrated deep knowledge of blockchain concepts",
+      "communityPillar": "Active contributor to our growing community",
+      "cryptoWizard": "Successfully completed advanced crypto transactions"
+    }
   },
   "blockchainGuide": {
     "title": "Blockchain & Web3 Guide",
@@ -136,6 +150,7 @@
     "connect": "Connect MetaMask",
     "connecting": "Connecting...",
     "messageToSign": "Message to Sign",
+    "messagePlaceholder": "Enter a message to sign",
     "regenerate": "Regenerate Default Message",
     "signButton": "Sign Message with MetaMask",
     "signing": "Signing...",
@@ -147,6 +162,19 @@
     "requiresMetamask": "This feature requires MetaMask or a compatible web3 wallet to sign messages.",
     "installMetamask": "Install MetaMask",
     "afterInstalling": "After installing MetaMask:",
+    "defaultMessage": "I, user with Clerk ID {{userId}}, authorize this action at {{timestamp}}",
+    "errors": {
+      "notInstalled": "MetaMask is not installed. Please install MetaMask to continue.",
+      "noAccounts": "No accounts found.",
+      "connectionFailed": "Failed to connect wallet",
+      "connectFirst": "Please connect your wallet first",
+      "noMessage": "Please generate a message to sign",
+      "signingFailed": "Failed to sign message"
+    },
+    "success": {
+      "connected": "Wallet connected successfully!",
+      "signed": "Message signed successfully!"
+    },
     "steps": [
       "Create or import a wallet",
       "Connect to the Ethereum network",

@@ -40,7 +40,21 @@
     "testDescription": "Mit diesem Panel kannst du das Abzeichen-System testen, indem du manuell Abzeichen verleihst und entfernst.",
     "availableBadges": "Abzeichen verleihen",
     "award": "Verleihen",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "badgeNames": {
+      "earlyAdopter": "Früher Anwender",
+      "web3Explorer": "Web3-Entdecker",
+      "blockchainMaster": "Blockchain-Meister",
+      "communityPillar": "Gemeinschaftssäule",
+      "cryptoWizard": "Krypto-Zauberer"
+    },
+    "badgeDescriptions": {
+      "earlyAdopter": "Ist während der Startphase unserer Plattform beigetreten",
+      "web3Explorer": "Hat ein Web3-Wallet mit seinem Konto verbunden",
+      "blockchainMaster": "Hat tiefgreifendes Wissen über Blockchain-Konzepte bewiesen",
+      "communityPillar": "Aktiver Beitragender zu unserer wachsenden Gemeinschaft",
+      "cryptoWizard": "Hat erfolgreich fortgeschrittene Krypto-Transaktionen durchgeführt"
+    }
   },
   "blockchainGuide": {
     "title": "Blockchain & Web3-Leitfaden",
@@ -136,19 +150,20 @@
     "connect": "MetaMask verbinden",
     "connecting": "Verbinde...",
     "messageToSign": "Zu signierende Nachricht",
+    "messagePlaceholder": "Geben Sie eine zu signierende Nachricht ein",
     "regenerate": "Standardnachricht neu generieren",
     "signButton": "Nachricht mit MetaMask signieren",
     "signing": "Signiere...",
     "signature": "Signatur",
-    "information": "Diese Funktion ermöglicht es Ihnen, Nachrichten mit Ihrer Ethereum-Wallet über MetaMask zu signieren.",
-    "verify": "Die Signatur kann verwendet werden, um Ihren Besitz der verbundenen Wallet-Adresse zu überprüfen.",
+    "information": "Mit dieser Funktion können Sie Nachrichten mit Ihrem Ethereum-Wallet über MetaMask signieren.",
+    "verify": "Die Signatur kann verwendet werden, um Ihren Besitz der verbundenen Wallet-Adresse zu verifizieren.",
     "walletRequired": "Web3-Wallet erforderlich",
     "metamaskNotInstalled": "MetaMask ist nicht installiert",
-    "requiresMetamask": "Diese Funktion erfordert MetaMask oder eine kompatible Web3-Wallet, um Nachrichten zu signieren.",
+    "requiresMetamask": "Diese Funktion erfordert MetaMask oder ein kompatibles Web3-Wallet, um Nachrichten zu signieren.",
     "installMetamask": "MetaMask installieren",
     "afterInstalling": "Nach der Installation von MetaMask:",
     "steps": [
-      "Erstellen oder importieren Sie eine Wallet",
+      "Erstellen oder importieren Sie ein Wallet",
       "Verbinden Sie sich mit dem Ethereum-Netzwerk",
       "Aktualisieren Sie diese Seite"
     ]

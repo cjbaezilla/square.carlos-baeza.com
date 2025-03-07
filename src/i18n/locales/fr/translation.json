@@ -40,7 +40,21 @@
     "testDescription": "Ce panneau vous permet de tester le système de badges en attribuant et en retirant manuellement des badges.",
     "availableBadges": "Attribuer des Badges",
     "award": "Attribuer",
-    "remove": "Retirer"
+    "remove": "Retirer",
+    "badgeNames": {
+      "earlyAdopter": "Adopteur Précoce",
+      "web3Explorer": "Explorateur Web3",
+      "blockchainMaster": "Maître de la Blockchain",
+      "communityPillar": "Pilier de la Communauté",
+      "cryptoWizard": "Sorcier Crypto"
+    },
+    "badgeDescriptions": {
+      "earlyAdopter": "A rejoint pendant la phase de lancement de notre plateforme",
+      "web3Explorer": "A connecté un portefeuille Web3 à son compte",
+      "blockchainMaster": "A démontré une connaissance approfondie des concepts de blockchain",
+      "communityPillar": "Contributeur actif à notre communauté grandissante",
+      "cryptoWizard": "A réussi des transactions crypto avancées"
+    }
   },
   "blockchainGuide": {
     "title": "Guide Blockchain et Web3",
@@ -136,6 +150,7 @@
     "connect": "Connecter MetaMask",
     "connecting": "Connexion en cours...",
     "messageToSign": "Message à Signer",
+    "messagePlaceholder": "Saisissez un message à signer",
     "regenerate": "Regénérer le Message par Défaut",
     "signButton": "Signer le Message avec MetaMask",
     "signing": "Signature en cours...",

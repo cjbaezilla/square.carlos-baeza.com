@@ -40,7 +40,21 @@
     "testDescription": "Este panel te permite probar el sistema de insignias otorgando y quitando insignias manualmente.",
     "availableBadges": "Otorgar Insignias",
     "award": "Otorgar",
-    "remove": "Quitar"
+    "remove": "Quitar",
+    "badgeNames": {
+      "earlyAdopter": "Adoptador Temprano",
+      "web3Explorer": "Explorador Web3",
+      "blockchainMaster": "Maestro de Blockchain",
+      "communityPillar": "Pilar de la Comunidad",
+      "cryptoWizard": "Mago de Criptomonedas"
+    },
+    "badgeDescriptions": {
+      "earlyAdopter": "Se unió durante la fase de lanzamiento de nuestra plataforma",
+      "web3Explorer": "Conectó una billetera Web3 a su cuenta",
+      "blockchainMaster": "Demostró un conocimiento profundo de los conceptos de blockchain",
+      "communityPillar": "Contribuyente activo a nuestra creciente comunidad",
+      "cryptoWizard": "Completó con éxito transacciones avanzadas de criptomonedas"
+    }
   },
   "blockchainGuide": {
     "title": "Guía de Blockchain y Web3",
@@ -136,12 +150,13 @@
     "connect": "Conectar MetaMask",
     "connecting": "Conectando...",
     "messageToSign": "Mensaje para Firmar",
+    "messagePlaceholder": "Introduce un mensaje para firmar",
     "regenerate": "Regenerar Mensaje Predeterminado",
     "signButton": "Firmar Mensaje con MetaMask",
     "signing": "Firmando...",
     "signature": "Firma",
-    "information": "Esta característica te permite firmar mensajes con tu billetera Ethereum a través de MetaMask.",
-    "verify": "La firma puede ser utilizada para verificar tu propiedad de la dirección de billetera conectada.",
+    "information": "Esta función te permite firmar mensajes con tu billetera Ethereum a través de MetaMask.",
+    "verify": "La firma puede usarse para verificar tu propiedad de la dirección de la billetera conectada.",
     "walletRequired": "Se Requiere Billetera Web3",
     "metamaskNotInstalled": "MetaMask no está instalado",
     "requiresMetamask": "Esta función requiere MetaMask o una billetera web3 compatible para firmar mensajes.",

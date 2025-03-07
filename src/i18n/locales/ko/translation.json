@@ -130,27 +130,28 @@
     }
   },
   "metamaskSign": {
-    "title": "MetaMask로 메시지 서명",
+    "title": "MetaMask로 메시지 서명하기",
     "walletConnection": "지갑 연결",
     "connectedAccount": "연결된 계정:",
-    "connect": "MetaMask 연결",
+    "connect": "MetaMask 연결하기",
     "connecting": "연결 중...",
     "messageToSign": "서명할 메시지",
+    "messagePlaceholder": "서명할 메시지를 입력하세요",
     "regenerate": "기본 메시지 재생성",
-    "signButton": "MetaMask로 메시지 서명",
+    "signButton": "MetaMask로 메시지 서명하기",
     "signing": "서명 중...",
     "signature": "서명",
     "information": "이 기능을 사용하면 MetaMask를 통해 이더리움 지갑으로 메시지에 서명할 수 있습니다.",
-    "verify": "서명은 연결된 지갑 주소의 소유권을 확인하는 데 사용될 수 있습니다.",
+    "verify": "서명은 연결된 지갑 주소의 소유권을 증명하는 데 사용할 수 있습니다.",
     "walletRequired": "Web3 지갑 필요",
     "metamaskNotInstalled": "MetaMask가 설치되지 않았습니다",
-    "requiresMetamask": "이 기능은 메시지에 서명하기 위해 MetaMask 또는 호환되는 web3 지갑이 필요합니다.",
-    "installMetamask": "MetaMask 설치",
+    "requiresMetamask": "이 기능을 사용하려면 메시지 서명을 위해 MetaMask 또는 호환되는 web3 지갑이 필요합니다.",
+    "installMetamask": "MetaMask 설치하기",
     "afterInstalling": "MetaMask 설치 후:",
     "steps": [
       "지갑 생성 또는 가져오기",
-      "이더리움 네트워크에 연결",
-      "이 페이지 새로 고침"
+      "이더리움 네트워크에 연결하기",
+      "이 페이지 새로고침"
     ]
   },
   "userProfile": {
