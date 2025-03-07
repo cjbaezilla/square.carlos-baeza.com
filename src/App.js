@@ -2,6 +2,7 @@ import React from 'react';
 import { SignedIn, SignedOut, UserButton, SignInButton, useUser } from '@clerk/clerk-react';
 import './App.css';
 import UserProfileCard from './components/UserProfileCard';
+import MetaMaskSign from './components/MetaMaskSign';
 
 function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -33,6 +34,12 @@ function App() {
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-gray-100">User Profile</h2>
             <UserProfileCard />
+          </div>
+          
+          {/* MetaMask Signing Component */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">Web3 Authentication</h2>
+            <MetaMaskSign />
           </div>
         </SignedIn>
         
