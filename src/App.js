@@ -9,6 +9,7 @@ import LanguageSelector from './components/LanguageSelector';
 import BadgesPage from './badges/BadgesPage';
 import UserRewardsPage from './rewards/UserRewardsPage';
 import PointsBadge from './rewards/PointsBadge';
+import MascotsPage from './mascots/MascotsPage';
 
 function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -41,6 +42,13 @@ function App() {
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.rewards', 'Rewards & Points')}</h2>
             <UserRewardsPage />
+          </div>
+        );
+      case '#/mascots':
+        return (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-100">{t('sections.mascots', 'Robot Mascots')}</h2>
+            <MascotsPage />
           </div>
         );
       default:
@@ -117,6 +125,14 @@ function App() {
               {t('nav.rewards', 'Rewards')}
             </a>
           </li>
+          <li>
+            <a 
+              href="#/mascots" 
+              className={`hover:text-white transition-colors ${currentRoute === '#/mascots' ? 'text-white font-medium' : ''}`}
+            >
+              {t('nav.mascots', 'Mascots')}
+            </a>
+          </li>
         </SignedIn>
       </ul>
     </nav>
@@ -159,6 +175,11 @@ function App() {
             <li>
               <a href="#/rewards" className={`${currentRoute === '#/rewards' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
                 {t('nav.rewards', 'Rewards')}
+              </a>
+            </li>
+            <li>
+              <a href="#/mascots" className={`${currentRoute === '#/mascots' ? 'text-blue-400' : 'text-gray-300 hover:text-white'}`}>
+                {t('nav.mascots', 'Mascots')}
               </a>
             </li>
           </ul>

@@ -9,6 +9,7 @@ export const POINT_VALUES = {
   COMPLETE_PROFILE: 10, // Points for completing profile
   VIEW_GUIDE: 3,      // Points for viewing guides
   EARN_BADGE: 15,     // Points for earning a badge
+  TRAIN_MASCOT: 2,     // Points for training mascots
 };
 
 // Create a custom event for points updates
@@ -159,6 +160,11 @@ class PointsService {
   // Award points for earning a badge
   awardBadgePoints(userId) {
     return this.awardPointsForAction(userId, 'EARN_BADGE');
+  }
+
+  // Award points for training a mascot
+  awardMascotTrainingPoints(userId) {
+    return this.awardPointsForAction(userId, 'TRAIN_MASCOT');
   }
 }
 
