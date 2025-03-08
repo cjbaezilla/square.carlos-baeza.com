@@ -238,6 +238,24 @@ const UserRewardsPage = () => {
     );
   }
 
+  // Add loading screen effect similar to badges page
+  if (isLoading) {
+    return (
+      <div className="p-6 bg-gray-800 rounded-lg animate-pulse">
+        <div className="h-8 bg-gray-700 rounded mb-6 w-1/3"></div>
+        <div className="space-y-4">
+          <div className="h-16 bg-gray-700 rounded-lg"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-700 p-4 rounded-lg h-32"></div>
+            <div className="bg-gray-700 p-4 rounded-lg h-32"></div>
+          </div>
+          <div className="h-4 w-3/4 bg-gray-700 rounded mt-6"></div>
+          <div className="h-4 w-2/3 bg-gray-700 rounded mt-2"></div>
+        </div>
+      </div>
+    );
+  }
+
   if (!userData) {
     return (
       <div className="bg-gray-800 rounded-lg p-6 text-center">
@@ -249,20 +267,8 @@ const UserRewardsPage = () => {
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-      {/* User Points Summary with inline loading state */}
-      {isLoading ? (
-        <div className="mb-6 text-center">
-          <div className="h-8 w-32 mx-auto bg-gray-700 rounded animate-pulse"></div>
-          <div className="flex items-center mb-2 mt-2">
-            <div className="h-4 w-16 bg-gray-700 rounded animate-pulse mr-2"></div>
-            <div className="w-full bg-gray-700 rounded-full h-2.5"></div>
-            <div className="h-4 w-16 bg-gray-700 rounded animate-pulse ml-2"></div>
-          </div>
-          <div className="h-4 w-48 mx-auto bg-gray-700 rounded animate-pulse mt-2"></div>
-        </div>
-      ) : (
-        <PointsSummary userData={userData} t={t} />
-      )}
+      {/* User Points Summary - removed inline loading state */}
+      <PointsSummary userData={userData} t={t} />
 
       {/* Rewards Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -293,22 +299,12 @@ const UserRewardsPage = () => {
         />
       </div>
 
-      {/* Recent Activity with inline loading state */}
-      {isLoading ? (
-        <div className="border-t border-gray-700 pt-4">
-          <h4 className="text-lg font-semibold text-gray-200 mb-3">{t('rewards.recentActivity', 'Recent Activity')}</h4>
-          <div className="space-y-2">
-            <div className="h-4 w-3/4 bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 w-2/3 bg-gray-700 rounded animate-pulse"></div>
-          </div>
-        </div>
-      ) : (
-        <ActivityList 
-          actions={actions} 
-          pointValues={POINT_VALUES} 
-          t={t} 
-        />
-      )}
+      {/* Recent Activity - removed inline loading state */}
+      <ActivityList 
+        actions={actions} 
+        pointValues={POINT_VALUES} 
+        t={t} 
+      />
     </div>
   );
 };
