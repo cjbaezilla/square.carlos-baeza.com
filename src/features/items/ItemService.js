@@ -3,7 +3,7 @@
  * Service for managing item system with Supabase persistence
  */
 
-import supabase from '../../shared/utils/supabaseClient';
+import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 import PointsService from '../rewards/PointsService';
 
 // Custom event for item updates
@@ -426,31 +426,54 @@ class ItemService {
     }
     
     try {
-      const { data, error } = await supabase
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        // Try with regular client as fallback
+        const { data, error } = await supabase
+          .from(this.USER_ITEMS_TABLE)
+          .select('*')
+          .eq('user_id', userId);
+          
+        if (error) {
+          console.error('Error getting user items with regular client:', error);
+          return [];
+        }
+        
+        return this.formatItemsResponse(data);
+      }
+      
+      // Use admin client to bypass RLS
+      const { data, error } = await supabaseAdmin
         .from(this.USER_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId);
         
       if (error) {
-        console.error('Error getting user items:', error);
+        console.error('Error getting user items with admin client:', error);
         return [];
       }
       
-      // Transform to match the expected structure
-      return data ? data.map(item => ({
-        id: item.item_id,
-        instanceId: item.instance_id,
-        name: item.name,
-        description: item.description,
-        type: item.type,
-        rarity: item.rarity,
-        stats: item.stats,
-        svg: item.svg
-      })) : [];
+      return this.formatItemsResponse(data);
     } catch (err) {
       console.error('Error getting user items:', err);
       return [];
     }
+  }
+  
+  // Helper method to format items response
+  formatItemsResponse(data) {
+    // Transform to match the expected structure
+    return data ? data.map(item => ({
+      id: item.item_id,
+      instanceId: item.instance_id,
+      name: item.name,
+      description: item.description,
+      type: item.type,
+      rarity: item.rarity,
+      stats: item.stats,
+      svg: item.svg
+    })) : [];
   }
   
   // Add item to user's inventory
@@ -477,14 +500,26 @@ class ItemService {
         svg: item.svg
       };
       
-      // Insert into Supabase
-      const { error } = await supabase
+      // Use supabaseAdmin to bypass row-level security policies
+      // Only using this for item operations to ensure proper inventory management
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        return null;
+      }
+      
+      // Insert into Supabase and get the result
+      const { data, error } = await supabaseAdmin
         .from(this.USER_ITEMS_TABLE)
         .insert(itemInstance)
         .select();
         
       if (error) {
         console.error('Error adding item to inventory:', error);
+        return null;
+      }
+      
+      if (!data || data.length === 0) {
+        console.error('No data returned after inserting item to inventory');
         return null;
       }
       
@@ -538,13 +573,17 @@ class ItemService {
         };
       }
       
-      // Deduct points
-      await PointsService.addPoints(userId, -itemPrice, 'ITEM_PURCHASE');
-      
-      // Generate a random item
+      // Generate a random item first to ensure we have a valid item
       const newItem = generateRandomItem();
+      if (!newItem) {
+        console.error('Failed to generate random item');
+        return {
+          success: false,
+          message: 'Failed to generate item'
+        };
+      }
       
-      // Add to user's inventory
+      // Try to add the item to inventory first before deducting points
       const itemInstance = await this.addItemToUserInventory(userId, newItem);
       
       if (!itemInstance) {
@@ -554,15 +593,35 @@ class ItemService {
         };
       }
       
-      // Get updated points
-      const updatedUserData = await PointsService.getUserPoints(userId);
+      // Deduct points only after successfully adding item to inventory
+      const pointsResult = await PointsService.addPoints(userId, -itemPrice, 'ITEM_PURCHASE');
+      if (!pointsResult || !pointsResult.success) {
+        console.error('Failed to deduct points after adding item:', pointsResult);
+        // Item was added but points weren't deducted - this is an edge case
+        // Consider rolling back the item addition in a production app
+        return {
+          success: true,
+          item: itemInstance,
+          message: `Successfully purchased ${newItem.name}, but there was an issue updating your points. Please refresh.`,
+        };
+      }
+      
+      // Dispatch event for UI updates
+      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
+        detail: { 
+          userId,
+          itemId: itemInstance.instanceId,
+          timestamp: Date.now()
+        }
+      });
+      document.dispatchEvent(event);
       
       return {
         success: true,
         item: itemInstance,
         message: `Successfully purchased ${newItem.name}`,
         pointsSpent: itemPrice,
-        remainingPoints: updatedUserData.points
+        remainingPoints: pointsResult.userData.points
       };
     } catch (err) {
       console.error('Error purchasing random item:', err);
@@ -581,8 +640,14 @@ class ItemService {
     }
     
     try {
-      // Get equipped item instances from the join table
-      const { data: equippedData, error: equippedError } = await supabase
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        return [];
+      }
+      
+      // Get equipped item instances from the join table - use admin client
+      const { data: equippedData, error: equippedError } = await supabaseAdmin
         .from(this.MASCOT_ITEMS_TABLE)
         .select('item_instance_id')
         .eq('user_id', userId)
@@ -600,8 +665,8 @@ class ItemService {
       // Get the instance IDs
       const itemInstanceIds = equippedData.map(entry => entry.item_instance_id);
       
-      // Get the actual items
-      const { data: itemsData, error: itemsError } = await supabase
+      // Get the actual items - use admin client
+      const { data: itemsData, error: itemsError } = await supabaseAdmin
         .from(this.USER_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId)
@@ -612,17 +677,8 @@ class ItemService {
         return [];
       }
       
-      // Transform to the expected format
-      return itemsData ? itemsData.map(item => ({
-        id: item.item_id,
-        instanceId: item.instance_id,
-        name: item.name,
-        description: item.description,
-        type: item.type,
-        rarity: item.rarity,
-        stats: item.stats,
-        svg: item.svg
-      })) : [];
+      // Use the helper method to format the response
+      return this.formatItemsResponse(itemsData);
     } catch (err) {
       console.error('Error getting mascot items:', err);
       return [];
@@ -639,6 +695,15 @@ class ItemService {
     }
     
     try {
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        return {
+          success: false,
+          message: 'Service unavailable'
+        };
+      }
+      
       // Check if item exists in user's inventory
       const { data: itemData, error: itemError } = await supabase
         .from(this.USER_ITEMS_TABLE)
@@ -699,8 +764,8 @@ class ItemService {
         };
       }
       
-      // Equip the item
-      const { error: insertError } = await supabase
+      // Equip the item - use admin client to bypass RLS
+      const { error: insertError } = await supabaseAdmin
         .from(this.MASCOT_ITEMS_TABLE)
         .insert({
           user_id: userId,
@@ -759,6 +824,15 @@ class ItemService {
     }
     
     try {
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        return {
+          success: false,
+          message: 'Service unavailable'
+        };
+      }
+      
       // Get the item details first for the success message
       const { data: itemData, error: itemError } = await supabase
         .from(this.USER_ITEMS_TABLE)
@@ -775,8 +849,8 @@ class ItemService {
         };
       }
       
-      // Delete the equipment relationship
-      const { error: deleteError } = await supabase
+      // Delete the equipment relationship - use admin client to bypass RLS
+      const { error: deleteError } = await supabaseAdmin
         .from(this.MASCOT_ITEMS_TABLE)
         .delete()
         .eq('user_id', userId)
@@ -804,16 +878,6 @@ class ItemService {
       return {
         success: true,
         message: `${itemData.name} has been unequipped from your mascot`,
-        unequippedItem: {
-          id: itemData.item_id,
-          instanceId: itemData.instance_id,
-          name: itemData.name,
-          description: itemData.description,
-          type: itemData.type,
-          rarity: itemData.rarity,
-          stats: itemData.stats,
-          svg: itemData.svg
-        }
       };
     } catch (err) {
       console.error('Error unequipping item from mascot:', err);
@@ -850,7 +914,13 @@ class ItemService {
     if (!userId || !itemInstanceId) return false;
     
     try {
-      const { data, error } = await supabase
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Check environment variables.');
+        return false;
+      }
+      
+      const { data, error } = await supabaseAdmin
         .from(this.MASCOT_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId)

@@ -193,7 +193,11 @@ class PointsService {
         }
         
         console.error('Error fetching user points for update:', error);
-        return null;
+        return {
+          success: false,
+          message: 'Failed to fetch user points',
+          error: error
+        };
       }
       
       // Calculate new points and level
@@ -213,7 +217,11 @@ class PointsService {
         
       if (updateError) {
         console.error('Error updating user points:', updateError);
-        return null;
+        return {
+          success: false,
+          message: 'Failed to update user points',
+          error: updateError
+        };
       }
       
       const userData = this.formatUserData(updatedData);
@@ -226,10 +234,19 @@ class PointsService {
         await this.recordCompletedAction(userId, actionType);
       }
       
-      return userData;
+      return {
+        success: true,
+        userData: userData,
+        pointsAdded: amount,
+        newTotal: newPoints
+      };
     } catch (err) {
       console.error('Unexpected error in addPoints:', err);
-      return null;
+      return {
+        success: false,
+        message: 'Unexpected error adding points',
+        error: err
+      };
     }
   }
 
