@@ -832,7 +832,17 @@ const ItemsPage = () => {
       return isSignedIn && user ? !isItemEquippedState[item.instanceId] : true;
     });
 
-    if (filteredItems.length === 0) {
+    // Sort items by creation date, newest first
+    const sortedItems = [...filteredItems].sort((a, b) => {
+      // If createdAt dates are available, use them
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      // Fallback to instance ID if dates are not available
+      return a.instanceId.localeCompare(b.instanceId);
+    });
+
+    if (sortedItems.length === 0) {
       return (
         <div className="bg-gray-800 text-gray-300 rounded-xl p-8 flex flex-col items-center text-center">
           <div className="mb-4 text-blue-400">
@@ -869,7 +879,7 @@ const ItemsPage = () => {
             </svg>
             {t('items.your_items', 'Your Items')} 
             <span className="ml-2 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full">
-              {filteredItems.length}
+              {sortedItems.length}
             </span>
           </h3>
           
@@ -898,7 +908,7 @@ const ItemsPage = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-          {filteredItems.map(item => {
+          {sortedItems.map(item => {
             const rarityInfo = ITEM_RARITIES[item.rarity];
             
             return (
@@ -943,9 +953,16 @@ const ItemsPage = () => {
                   </span>
                 </div>
                 
-                <div className="text-xs text-gray-300 mb-3 flex-grow">
+                {/* Add created date display */}
+                {item.createdAt && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {t('items.acquired', 'Acquired')}: {new Date(item.createdAt).toLocaleDateString()}
+                  </div>
+                )}
+                
+                <p className="text-xs text-gray-400 mt-2 mb-3 flex-grow">
                   {t(`items.descriptions.${item.id}`, item.description)}
-                </div>
+                </p>
                 
                 <div className="flex flex-wrap gap-1.5 text-xs mb-3">
                   {Object.entries(item.stats).map(([stat, value]) => (
@@ -1088,68 +1105,93 @@ const ItemsPage = () => {
         
         {/* Equipped items list */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {equippedItems.map(item => {
-            const rarityInfo = ITEM_RARITIES[item.rarity];
-            
-            return (
-              <div 
-                key={item.instanceId} 
-                className="bg-gray-800 backdrop-blur-sm bg-opacity-70 border-2 rounded-xl p-4 flex flex-col relative overflow-hidden transition-all duration-300 hover:shadow-lg"
-                style={{ 
-                  borderColor: `${rarityInfo.color}50`
-                }}
-              >
-                {/* Rarity indicator */}
+          {/* Sort equipped items by creation date, newest first */}
+          {[...equippedItems]
+            .sort((a, b) => {
+              // If createdAt dates are available, use them
+              if (a.createdAt && b.createdAt) {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              }
+              // Fallback to instance ID if dates are not available
+              return a.instanceId.localeCompare(b.instanceId);
+            })
+            .map(item => {
+              const rarityInfo = ITEM_RARITIES[item.rarity];
+              
+              return (
                 <div 
-                  className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rotate-45 opacity-10"
-                  style={{ backgroundColor: rarityInfo.color }}
-                />
-                
-                <div 
-                  className="w-full h-24 mb-3 flex items-center justify-center item-svg-container p-2 rounded-lg"
+                  key={item.instanceId} 
+                  className="bg-gray-800 backdrop-blur-sm bg-opacity-70 border-2 rounded-xl p-4 flex flex-col relative overflow-hidden transition-all duration-300 hover:shadow-lg"
                   style={{ 
-                    backgroundColor: `${rarityInfo.color}20`,
-                    color: rarityInfo.color
+                    borderColor: `${rarityInfo.color}50`
                   }}
-                  dangerouslySetInnerHTML={{ __html: item.svg }}
-                />
-                
-                <div className="text-lg font-bold mb-1" style={{ color: rarityInfo.color }}>
-                  {t(`items.names.${item.id}`, item.name)}
-                </div>
-                
-                <div className="text-xs text-gray-400 mb-1">
-                  {t(`items.rarities.${rarityInfo.name}`, rarityInfo.name)} {t(`items.types.${item.type}`, item.type)}
-                </div>
-                
-                <div className="text-xs text-gray-300 mb-2 flex-grow">
-                  {t(`items.descriptions.${item.id}`, item.description)}
-                </div>
-                
-                <div className="flex flex-wrap gap-1.5 text-xs mb-3">
-                  {Object.entries(item.stats).map(([stat, value]) => (
-                    value !== 0 ? (
-                      <div 
-                        key={stat} 
-                        className={`px-2 py-1 rounded-lg flex items-center ${value > 0 ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}
-                        title={`${stat.toUpperCase()}: ${value}`}
-                      >
-                        <span className="font-bold mr-1">{stat.substring(0, 2).toUpperCase()}</span>
-                        <span>{value > 0 ? `+${value}` : value}</span>
-                      </div>
-                    ) : null
-                  ))}
-                </div>
-                
-                <button 
-                  className="w-full px-3 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition-colors"
-                  onClick={() => handleUnequipItem(item.instanceId)}
                 >
-                  {t('items.unequip', 'Unequip')}
-                </button>
-              </div>
-            );
-          })}
+                  {/* Rarity indicator */}
+                  <div 
+                    className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rotate-45 opacity-10"
+                    style={{ backgroundColor: rarityInfo.color }}
+                  />
+                  
+                  <div 
+                    className="w-full h-24 mb-3 flex items-center justify-center item-svg-container p-2 rounded-lg"
+                    style={{ 
+                      backgroundColor: `${rarityInfo.color}20`,
+                      color: rarityInfo.color
+                    }}
+                    dangerouslySetInnerHTML={{ __html: item.svg }}
+                  />
+                  
+                  <div className="text-lg font-bold mb-1 truncate" style={{ color: rarityInfo.color }}>
+                    {t(`items.names.${item.id}`, item.name)}
+                  </div>
+                  
+                  <div className="flex items-center mb-2">
+                    <span 
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{ 
+                        backgroundColor: `${rarityInfo.color}30`,
+                        color: rarityInfo.color
+                      }}
+                    >
+                      {t(`items.rarities.${rarityInfo.name}`, rarityInfo.name)}
+                    </span>
+                  </div>
+                  
+                  {/* Add created date display */}
+                  {item.createdAt && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {t('items.acquired', 'Acquired')}: {new Date(item.createdAt).toLocaleDateString()}
+                    </div>
+                  )}
+                  
+                  <div className="text-xs text-gray-400 mb-3 flex-grow">
+                    {t(`items.descriptions.${item.id}`, item.description)}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1.5 text-xs mb-3">
+                    {Object.entries(item.stats).map(([stat, value]) => (
+                      value !== 0 ? (
+                        <div 
+                          key={stat} 
+                          className={`px-2 py-1 rounded-lg flex items-center ${value > 0 ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}
+                          title={`${stat.toUpperCase()}: ${value}`}
+                        >
+                          <span className="font-bold mr-1">{stat.substring(0, 2).toUpperCase()}</span>
+                          <span>{value > 0 ? `+${value}` : value}</span>
+                        </div>
+                      ) : null
+                    ))}
+                  </div>
+                  
+                  <button 
+                    className="w-full px-3 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition-colors"
+                    onClick={() => handleUnequipItem(item.instanceId)}
+                  >
+                    {t('items.unequip', 'Unequip')}
+                  </button>
+                </div>
+              );
+            })}
           
           {/* Add placeholders for remaining item slots */}
           {Array.from({ length: 3 - equippedItems.length }).map((_, index) => (

@@ -490,7 +490,8 @@ class ItemService {
           type: item.type,
           rarity: item.rarity,
           stats: item.stats || {},
-          svg: item.svg
+          svg: item.svg,
+          createdAt: item.created_at
         };
       }).filter(Boolean); // Remove any null items
     } catch (error) {
