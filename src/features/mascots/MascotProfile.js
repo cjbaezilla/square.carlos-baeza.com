@@ -11,33 +11,53 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
   const [activeMascot, setActiveMascot] = useState(propMascot);
   const [equippedItems, setEquippedItems] = useState([]);
   const [totalStats, setTotalStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load active mascot if not provided via props
   useEffect(() => {
-    if (isSignedIn && user && !propMascot) {
-      const mascot = MascotService.getUserActiveMascot(user.id);
-      setActiveMascot(mascot);
-      
-      if (mascot) {
-        // Initialize total stats with mascot's base stats
-        setTotalStats({ ...mascot.stats });
+    const fetchMascot = async () => {
+      if (isSignedIn && user && !propMascot) {
+        try {
+          setIsLoading(true);
+          const mascot = await MascotService.getUserActiveMascot(user.id);
+          setActiveMascot(mascot);
+          
+          if (mascot) {
+            // Initialize total stats with mascot's base stats
+            setTotalStats({ ...mascot.stats });
+          }
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching active mascot:', error);
+          setIsLoading(false);
+        }
+      } else if (propMascot) {
+        // If mascot is provided via props, use it
+        setActiveMascot(propMascot);
+        setTotalStats({ ...propMascot.stats });
+        setIsLoading(false);
       }
-    } else if (propMascot) {
-      // If mascot is provided via props, use it
-      setActiveMascot(propMascot);
-      setTotalStats({ ...propMascot.stats });
-    }
+    };
+    
+    fetchMascot();
   }, [isSignedIn, user, propMascot]);
 
   // Listen for mascot updates
   useEffect(() => {
-    const handleMascotUpdate = (event) => {
+    const handleMascotUpdate = async (event) => {
       if (isSignedIn && user && event.detail.userId === user.id && !propMascot) {
-        const updatedMascot = MascotService.getUserActiveMascot(user.id);
-        setActiveMascot(updatedMascot);
-        
-        if (updatedMascot) {
-          setTotalStats({ ...updatedMascot.stats });
+        try {
+          setIsLoading(true);
+          const updatedMascot = await MascotService.getUserActiveMascot(user.id);
+          setActiveMascot(updatedMascot);
+          
+          if (updatedMascot) {
+            setTotalStats({ ...updatedMascot.stats });
+          }
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error handling mascot update:', error);
+          setIsLoading(false);
         }
       }
     };
@@ -92,8 +112,23 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
     };
   }, [isSignedIn, user, activeMascot]);
 
-  if (!isSignedIn || !activeMascot || !totalStats) {
-    return null;
+  if (!isSignedIn || isLoading) {
+    return (
+      <div className="flex justify-center items-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  if (!activeMascot || !totalStats) {
+    return (
+      <div className="bg-gray-800 rounded-lg p-4 text-center">
+        <p className="text-gray-400">{t('mascot.no_active_mascot', 'No active mascot selected')}</p>
+        <Link to="/mascots" className="text-blue-400 text-sm hover:underline mt-2 inline-block">
+          {t('mascot.select_mascot', 'Select a mascot')} →
+        </Link>
+      </div>
+    );
   }
 
   // Calculate stat differences (bonuses from items)

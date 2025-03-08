@@ -1,9 +1,10 @@
 /**
  * MascotService.js
- * Service for managing mascot system with localStorage persistence
+ * Service for managing mascot system with Supabase persistence
  */
 
 import PointsService from '../rewards/PointsService';
+import supabase from '../../shared/utils/supabaseClient';
 
 // Custom event for mascot updates
 export const MASCOT_UPDATED_EVENT = 'mascot-updated';
@@ -181,8 +182,7 @@ export const MASCOTS = [
 // Mascot System Class
 class MascotService {
   constructor() {
-    this.mascotKey = 'user_mascots';
-    this.activeMascotKey = 'user_active_mascot';
+    this.TABLE_NAME = 'user_mascots';
   }
 
   // Get all available mascots (shop catalog)
@@ -196,121 +196,253 @@ class MascotService {
   }
 
   // Get mascots owned by a user
-  getUserMascots(userId) {
-    const data = localStorage.getItem(this.mascotKey);
-    const allUserMascots = data ? JSON.parse(data) : {};
-    return allUserMascots[userId] || [];
+  async getUserMascots(userId) {
+    try {
+      // Query Supabase for user's mascots
+      const { data, error } = await supabase
+        .from(this.TABLE_NAME)
+        .select('*')
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Error fetching user mascots:', error);
+        return [];
+      }
+      
+      // Map database records to mascot objects with full details
+      return data.map(record => {
+        const mascotTemplate = this.getMascotById(record.mascot_id);
+        return {
+          ...mascotTemplate,
+          purchaseDate: record.purchase_date,
+          experience: record.experience,
+          level: record.level,
+          isActive: record.is_active
+        };
+      });
+    } catch (err) {
+      console.error('Unexpected error in getUserMascots:', err);
+      return [];
+    }
   }
-
-  // Save user's mascots
-  saveUserMascots(userId, mascots) {
-    const data = localStorage.getItem(this.mascotKey);
-    const allUserMascots = data ? JSON.parse(data) : {};
-    allUserMascots[userId] = mascots;
-    localStorage.setItem(this.mascotKey, JSON.stringify(allUserMascots));
-    
-    // Dispatch a custom event when mascots are updated
+  
+  // Helper method to dispatch mascot update event
+  dispatchMascotUpdatedEvent(userId, activeMascotId = null) {
     const event = new CustomEvent(MASCOT_UPDATED_EVENT, { 
-      detail: { userId, mascots }
+      detail: { userId, activeMascotId }
     });
     document.dispatchEvent(event);
   }
 
   // Get user's active mascot
-  getUserActiveMascot(userId) {
-    const data = localStorage.getItem(this.activeMascotKey);
-    const allActiveUserMascots = data ? JSON.parse(data) : {};
-    const activeMascotId = allActiveUserMascots[userId];
-    
-    if (!activeMascotId) {
+  async getUserActiveMascot(userId) {
+    try {
+      // Query Supabase for user's active mascot
+      const { data, error } = await supabase
+        .from(this.TABLE_NAME)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .single();
+      
+      if (error) {
+        if (error.code === 'PGRST116') { // No active mascot found
+          return null;
+        }
+        console.error('Error fetching active mascot:', error);
+        return null;
+      }
+      
+      // Map database record to mascot object with full details
+      const mascotTemplate = this.getMascotById(data.mascot_id);
+      return {
+        ...mascotTemplate,
+        purchaseDate: data.purchase_date,
+        experience: data.experience,
+        level: data.level,
+        isActive: data.is_active
+      };
+    } catch (err) {
+      console.error('Unexpected error in getUserActiveMascot:', err);
       return null;
     }
-    
-    // Find the mascot details
-    const userMascots = this.getUserMascots(userId);
-    return userMascots.find(mascot => mascot.id === activeMascotId);
   }
 
   // Set user's active mascot
-  setUserActiveMascot(userId, mascotId) {
-    const data = localStorage.getItem(this.activeMascotKey);
-    const allActiveUserMascots = data ? JSON.parse(data) : {};
-    allActiveUserMascots[userId] = mascotId;
-    localStorage.setItem(this.activeMascotKey, JSON.stringify(allActiveUserMascots));
-    
-    // Dispatch event
-    const event = new CustomEvent(MASCOT_UPDATED_EVENT, { 
-      detail: { userId, activeMascotId: mascotId }
-    });
-    document.dispatchEvent(event);
-    
-    return mascotId;
+  async setUserActiveMascot(userId, mascotId) {
+    try {
+      // First, set all mascots to inactive
+      const { error: resetError } = await supabase
+        .from(this.TABLE_NAME)
+        .update({ is_active: false })
+        .eq('user_id', userId);
+      
+      if (resetError) {
+        console.error('Error resetting active mascots:', resetError);
+        return null;
+      }
+      
+      // Then set the selected mascot to active
+      const { error } = await supabase
+        .from(this.TABLE_NAME)
+        .update({ is_active: true })
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId);
+      
+      if (error) {
+        console.error('Error setting active mascot:', error);
+        return null;
+      }
+      
+      // Dispatch event
+      this.dispatchMascotUpdatedEvent(userId, mascotId);
+      
+      return mascotId;
+    } catch (err) {
+      console.error('Unexpected error in setUserActiveMascot:', err);
+      return null;
+    }
   }
 
   // Purchase a mascot for a user
-  purchaseMascot(userId, mascotId) {
-    // Get the mascot details
-    const mascot = this.getMascotById(mascotId);
-    if (!mascot) {
-      return { success: false, message: 'Mascot not found' };
+  async purchaseMascot(userId, mascotId) {
+    try {
+      // Get the mascot details
+      const mascot = this.getMascotById(mascotId);
+      if (!mascot) {
+        return { success: false, message: 'Mascot not found' };
+      }
+      
+      // Get user points
+      const userData = await PointsService.getUserPoints(userId);
+      
+      // Check if user has enough points
+      if (userData.points < mascot.price) {
+        return { success: false, message: 'Not enough points' };
+      }
+      
+      // Check if user already owns this mascot
+      const { data, error: checkError } = await supabase
+        .from(this.TABLE_NAME)
+        .select('mascot_id')
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId);
+      
+      if (checkError) {
+        console.error('Error checking mascot ownership:', checkError);
+        return { success: false, message: 'Error checking mascot ownership' };
+      }
+      
+      if (data && data.length > 0) {
+        return { success: false, message: 'You already own this mascot' };
+      }
+      
+      // Deduct points
+      await PointsService.addPoints(userId, -mascot.price);
+      
+      // Check if this is the first mascot
+      const { data: existingMascots, error: countError } = await supabase
+        .from(this.TABLE_NAME)
+        .select('mascot_id')
+        .eq('user_id', userId);
+      
+      if (countError) {
+        console.error('Error counting existing mascots:', countError);
+      }
+      
+      const isFirstMascot = !existingMascots || existingMascots.length === 0;
+      
+      // Add mascot to user's collection
+      const { error } = await supabase
+        .from(this.TABLE_NAME)
+        .insert({
+          user_id: userId,
+          mascot_id: mascotId,
+          is_active: isFirstMascot, // Set as active if it's the first mascot
+          purchase_date: new Date().toISOString(),
+          experience: 0,
+          level: 1
+        });
+      
+      if (error) {
+        console.error('Error purchasing mascot:', error);
+        return { success: false, message: 'Error purchasing mascot' };
+      }
+      
+      // Dispatch event
+      this.dispatchMascotUpdatedEvent(userId, isFirstMascot ? mascotId : null);
+      
+      // Get the full mascot object to return
+      const userMascot = {
+        ...mascot,
+        purchaseDate: new Date().toISOString(),
+        experience: 0,
+        level: 1,
+        isActive: isFirstMascot
+      };
+      
+      return { 
+        success: true, 
+        message: 'Mascot purchased successfully', 
+        mascot: userMascot 
+      };
+    } catch (err) {
+      console.error('Unexpected error in purchaseMascot:', err);
+      return { success: false, message: 'Unexpected error occurred' };
     }
-    
-    // Get user points
-    const userData = PointsService.getUserPoints(userId);
-    
-    // Check if user has enough points
-    if (userData.points < mascot.price) {
-      return { success: false, message: 'Not enough points' };
-    }
-    
-    // Check if user already owns this mascot
-    const userMascots = this.getUserMascots(userId);
-    if (userMascots.some(m => m.id === mascotId)) {
-      return { success: false, message: 'You already own this mascot' };
-    }
-    
-    // Deduct points
-    PointsService.addPoints(userId, -mascot.price);
-    
-    // Add mascot to user's collection with experience and level
-    const userMascot = {
-      ...mascot,
-      purchaseDate: new Date().toISOString(),
-      experience: 0,
-      level: 1
-    };
-    
-    userMascots.push(userMascot);
-    this.saveUserMascots(userId, userMascots);
-    
-    // If this is the first mascot, set it as active
-    if (userMascots.length === 1) {
-      this.setUserActiveMascot(userId, mascotId);
-    }
-    
-    return { success: true, message: 'Mascot purchased successfully', mascot: userMascot };
   }
 
   // Add experience to a mascot
-  addMascotExperience(userId, mascotId, expAmount) {
-    const userMascots = this.getUserMascots(userId);
-    const mascotIndex = userMascots.findIndex(m => m.id === mascotId);
-    
-    if (mascotIndex === -1) {
+  async addMascotExperience(userId, mascotId, expAmount) {
+    try {
+      // Get current mascot data
+      const { data, error: fetchError } = await supabase
+        .from(this.TABLE_NAME)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId)
+        .single();
+      
+      if (fetchError) {
+        console.error('Error fetching mascot for experience update:', fetchError);
+        return null;
+      }
+      
+      // Update experience and level
+      const newExperience = data.experience + expAmount;
+      const newLevel = Math.floor(newExperience / 100) + 1;
+      
+      // Update in database
+      const { error } = await supabase
+        .from(this.TABLE_NAME)
+        .update({ 
+          experience: newExperience,
+          level: newLevel
+        })
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId);
+      
+      if (error) {
+        console.error('Error updating mascot experience:', error);
+        return null;
+      }
+      
+      // Dispatch event
+      this.dispatchMascotUpdatedEvent(userId);
+      
+      // Get the full mascot object to return
+      const mascotTemplate = this.getMascotById(mascotId);
+      return {
+        ...mascotTemplate,
+        purchaseDate: data.purchase_date,
+        experience: newExperience,
+        level: newLevel,
+        isActive: data.is_active
+      };
+    } catch (err) {
+      console.error('Unexpected error in addMascotExperience:', err);
       return null;
     }
-    
-    // Update experience and level
-    userMascots[mascotIndex].experience += expAmount;
-    
-    // Level up if enough experience (100 exp per level)
-    const newLevel = Math.floor(userMascots[mascotIndex].experience / 100) + 1;
-    if (newLevel > userMascots[mascotIndex].level) {
-      userMascots[mascotIndex].level = newLevel;
-    }
-    
-    this.saveUserMascots(userId, userMascots);
-    return userMascots[mascotIndex];
   }
 }
 

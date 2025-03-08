@@ -18,11 +18,13 @@ function App() {
   const [userMascots, setUserMascots] = useState([]);
   const [activeMascot, setActiveMascot] = useState(null);
   const [userItems, setUserItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Fetch and update items - extracted as a separate function to reuse
-  const fetchAndUpdateItems = useCallback(() => {
+  const fetchAndUpdateItems = useCallback(async () => {
     if (isSignedIn && user) {
       try {
+        setIsLoading(true);
         // Force initialization of user items data structure if it doesn't exist
         ItemService.initUserItemsData(user.id);
         
@@ -36,38 +38,55 @@ function App() {
           console.warn('Items not available or not an array:', items);
           setUserItems([]);
         }
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching items:', error);
         setUserItems([]);
+        setIsLoading(false);
+      }
+    }
+  }, [isSignedIn, user]);
+
+  // Fetch and update mascots
+  const fetchAndUpdateMascots = useCallback(async () => {
+    if (isSignedIn && user) {
+      try {
+        setIsLoading(true);
+        // Get user's mascots
+        const mascots = await MascotService.getUserMascots(user.id);
+        setUserMascots(mascots);
+        
+        // Get user's active mascot
+        const active = await MascotService.getUserActiveMascot(user.id);
+        setActiveMascot(active);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching mascots:', error);
+        setUserMascots([]);
+        setActiveMascot(null);
+        setIsLoading(false);
       }
     }
   }, [isSignedIn, user]);
 
   // Load user's data on initial render
   useEffect(() => {
-    if (isSignedIn && user) {
-      // Get user's mascots
-      const mascots = MascotService.getUserMascots(user.id);
-      setUserMascots(mascots);
-      
-      // Get user's active mascot
-      const active = MascotService.getUserActiveMascot(user.id);
-      setActiveMascot(active);
-      
-      // Fetch items
-      fetchAndUpdateItems();
-    }
-  }, [isSignedIn, user, fetchAndUpdateItems]);
+    const loadUserData = async () => {
+      if (isSignedIn && user) {
+        // Fetch mascots and items
+        await fetchAndUpdateMascots();
+        await fetchAndUpdateItems();
+      }
+    };
+    
+    loadUserData();
+  }, [isSignedIn, user, fetchAndUpdateMascots, fetchAndUpdateItems]);
 
   // Listen for mascot updates
   useEffect(() => {
-    const handleMascotUpdate = (event) => {
+    const handleMascotUpdate = async (event) => {
       if (isSignedIn && user && event.detail.userId === user.id) {
-        const mascots = MascotService.getUserMascots(user.id);
-        setUserMascots(mascots);
-        
-        const active = MascotService.getUserActiveMascot(user.id);
-        setActiveMascot(active);
+        await fetchAndUpdateMascots();
       }
     };
     
@@ -76,7 +95,7 @@ function App() {
     return () => {
       document.removeEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
     };
-  }, [isSignedIn, user]);
+  }, [isSignedIn, user, fetchAndUpdateMascots]);
 
   // Listen for item updates
   useEffect(() => {
@@ -151,12 +170,20 @@ function App() {
         
         <main className="max-w-5xl mx-auto p-4">
           <SignedIn>
-            <Navigation />
-            <AppRouter
-              userMascots={userMascots}
-              activeMascot={activeMascot}
-              userItems={userItems}
-            />
+            {isLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+              </div>
+            ) : (
+              <>
+                <Navigation />
+                <AppRouter
+                  userMascots={userMascots}
+                  activeMascot={activeMascot}
+                  userItems={userItems}
+                />
+              </>
+            )}
           </SignedIn>
           <SignedOut>
             <div className="text-center py-12">

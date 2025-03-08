@@ -22,38 +22,40 @@ const MascotsPage = () => {
 
   // Load user's mascots and available mascots
   useEffect(() => {
-    if (isSignedIn && user) {
-      const userId = user.id;
-      
-      // Get user's mascots
-      const mascots = MascotService.getUserMascots(userId);
-      setUserMascots(mascots);
-      
-      // Get user's active mascot
-      const activeMascot = MascotService.getUserActiveMascot(userId);
-      if (activeMascot) {
-        setActiveMascotId(activeMascot.id);
-      }
-      
-      // Get user's points - using async/await pattern
-      const fetchInitialPoints = async () => {
+    const loadData = async () => {
+      if (isSignedIn && user) {
+        setIsLoading(true);
+        const userId = user.id;
+        
         try {
+          // Get user's mascots
+          const mascots = await MascotService.getUserMascots(userId);
+          setUserMascots(mascots);
+          
+          // Get user's active mascot
+          const activeMascot = await MascotService.getUserActiveMascot(userId);
+          if (activeMascot) {
+            setActiveMascotId(activeMascot.id);
+          }
+          
+          // Get user's points
           const userData = await PointsService.getUserPoints(userId);
           if (userData) {
             setUserPoints(userData.points);
           }
+          
+          // Get all available mascots
+          setAvailableMascots(MascotService.getAllMascots());
+          
+          setIsLoading(false);
         } catch (error) {
-          console.error('Error fetching initial user points:', error);
+          console.error('Error loading mascot data:', error);
+          setIsLoading(false);
         }
-      };
-      
-      fetchInitialPoints();
-      
-      // Get all available mascots
-      setAvailableMascots(MascotService.getAllMascots());
-      
-      setIsLoading(false);
-    }
+      }
+    };
+    
+    loadData();
   }, [isSignedIn, user]);
 
   // Set up points polling interval and listeners
@@ -77,13 +79,17 @@ const MascotsPage = () => {
       intervalRef.current = setInterval(fetchPointsFromSupabase, 5000);
       
       // Listen for mascot updates
-      const handleMascotUpdate = (event) => {
+      const handleMascotUpdate = async (event) => {
         if (event.detail.userId === userId) {
-          const mascots = MascotService.getUserMascots(userId);
-          setUserMascots(mascots);
-          
-          if (event.detail.activeMascotId) {
-            setActiveMascotId(event.detail.activeMascotId);
+          try {
+            const mascots = await MascotService.getUserMascots(userId);
+            setUserMascots(mascots);
+            
+            if (event.detail.activeMascotId) {
+              setActiveMascotId(event.detail.activeMascotId);
+            }
+          } catch (error) {
+            console.error('Error handling mascot update:', error);
           }
         }
       };
@@ -112,50 +118,87 @@ const MascotsPage = () => {
   }, [isSignedIn, user]);
 
   // Handle mascot purchase
-  const handlePurchase = (mascotId) => {
+  const handlePurchase = async (mascotId) => {
     if (isSignedIn && user) {
-      const result = MascotService.purchaseMascot(user.id, mascotId);
-      
-      if (result.success) {
-        // Update local state
-        setUserMascots(MascotService.getUserMascots(user.id));
-        setUserPoints(PointsService.getUserPoints(user.id).points);
+      try {
+        setIsLoading(true);
+        const result = await MascotService.purchaseMascot(user.id, mascotId);
         
-        // Show success notification
-        setNotification({
-          type: 'success',
-          message: t('mascot.purchaseSuccess', 'Mascot purchased successfully!')
-        });
+        if (result.success) {
+          // Update local state
+          const mascots = await MascotService.getUserMascots(user.id);
+          setUserMascots(mascots);
+          
+          const userData = await PointsService.getUserPoints(user.id);
+          setUserPoints(userData.points);
+          
+          // Show success notification
+          setNotification({
+            type: 'success',
+            message: t('mascot.purchaseSuccess', 'Mascot purchased successfully!')
+          });
+          
+          // Switch to collection tab
+          setActiveTab('collection');
+        } else {
+          // Show error notification
+          setNotification({
+            type: 'error',
+            message: t(`mascot.purchaseError.${result.message}`, result.message)
+          });
+        }
         
-        // Switch to collection tab
-        setActiveTab('collection');
-      } else {
+        setIsLoading(false);
+        
+        // Clear notification after 3 seconds
+        setTimeout(() => setNotification(null), 3000);
+      } catch (error) {
+        console.error('Error purchasing mascot:', error);
+        setIsLoading(false);
+        
         // Show error notification
         setNotification({
           type: 'error',
-          message: t(`mascot.purchaseError.${result.message}`, result.message)
+          message: t('mascot.purchaseError.unknown', 'An error occurred while purchasing the mascot')
         });
+        
+        // Clear notification after 3 seconds
+        setTimeout(() => setNotification(null), 3000);
       }
-      
-      // Clear notification after 3 seconds
-      setTimeout(() => setNotification(null), 3000);
     }
   };
 
   // Handle activating a mascot
-  const handleActivate = (mascotId) => {
+  const handleActivate = async (mascotId) => {
     if (isSignedIn && user) {
-      MascotService.setUserActiveMascot(user.id, mascotId);
-      setActiveMascotId(mascotId);
-      
-      // Show success notification
-      setNotification({
-        type: 'success',
-        message: t('mascot.activateSuccess', 'Mascot activated!')
-      });
-      
-      // Clear notification after 3 seconds
-      setTimeout(() => setNotification(null), 3000);
+      try {
+        setIsLoading(true);
+        await MascotService.setUserActiveMascot(user.id, mascotId);
+        setActiveMascotId(mascotId);
+        
+        // Show success notification
+        setNotification({
+          type: 'success',
+          message: t('mascot.activateSuccess', 'Mascot activated!')
+        });
+        
+        setIsLoading(false);
+        
+        // Clear notification after 3 seconds
+        setTimeout(() => setNotification(null), 3000);
+      } catch (error) {
+        console.error('Error activating mascot:', error);
+        setIsLoading(false);
+        
+        // Show error notification
+        setNotification({
+          type: 'error',
+          message: t('mascot.activateError', 'An error occurred while activating the mascot')
+        });
+        
+        // Clear notification after 3 seconds
+        setTimeout(() => setNotification(null), 3000);
+      }
     }
   };
 
@@ -166,35 +209,58 @@ const MascotsPage = () => {
   };
 
   // Complete training and award experience
-  const completeTraining = () => {
+  const completeTraining = async () => {
     if (!trainingMascot || !isSignedIn || !user) return;
     
-    // Add experience to the mascot
-    const experienceGained = Math.floor(Math.random() * 10) + 5; // 5-15 exp
-    MascotService.addMascotExperience(user.id, trainingMascot.id, experienceGained);
-    
-    // Award points to user for training
-    PointsService.awardMascotTrainingPoints(user.id);
-    setUserPoints(PointsService.getUserPoints(user.id).points);
-    
-    // Update local state with new mascot data
-    setUserMascots(MascotService.getUserMascots(user.id));
-    
-    // Show success notification
-    setNotification({
-      type: 'success',
-      message: t('mascot.trainingSuccess', 'Training complete! {{name}} gained {{exp}} experience.', {
-        name: t(`mascots.names.${trainingMascot.id}`, trainingMascot.name),
-        exp: experienceGained
-      })
-    });
-    
-    // Reset training state
-    setIsTraining(false);
-    setTrainingMascot(null);
-    
-    // Clear notification after 3 seconds
-    setTimeout(() => setNotification(null), 3000);
+    try {
+      setIsLoading(true);
+      
+      // Add experience to the mascot
+      const experienceGained = Math.floor(Math.random() * 10) + 5; // 5-15 exp
+      await MascotService.addMascotExperience(user.id, trainingMascot.id, experienceGained);
+      
+      // Award points to user for training
+      await PointsService.awardMascotTrainingPoints(user.id);
+      const userData = await PointsService.getUserPoints(user.id);
+      setUserPoints(userData.points);
+      
+      // Update local state with new mascot data
+      const mascots = await MascotService.getUserMascots(user.id);
+      setUserMascots(mascots);
+      
+      // Show success notification
+      setNotification({
+        type: 'success',
+        message: t('mascot.trainingSuccess', 'Training complete! {{name}} gained {{exp}} experience.', {
+          name: t(`mascots.names.${trainingMascot.id}`, trainingMascot.name),
+          exp: experienceGained
+        })
+      });
+      
+      // Reset training state
+      setIsTraining(false);
+      setTrainingMascot(null);
+      setIsLoading(false);
+      
+      // Clear notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      console.error('Error completing training:', error);
+      setIsLoading(false);
+      
+      // Show error notification
+      setNotification({
+        type: 'error',
+        message: t('mascot.trainingError', 'An error occurred during training')
+      });
+      
+      // Reset training state
+      setIsTraining(false);
+      setTrainingMascot(null);
+      
+      // Clear notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    }
   };
 
   // Cancel training
@@ -248,46 +314,22 @@ const MascotsPage = () => {
                 : 'border-transparent hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <span>{t('mascot.submenu.collection', 'My Mascots')}</span>
+            <span>{t('mascot.submenu.collection', 'Your Collection')}</span>
           </button>
         </li>
         <li className="mr-2">
           <button
             onClick={() => {
-              setCurrentSection('store');
-              setActiveTab('store');
+              setCurrentSection('shop');
+              setActiveTab('shop');
             }}
             className={`inline-flex p-4 border-b-2 rounded-t-lg group ${
-              currentSection === 'store' 
+              currentSection === 'shop' 
                 ? 'text-blue-400 border-blue-400' 
                 : 'border-transparent hover:text-gray-300 hover:border-gray-300'
             }`}
           >
-            <span>{t('mascot.submenu.store', 'Mascot Store')}</span>
-          </button>
-        </li>
-        <li className="mr-2">
-          <button
-            onClick={() => setCurrentSection('training')}
-            className={`inline-flex p-4 border-b-2 rounded-t-lg group ${
-              currentSection === 'training' 
-                ? 'text-blue-400 border-blue-400' 
-                : 'border-transparent hover:text-gray-300 hover:border-gray-300'
-            }`}
-          >
-            <span>{t('mascot.submenu.training', 'Training Center')}</span>
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => setCurrentSection('stats')}
-            className={`inline-flex p-4 border-b-2 rounded-t-lg group ${
-              currentSection === 'stats' 
-                ? 'text-blue-400 border-blue-400' 
-                : 'border-transparent hover:text-gray-300 hover:border-gray-300'
-            }`}
-          >
-            <span>{t('mascot.submenu.stats', 'Mascot Stats')}</span>
+            <span>{t('mascot.submenu.shop', 'Mascot Shop')}</span>
           </button>
         </li>
       </ul>
@@ -374,8 +416,8 @@ const MascotsPage = () => {
                 </div>
                 <button
                   onClick={() => {
-                    setCurrentSection('store');
-                    setActiveTab('store');
+                    setCurrentSection('shop');
+                    setActiveTab('shop');
                   }}
                   className="text-sm text-blue-400 hover:text-blue-300"
                 >
@@ -400,8 +442,8 @@ const MascotsPage = () => {
                   
                   <button
                     onClick={() => {
-                      setCurrentSection('store');
-                      setActiveTab('store');
+                      setCurrentSection('shop');
+                      setActiveTab('shop');
                     }}
                     className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded"
                   >
@@ -423,13 +465,13 @@ const MascotsPage = () => {
         );
       
       case 'collection':
-      case 'store':
+      case 'shop':
         return (
           <>
             {/* Show the existing tabs but hide the tab selector */}
             <div className="hidden">
               <button onClick={() => setActiveTab('collection')}></button>
-              <button onClick={() => setActiveTab('store')}></button>
+              <button onClick={() => setActiveTab('shop')}></button>
             </div>
             
             {activeTab === 'collection' && (
@@ -439,12 +481,12 @@ const MascotsPage = () => {
                     <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots yet.')}</p>
                     <button
                       onClick={() => {
-                        setActiveTab('store');
-                        setCurrentSection('store');
+                        setActiveTab('shop');
+                        setCurrentSection('shop');
                       }}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                     >
-                      {t('mascot.goToStore', 'Visit Mascot Store')}
+                      {t('mascot.goToStore', 'Visit Mascot Shop')}
                     </button>
                   </div>
                 ) : (
@@ -466,10 +508,10 @@ const MascotsPage = () => {
               </>
             )}
             
-            {activeTab === 'store' && (
+            {activeTab === 'shop' && (
               <>
                 <div className="mb-4">
-                  <p className="text-gray-300">{t('mascot.storeDescription', 'Purchase unique robot mascots using your earned points.')}</p>
+                  <p className="text-gray-300">{t('mascot.shopDescription', 'Purchase unique robot mascots using your earned points.')}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {availableMascots
@@ -508,12 +550,12 @@ const MascotsPage = () => {
                 <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots to train.')}</p>
                 <button
                   onClick={() => {
-                    setActiveTab('store');
-                    setCurrentSection('store');
+                    setActiveTab('shop');
+                    setCurrentSection('shop');
                   }}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                 >
-                  {t('mascot.goToStore', 'Visit Mascot Store')}
+                  {t('mascot.goToStore', 'Visit Mascot Shop')}
                 </button>
               </div>
             ) : (
@@ -563,12 +605,12 @@ const MascotsPage = () => {
                 <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots to compare.')}</p>
                 <button
                   onClick={() => {
-                    setActiveTab('store');
-                    setCurrentSection('store');
+                    setActiveTab('shop');
+                    setCurrentSection('shop');
                   }}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                 >
-                  {t('mascot.goToStore', 'Visit Mascot Store')}
+                  {t('mascot.goToStore', 'Visit Mascot Shop')}
                 </button>
               </div>
             ) : (
