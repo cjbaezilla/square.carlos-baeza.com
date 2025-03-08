@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import MascotService, { MASCOT_UPDATED_EVENT } from './MascotService';
@@ -18,6 +18,7 @@ const MascotsPage = () => {
   const [isTraining, setIsTraining] = useState(false);
   const [trainingMascot, setTrainingMascot] = useState(null);
   const [currentSection, setCurrentSection] = useState('overview');
+  const intervalRef = useRef(null); // Reference for the points update interval
 
   // Load user's mascots and available mascots
   useEffect(() => {
@@ -34,9 +35,19 @@ const MascotsPage = () => {
         setActiveMascotId(activeMascot.id);
       }
       
-      // Get user's points
-      const userData = PointsService.getUserPoints(userId);
-      setUserPoints(userData.points);
+      // Get user's points - using async/await pattern
+      const fetchInitialPoints = async () => {
+        try {
+          const userData = await PointsService.getUserPoints(userId);
+          if (userData) {
+            setUserPoints(userData.points);
+          }
+        } catch (error) {
+          console.error('Error fetching initial user points:', error);
+        }
+      };
+      
+      fetchInitialPoints();
       
       // Get all available mascots
       setAvailableMascots(MascotService.getAllMascots());
@@ -45,34 +56,59 @@ const MascotsPage = () => {
     }
   }, [isSignedIn, user]);
 
-  // Listen for mascot updates
+  // Set up points polling interval and listeners
   useEffect(() => {
-    const handleMascotUpdate = (event) => {
-      if (isSignedIn && user && event.detail.userId === user.id) {
-        const mascots = MascotService.getUserMascots(user.id);
-        setUserMascots(mascots);
-        
-        if (event.detail.activeMascotId) {
-          setActiveMascotId(event.detail.activeMascotId);
+    if (isSignedIn && user) {
+      const userId = user.id;
+      
+      // Function to fetch points from Supabase
+      const fetchPointsFromSupabase = async () => {
+        try {
+          const userData = await PointsService.getUserPoints(userId);
+          if (userData) {
+            setUserPoints(userData.points);
+          }
+        } catch (error) {
+          console.error('Error fetching user points:', error);
         }
-      }
-    };
-    
-    // Listen for points updates
-    const handlePointsUpdate = (event) => {
-      if (isSignedIn && user) {
-        const userData = PointsService.getUserPoints(user.id);
-        setUserPoints(userData.points);
-      }
-    };
-    
-    document.addEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
-    document.addEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
-    
-    return () => {
-      document.removeEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
-      document.removeEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
-    };
+      };
+      
+      // Set up interval to fetch points every 5 seconds
+      intervalRef.current = setInterval(fetchPointsFromSupabase, 5000);
+      
+      // Listen for mascot updates
+      const handleMascotUpdate = (event) => {
+        if (event.detail.userId === userId) {
+          const mascots = MascotService.getUserMascots(userId);
+          setUserMascots(mascots);
+          
+          if (event.detail.activeMascotId) {
+            setActiveMascotId(event.detail.activeMascotId);
+          }
+        }
+      };
+      
+      // Listen for points updates
+      const handlePointsUpdate = async (event) => {
+        // Only update points when the event is for this user
+        if (event.detail.pointsData && event.detail.pointsData[userId]) {
+          const pointsData = event.detail.pointsData[userId];
+          setUserPoints(pointsData.points);
+        }
+      };
+      
+      document.addEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
+      document.addEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
+      
+      return () => {
+        // Clear interval and remove event listeners on cleanup
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        document.removeEventListener(MASCOT_UPDATED_EVENT, handleMascotUpdate);
+        document.removeEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
+      };
+    }
   }, [isSignedIn, user]);
 
   // Handle mascot purchase
