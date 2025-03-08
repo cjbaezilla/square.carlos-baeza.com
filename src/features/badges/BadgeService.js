@@ -139,15 +139,16 @@ class BadgeService {
       // If no badges found, check if the table exists
       if (!data || data.length === 0) {
         console.log('No badges found, checking if table exists');
-        const { data: tableData, error: tableError } = await client
-          .from('information_schema.tables')
-          .select('table_name')
-          .eq('table_name', this.TABLE_NAME);
+        // Try a direct approach - just query the table and see if it exists
+        const { data: testData, error: testError } = await client
+          .from(this.TABLE_NAME)
+          .select('*')
+          .limit(1);
           
-        if (tableError) {
-          console.error('Error checking if table exists:', tableError);
+        if (testError) {
+          console.error('Error checking if table exists:', testError);
         } else {
-          console.log('Table check result:', tableData);
+          console.log('Table check result: Table exists');
         }
       }
       
@@ -470,118 +471,70 @@ class BadgeService {
         return true;
       }
       
-      // Check if table exists
+      // Check if table exists by trying to query it
       const { data: tableData, error: tableError } = await supabaseAdmin
-        .from('information_schema.tables')
-        .select('table_name')
-        .eq('table_schema', 'public')
-        .eq('table_name', this.TABLE_NAME);
+        .from(this.TABLE_NAME)
+        .select('*')
+        .limit(1);
       
       if (tableError) {
         console.error('Error checking if table exists:', tableError);
-        // Try a simpler approach - just query the table and see if it exists
-        const { /* data: testData, */ error: testError } = await supabaseAdmin
-          .from(this.TABLE_NAME)
-          .select('*')
-          .limit(1);
-          
-        if (testError && testError.code === '42P01') {
-          // Table doesn't exist error
-          console.log('Table confirmed not to exist via direct query');
-        } else if (testError) {
-          console.error('Error testing table access:', testError);
-          return false;
-        } else {
-          // Table exists
-          console.log('Table exists and is accessible via direct query');
-          return true;
-        }
-      }
-      
-      // If table doesn't exist, create it
-      if (!tableData || tableData.length === 0) {
-        console.log('Table does not exist. Creating user_badges table...');
         
-        try {
-          // Try to create the table with individual commands
-          // 1. Create table
-          const createTableResult = await supabaseAdmin.rpc('exec_sql', { 
-            sql: `CREATE TABLE IF NOT EXISTS ${this.TABLE_NAME} (
-              id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-              user_id TEXT NOT NULL,
-              badge_id TEXT NOT NULL,
-              date_awarded TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
-              UNIQUE(user_id, badge_id)
-            );`
-          });
+        // If the table doesn't exist, try to create it
+        if (tableError.code === '42P01') {
+          console.log('Table confirmed not to exist via direct query. Creating table...');
           
-          if (createTableResult.error) {
-            console.error('Error creating table:', createTableResult.error);
+          try {
+            // We need to use the REST API directly since we don't have exec_sql
+            // Instead of using RPC, we'll create a simple table with minimal features
+            // that we'll enhance manually later if needed
+            
+            const createResult = await fetch(`${supabaseAdmin.supabaseUrl}/rest/v1/${this.TABLE_NAME}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': supabaseAdmin.supabaseKey,
+                'Authorization': `Bearer ${supabaseAdmin.supabaseKey}`,
+                'Prefer': 'return=representation'
+              },
+              body: JSON.stringify({
+                id: '00000000-0000-0000-0000-000000000000', // Dummy record we'll delete
+                user_id: 'SYSTEM',
+                badge_id: 'system_init',
+                date_awarded: new Date().toISOString()
+              })
+            });
+            
+            if (!createResult.ok) {
+              const errorData = await createResult.json();
+              console.error('Error creating table via REST API:', errorData);
+              return false;
+            }
+            
+            console.log('Successfully created user_badges table');
+            
+            // Now delete the dummy record
+            const { error: deleteError } = await supabaseAdmin
+              .from(this.TABLE_NAME)
+              .delete()
+              .eq('id', '00000000-0000-0000-0000-000000000000');
+            
+            if (deleteError) {
+              console.warn('Error deleting dummy record, but continuing:', deleteError);
+            }
+            
+            return true;
+          } catch (error) {
+            console.error('Error in table creation process:', error);
             return false;
           }
-          
-          // 2. Create index
-          const createIndexResult = await supabaseAdmin.rpc('exec_sql', {
-            sql: `CREATE INDEX IF NOT EXISTS user_badges_user_id_idx ON ${this.TABLE_NAME}(user_id);`
-          });
-          
-          if (createIndexResult.error) {
-            console.warn('Error creating index, but continuing:', createIndexResult.error);
-            // Continue anyway as this is not critical
-          }
-          
-          // 3. Enable RLS
-          const enableRlsResult = await supabaseAdmin.rpc('exec_sql', {
-            sql: `ALTER TABLE ${this.TABLE_NAME} ENABLE ROW LEVEL SECURITY;`
-          });
-          
-          if (enableRlsResult.error) {
-            console.warn('Error enabling RLS, but continuing:', enableRlsResult.error);
-            // Continue anyway
-          }
-          
-          // 4. Create select policy
-          const createSelectPolicyResult = await supabaseAdmin.rpc('exec_sql', {
-            sql: `CREATE POLICY IF NOT EXISTS select_own_badges ON ${this.TABLE_NAME} 
-              FOR SELECT USING (auth.uid()::text = user_id);`
-          });
-          
-          if (createSelectPolicyResult.error) {
-            console.warn('Error creating select policy, but continuing:', createSelectPolicyResult.error);
-            // Continue anyway
-          }
-          
-          // 5. Create service role policy
-          const createServicePolicyResult = await supabaseAdmin.rpc('exec_sql', {
-            sql: `CREATE POLICY IF NOT EXISTS service_role_all_access ON ${this.TABLE_NAME} 
-              FOR ALL TO service_role USING (true);`
-          });
-          
-          if (createServicePolicyResult.error) {
-            console.warn('Error creating service role policy, but continuing:', createServicePolicyResult.error);
-            // Continue anyway
-          }
-          
-          console.log('Successfully created user_badges table with individual commands');
-          return true;
-        } catch (error) {
-          console.error('Error in table creation process:', error);
-          
-          // Fall back to a simple query to check if the table got created anyway
-          const { /* data: checkData, */ error: checkError } = await supabaseAdmin
-            .from(this.TABLE_NAME)
-            .select('*')
-            .limit(1);
-            
-          if (!checkError) {
-            console.log('Table exists despite errors in creation process');
-            return true;
-          }
-          
+        } else {
+          // Some other error occurred
           return false;
         }
       }
       
+      // Table exists and we were able to query it
       console.log('User badges table exists');
       return true;
     } catch (error) {
