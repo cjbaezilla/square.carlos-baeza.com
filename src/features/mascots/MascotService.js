@@ -332,8 +332,8 @@ class MascotService extends ServiceBase {
           ...baseMascot,
           id: mascotData.mascot_id,
           level: mascotData.level || 1,
-          exp: mascotData.exp || 0,
-          nextLevelExp: mascotData.next_level_exp || 100,
+          experience: mascotData.experience || 0,
+          nextLevelExp: 100 * Math.pow(1.5, (mascotData.level || 1) - 1),
           purchasedAt: mascotData.created_at,
           isActive: mascotData.is_active || false
         };
@@ -380,8 +380,8 @@ class MascotService extends ServiceBase {
         ...baseMascot,
         id: mascotData.mascot_id,
         level: mascotData.level || 1,
-        exp: mascotData.exp || 0,
-        nextLevelExp: mascotData.next_level_exp || 100,
+        experience: mascotData.experience || 0,
+        nextLevelExp: 100 * Math.pow(1.5, (mascotData.level || 1) - 1),
         purchasedAt: mascotData.created_at,
         isActive: true
       };
@@ -490,8 +490,7 @@ class MascotService extends ServiceBase {
         user_id: userId,
         mascot_id: mascotId,
         level: 1,
-        exp: 0,
-        next_level_exp: 100,
+        experience: 0,
         is_active: isFirstMascot, // If it's the first mascot, set it as active
         created_at: new Date().toISOString()
       };
@@ -505,10 +504,8 @@ class MascotService extends ServiceBase {
       // Deduct points for the purchase
       await PointsService.addPoints(userId, -mascot.price, 'MASCOT_PURCHASE');
       
-      // If this is the user's first mascot, set it as active
-      if (isFirstMascot) {
-        this.dispatchMascotUpdatedEvent(userId, mascotId);
-      }
+      // Always dispatch the event when a mascot is purchased
+      this.dispatchMascotUpdatedEvent(userId, isFirstMascot ? mascotId : null);
       
       return {
         success: true,
@@ -516,7 +513,7 @@ class MascotService extends ServiceBase {
         mascot: {
           ...mascot,
           level: 1,
-          exp: 0,
+          experience: 0,
           isActive: isFirstMascot
         }
       };
@@ -555,9 +552,10 @@ class MascotService extends ServiceBase {
       const mascotData = mascots[0];
       
       // Calculate new experience and level
-      const currentExp = mascotData.exp || 0;
+      const currentExp = mascotData.experience || 0;
       const currentLevel = mascotData.level || 1;
-      const expToNextLevel = mascotData.next_level_exp || 100;
+      // Calculate experience needed for next level based on current level
+      const expToNextLevel = 100 * Math.pow(1.5, currentLevel - 1);
       
       let newExp = currentExp + expAmount;
       let newLevel = currentLevel;
@@ -575,9 +573,8 @@ class MascotService extends ServiceBase {
         this.USER_MASCOTS_TABLE,
         { user_id: userId, mascot_id: mascotId },
         { 
-          exp: newExp,
-          level: newLevel,
-          next_level_exp: newExpToNextLevel
+          experience: newExp,
+          level: newLevel
         }
       );
       
@@ -598,7 +595,7 @@ class MascotService extends ServiceBase {
           `Your mascot gained ${expAmount} experience!`,
         mascot: {
           id: mascotId,
-          exp: newExp,
+          experience: newExp,
           level: newLevel,
           expToNextLevel: newExpToNextLevel,
           leveledUp: newLevel > currentLevel

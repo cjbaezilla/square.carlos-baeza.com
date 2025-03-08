@@ -225,7 +225,7 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
           <div className="text-sm text-gray-400 capitalize">{activeMascot.rarity} Class</div>
           {activeMascot.level && (
             <div className="text-sm text-green-400 mt-1">
-              Level {activeMascot.level} • {activeMascot.experience % 100}% XP
+              Level {activeMascot.level} • {Math.round((activeMascot.experience / activeMascot.nextLevelExp) * 100)}% XP
             </div>
           )}
           {equippedItems.length > 0 && (

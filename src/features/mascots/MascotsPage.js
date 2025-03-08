@@ -20,6 +20,12 @@ const MascotsPage = () => {
   const [currentSection, setCurrentSection] = useState('overview');
   const intervalRef = useRef(null); // Reference for the points update interval
 
+  // Helper function to switch tabs and ensure UI state consistency
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    setCurrentSection(tab);
+  };
+
   // Load user's mascots and available mascots
   useEffect(() => {
     const loadData = async () => {
@@ -181,8 +187,8 @@ const MascotsPage = () => {
             message: t('mascot.purchaseSuccess', 'Mascot purchased successfully!')
           });
           
-          // Switch to collection tab
-          setActiveTab('collection');
+          // Switch to collection tab using the helper function
+          switchTab('collection');
         } else {
           // Show error notification
           setNotification({
@@ -375,8 +381,7 @@ const MascotsPage = () => {
         <li className="mr-2">
           <button
             onClick={() => {
-              setCurrentSection('collection');
-              setActiveTab('collection');
+              switchTab('collection');
             }}
             className={`inline-flex p-4 border-b-2 rounded-t-lg group ${
               currentSection === 'collection' 
@@ -390,8 +395,7 @@ const MascotsPage = () => {
         <li className="mr-2">
           <button
             onClick={() => {
-              setCurrentSection('shop');
-              setActiveTab('shop');
+              switchTab('shop');
             }}
             className={`inline-flex p-4 border-b-2 rounded-t-lg group ${
               currentSection === 'shop' 
@@ -486,8 +490,7 @@ const MascotsPage = () => {
                 </div>
                 <button
                   onClick={() => {
-                    setCurrentSection('shop');
-                    setActiveTab('shop');
+                    switchTab('shop');
                   }}
                   className="text-sm text-blue-400 hover:text-blue-300"
                 >
@@ -502,8 +505,7 @@ const MascotsPage = () => {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => {
-                      setCurrentSection('collection');
-                      setActiveTab('collection');
+                      switchTab('collection');
                     }}
                     className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded"
                   >
@@ -512,8 +514,7 @@ const MascotsPage = () => {
                   
                   <button
                     onClick={() => {
-                      setCurrentSection('shop');
-                      setActiveTab('shop');
+                      switchTab('shop');
                     }}
                     className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded"
                   >
@@ -551,8 +552,7 @@ const MascotsPage = () => {
                     <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots yet.')}</p>
                     <button
                       onClick={() => {
-                        setActiveTab('shop');
-                        setCurrentSection('shop');
+                        switchTab('shop');
                       }}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                     >
@@ -710,8 +710,7 @@ const MascotsPage = () => {
                 <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots to train.')}</p>
                 <button
                   onClick={() => {
-                    setActiveTab('shop');
-                    setCurrentSection('shop');
+                    switchTab('shop');
                   }}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                 >
@@ -772,8 +771,7 @@ const MascotsPage = () => {
                 <p className="text-gray-400 mb-4">{t('mascot.noMascots', 'You don\'t have any mascots to compare.')}</p>
                 <button
                   onClick={() => {
-                    setActiveTab('shop');
-                    setCurrentSection('shop');
+                    switchTab('shop');
                   }}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
                 >
