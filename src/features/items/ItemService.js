@@ -6,6 +6,7 @@
 import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 import PointsService from '../rewards/PointsService';
 import ServiceBase from '../../shared/utils/ServiceBase';
+import { isUserInitialized, markUserInitialized, isAppInitializedThisSession, markAppInitializedThisSession } from '../../shared/utils/initializationTracker';
 
 // Custom event for item updates
 export const ITEM_UPDATED_EVENT = 'item-updated';
@@ -333,17 +334,57 @@ export const generateRandomItem = () => {
   // Filter items by the selected rarity
   const itemsByRarity = ITEMS.filter(item => item.rarity === selectedRarity);
   
+  // If no items found for this rarity, use a fallback COMMON item
+  if (!itemsByRarity.length) {
+    console.warn(`No items found for rarity ${selectedRarity}, using COMMON fallback`);
+    const commonItems = ITEMS.filter(item => item.rarity === 'COMMON');
+    
+    if (!commonItems.length) {
+      console.error('No common items found as fallback');
+      // Create a minimal valid item as ultimate fallback
+      return {
+        id: 'basic-item',
+        name: 'Basic Item',
+        description: 'A simple item that was created as a fallback.',
+        type: 'MISC',
+        rarity: 'COMMON',
+        stats: { hp: 1, mp: 1, agility: 0, power: 0, defense: 0 },
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#97a0af" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`
+      };
+    }
+    
+    // Select a random common item
+    const randomIndex = Math.floor(Math.random() * commonItems.length);
+    const item = commonItems[randomIndex];
+    
+    // Ensure item has stats
+    if (!item.stats) {
+      item.stats = { hp: 0, mp: 0, agility: 0, power: 0, defense: 0 };
+    }
+    
+    return item;
+  }
+  
   // Select a random item from the filtered list
   const randomIndex = Math.floor(Math.random() * itemsByRarity.length);
-  return itemsByRarity[randomIndex];
+  const item = itemsByRarity[randomIndex];
+  
+  // Ensure item has stats
+  if (!item.stats) {
+    console.warn(`Item ${item.id} missing stats, initializing default stats`);
+    item.stats = { hp: 0, mp: 0, agility: 0, power: 0, defense: 0 };
+  }
+  
+  return item;
 };
 
 // Item System Class
 class ItemService extends ServiceBase {
   constructor() {
-    super();
+    super('user_items');
     this.USER_ITEMS_TABLE = 'user_items';
     this.MASCOT_ITEMS_TABLE = 'mascot_equipped_items';
+    this.ITEMS_MASCOTS_TABLE = 'items_mascots';
     
     // Clean up localStorage on initialization - reference removed
     this.clearLocalStorageData();
@@ -393,27 +434,88 @@ class ItemService extends ServiceBase {
   // Initialize user data (if not already initialized)
   async initUserItemsData(userId) {
     if (!userId) {
+      console.error('initUserItemsData called with invalid userId');
       return this.handleError(new Error('Invalid userId'), 'initUserItemsData', false);
     }
     
+    console.log(`initUserItemsData called for user: ${userId}`);
+    
+    // Quick protection against multiple initializations in the same browser session
+    if (isAppInitializedThisSession()) {
+      console.log('Application already initialized items in this browser session, skipping');
+      return true;
+    }
+    
+    // Check initialization status using the tracker
+    if (isUserInitialized(userId, 'items')) {
+      console.log(`User ${userId} items already initialized (using tracker)`);
+      return true;
+    }
+    
     try {
-      // Check if user already has items data
-      const userItems = await this.fetchData(this.USER_ITEMS_TABLE, { user_id: userId });
+      console.log(`Checking if user ${userId} already has items...`);
       
-      // If user already has items data, no need to initialize
+      // Check if user already has items data with a more robust query
+      const { data: userItems, error } = await this.supabaseAdmin
+        .from(this.USER_ITEMS_TABLE)
+        .select('id, item_id')
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error(`Error checking for existing items for user ${userId}:`, error);
+        return false;
+      }
+      
+      console.log(`User ${userId} existing items check result:`, userItems);
+      
+      // If user already has at least one item, record that they're initialized and return
       if (userItems && userItems.length > 0) {
+        console.log(`User ${userId} already has ${userItems.length} items, skipping initialization`);
+        
+        // Check for specific starter items to avoid duplicates
+        const knownStarterItems = ['singularity-core', 'basic-antenna', 'precision-servo', 'quantum-processor', 'reinforced-plate'];
+        const existingStarterItems = userItems.filter(item => knownStarterItems.includes(item.item_id));
+        
+        console.log(`User already has ${existingStarterItems.length} of ${knownStarterItems.length} starter items`);
+        
+        // Mark as initialized using the tracker
+        markUserInitialized(userId, 'items');
         return true;
       }
       
+      console.log(`Creating starter items for user ${userId}`);
+      
       // Give the user some starter items
       const starterItems = this.getSampleItems();
+      console.log(`Generated ${starterItems.length} starter items for new user:`, starterItems.map(item => item.id));
+      
+      // Protection against duplicate starter items by recording which ones we've created
+      const createdItems = new Set();
       
       for (const item of starterItems) {
-        await this.addItemToUserInventory(userId, item);
+        // Skip if we've already created this item type (shouldn't happen, but just in case)
+        if (createdItems.has(item.id)) {
+          console.log(`Skipping duplicate starter item: ${item.id}`);
+          continue;
+        }
+        
+        const result = await this.addItemToUserInventory(userId, item);
+        console.log(`Added starter item to user ${userId} inventory:`, item.id, result.success);
+        
+        // Track that we've created this item
+        createdItems.add(item.id);
       }
       
+      // Mark as initialized using the tracker
+      markUserInitialized(userId, 'items');
+      
+      // Ensure we mark that initialization has happened this session
+      markAppInitializedThisSession();
+      
+      console.log(`User ${userId} items successfully initialized with ${createdItems.size} items`);
       return true;
     } catch (err) {
+      console.error(`Error initializing items for user ${userId}:`, err);
       return this.handleError(err, 'initUserItemsData', false);
     }
   }
@@ -462,13 +564,21 @@ class ItemService extends ServiceBase {
           console.error('Missing instance_id for item:', item);
         }
         
+        // Standardize rarity to uppercase to match ITEM_RARITIES keys
+        const standardizedRarity = item.rarity?.toUpperCase?.() || 'COMMON';
+        
+        // Verify that the rarity exists in our ITEM_RARITIES object
+        if (!ITEM_RARITIES[standardizedRarity]) {
+          console.warn(`Unknown rarity: "${item.rarity}" for item:`, item.item_id);
+        }
+        
         return {
           id: item.item_id,
           instanceId: item.instance_id,
           name: item.name,
           description: item.description,
           type: item.type,
-          rarity: item.rarity,
+          rarity: standardizedRarity,  // Use the standardized uppercase rarity
           stats: item.stats || {},
           svg: item.svg,
           createdAt: item.created_at
@@ -489,15 +599,22 @@ class ItemService extends ServiceBase {
   // Add an item to a user's inventory
   async addItemToUserInventory(userId, item) {
     if (!userId || !item) {
+      console.error('addItemToUserInventory called with invalid parameters', { userId, item });
       return {
         success: false,
         message: 'Missing required parameters'
       };
     }
     
+    console.log(`Adding item to user ${userId} inventory:`, item.id);
+    
     try {
       // Generate a unique instance ID
       const instanceId = `${item.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      console.log(`Generated instance ID: ${instanceId}`);
+      
+      // Standardize rarity to uppercase
+      const standardizedRarity = item.rarity?.toUpperCase?.() || 'COMMON';
       
       // Create item data object
       const itemData = {
@@ -507,7 +624,7 @@ class ItemService extends ServiceBase {
         name: item.name,
         description: item.description,
         type: item.type,
-        rarity: item.rarity,
+        rarity: standardizedRarity, // Use standardized rarity
         stats: item.stats,
         svg: item.svg,
         created_at: new Date().toISOString()
@@ -517,21 +634,27 @@ class ItemService extends ServiceBase {
       const result = await this.insertData(this.USER_ITEMS_TABLE, itemData);
       
       if (!result.success) {
+        console.error(`Failed to add item ${item.id} to user ${userId} inventory:`, result.message);
         return result;
       }
       
+      console.log(`Successfully added item ${item.id} (instance: ${instanceId}) to user ${userId} inventory`);
+      
       // Dispatch event
       this.dispatchEvent(ITEM_UPDATED_EVENT, { userId });
+      console.log(`Dispatched ITEM_UPDATED_EVENT for user ${userId}`);
       
       return {
         success: true,
         message: `${item.name} added to your inventory!`,
         item: {
           ...item,
-          instanceId
+          instanceId,
+          stats: item.stats || {}, // Ensure stats is always an object
         }
       };
     } catch (err) {
+      console.error(`Error adding item ${item?.id} to user ${userId} inventory:`, err);
       return {
         success: false,
         message: 'Failed to add item to inventory'
@@ -573,14 +696,29 @@ class ItemService extends ServiceBase {
         };
       }
       
-      // Try to add the item to inventory first before deducting points
-      const itemInstance = await this.addItemToUserInventory(userId, newItem);
+      // Ensure the item has stats before proceeding
+      if (!newItem.stats) {
+        console.warn('Generated item has no stats, initializing empty stats object');
+        newItem.stats = {};
+      }
       
-      if (!itemInstance) {
+      // Try to add the item to inventory first before deducting points
+      const itemResult = await this.addItemToUserInventory(userId, newItem);
+      
+      if (!itemResult.success) {
         return {
           success: false,
           message: 'Failed to add item to inventory'
         };
+      }
+
+      // Get the item instance with instanceId from the result
+      const itemInstance = itemResult.item;
+      
+      // Double-check that the item has all necessary properties
+      if (!itemInstance.stats) {
+        console.warn('Item instance missing stats, adding empty stats object');
+        itemInstance.stats = {};
       }
       
       // Deduct points only after successfully adding item to inventory
@@ -591,7 +729,10 @@ class ItemService extends ServiceBase {
         // Consider rolling back the item addition in a production app
         return {
           success: true,
-          item: itemInstance,
+          item: {
+            ...itemInstance,
+            stats: itemInstance.stats || {} // Ensure stats is always present
+          },
           message: `Successfully purchased ${newItem.name}, but there was an issue updating your points. Please refresh.`,
         };
       }
@@ -608,7 +749,10 @@ class ItemService extends ServiceBase {
       
       return {
         success: true,
-        item: itemInstance,
+        item: {
+          ...itemInstance,
+          stats: itemInstance.stats || {} // Ensure stats is always present
+        },
         message: `Successfully purchased ${newItem.name}`,
         pointsSpent: itemPrice,
         remainingPoints: pointsResult.userData.points
@@ -906,12 +1050,22 @@ class ItemService extends ServiceBase {
   
   // Get a sample set of items for new users
   getSampleItems() {
-    // Return one item of each rarity for display purposes
-    return ITEMS.filter((item, index, array) => {
-      // For each rarity, find the first item with that rarity
-      const rarityItems = array.filter(i => i.rarity === item.rarity);
-      return rarityItems.indexOf(item) === 0;
-    });
+    // Return specifically these items to ensure consistency
+    const starterItemIds = [
+      'singularity-core', 
+      'basic-antenna', 
+      'precision-servo', 
+      'quantum-processor', 
+      'reinforced-plate'
+    ];
+    
+    // Find and return these specific items
+    const starterItems = starterItemIds
+      .map(id => ITEMS.find(item => item.id === id))
+      .filter(Boolean); // Remove any nulls
+    
+    console.log(`Returning ${starterItems.length} fixed starter items:`, starterItems.map(i => i.id));
+    return starterItems;
   }
 
   // Create a random item instance

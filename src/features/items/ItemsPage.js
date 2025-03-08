@@ -29,38 +29,52 @@ const ItemsPage = () => {
     const loadData = async () => {
       if (isSignedIn && user) {
         try {
+          console.log('ItemsPage - loadData called for user:', user.id);
           setIsLoading(true);
           const userId = user.id;
           
           // Get user's items - now async
+          console.log('ItemsPage - Fetching user items...');
           const items = await ItemService.getUserItems(userId);
+          console.log(`ItemsPage - Fetched ${items.length} items for user:`, userId);
           setUserItems(items);
           
           // Get user's mascots - using await for async call
+          console.log('ItemsPage - Fetching user mascots...');
           const mascots = await MascotService.getUserMascots(userId);
+          console.log(`ItemsPage - Fetched ${mascots?.length || 0} mascots for user:`, userId);
           setUserMascots(mascots || []); // Ensure it's an array even if null/undefined is returned
           
           // Get user's active mascot - using await for async call
+          console.log('ItemsPage - Fetching active mascot...');
           const activeMascot = await MascotService.getUserActiveMascot(userId);
           if (activeMascot) {
+            console.log('ItemsPage - Active mascot found:', activeMascot.id);
             setSelectedMascot(activeMascot);
             
             // Get items equipped to the active mascot - now async
+            console.log('ItemsPage - Fetching items equipped to mascot:', activeMascot.id);
             const mascotItems = await ItemService.getMascotItems(userId, activeMascot.id);
+            console.log(`ItemsPage - Fetched ${mascotItems.length} equipped items for mascot:`, activeMascot.id);
             setEquippedItems(mascotItems);
             
             // Calculate base and total stats
             setMascotStats(activeMascot.stats);
             setMascotTotalStats(ItemService.calculateTotalMascotStats(activeMascot, mascotItems));
+          } else {
+            console.log('ItemsPage - No active mascot found for user:', userId);
           }
           
           // Get user's points
+          console.log('ItemsPage - Fetching user points...');
           const userData = await PointsService.getUserPoints(userId);
+          console.log('ItemsPage - User points:', userData.points);
           setUserPoints(userData.points);
           
+          console.log('ItemsPage - loadData completed successfully');
           setIsLoading(false);
         } catch (error) {
-          console.error('Error loading data:', error);
+          console.error('ItemsPage - Error loading data:', error);
           setUserMascots([]); // Ensure userMascots is an array in case of error
           setIsLoading(false);
         }
@@ -752,7 +766,14 @@ const ItemsPage = () => {
   const renderPurchaseAnimation = () => {
     if (!purchaseAnimation || !newItem) return null;
     
-    const rarityInfo = ITEM_RARITIES[newItem.rarity];
+    // Ensure we have the rarity in the correct format (uppercase) for the ITEM_RARITIES object
+    const rarityKey = newItem.rarity?.toUpperCase?.() || 'COMMON';
+    const rarityInfo = ITEM_RARITIES[rarityKey] || ITEM_RARITIES.COMMON;
+    
+    // Add debugging to help identify issues
+    console.log('Purchase animation - Item:', newItem);
+    console.log('Purchase animation - Rarity Key:', rarityKey);
+    console.log('Purchase animation - Rarity Info:', rarityInfo);
     
     return (
       <div className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-md flex items-center justify-center z-50">
@@ -842,7 +863,7 @@ const ItemsPage = () => {
               
               {/* Stats with enhanced visuals */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm mb-6 animate-fade-in animation-delay-600">
-                {Object.entries(newItem.stats).map(([stat, value], index) => (
+                {Object.entries(newItem.stats || {}).map(([stat, value], index) => (
                   value !== 0 ? (
                     <div 
                       key={stat} 
@@ -982,7 +1003,7 @@ const ItemsPage = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
           {sortedItems.map(item => {
-            const rarityInfo = ITEM_RARITIES[item.rarity];
+            const rarityInfo = ITEM_RARITIES[item.rarity?.toUpperCase?.()] || ITEM_RARITIES.COMMON;
             
             return (
               <div 
@@ -1038,7 +1059,7 @@ const ItemsPage = () => {
                 </p>
                 
                 <div className="flex flex-wrap gap-1.5 text-xs mb-3">
-                  {Object.entries(item.stats).map(([stat, value]) => (
+                  {Object.entries(item.stats || {}).map(([stat, value]) => (
                     value !== 0 ? (
                       <div 
                         key={stat} 
@@ -1224,7 +1245,7 @@ const ItemsPage = () => {
               return a.instanceId.localeCompare(b.instanceId);
             })
             .map(item => {
-              const rarityInfo = ITEM_RARITIES[item.rarity];
+              const rarityInfo = ITEM_RARITIES[item.rarity?.toUpperCase?.()] || ITEM_RARITIES.COMMON;
               
               return (
                 <div 
@@ -1277,7 +1298,7 @@ const ItemsPage = () => {
                   </div>
                   
                   <div className="flex flex-wrap gap-1.5 text-xs mb-3">
-                    {Object.entries(item.stats).map(([stat, value]) => (
+                    {Object.entries(item.stats || {}).map(([stat, value]) => (
                       value !== 0 ? (
                         <div 
                           key={stat} 

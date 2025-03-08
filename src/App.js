@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { MASCOT_UPDATED_EVENT } from './features/mascots/MascotService';
 import { ItemService } from './features/items';
 import { ITEM_UPDATED_EVENT } from './features/items/ItemService';
 import svgStyles from './shared/utils/svgStyles';
+import { isUserInitialized, markUserInitialized, isAppInitializedThisSession, markAppInitializedThisSession } from './shared/utils/initializationTracker';
 
 function App() {
   // eslint-disable-next-line no-unused-vars
@@ -19,28 +20,75 @@ function App() {
   const [activeMascot, setActiveMascot] = useState(null);
   const [userItems, setUserItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Add a ref to track if we've checked items for this session
+  const checkedItemsRef = useRef(false);
   
   // Fetch and update items
   const fetchAndUpdateItems = useCallback(async () => {
     if (isSignedIn && user) {
       try {
-        setIsLoading(true);
-        // Initialize user items data if needed
-        await ItemService.initUserItemsData(user.id);
+        // STRICT PROTECTION AGAINST MULTIPLE INITIALIZATIONS
+        // Skip if already initialized this session
+        if (isAppInitializedThisSession()) {
+          console.log('App.js: Application already initialized items in this browser session, skipping initialization');
+          
+          // Still need to get user's items for the app state
+          const items = await ItemService.getUserItems(user.id);
+          if (items && Array.isArray(items)) {
+            console.log(`App.js: Loaded ${items.length} existing items for user ${user.id}`);
+            setUserItems(items);
+          }
+          setIsLoading(false);
+          return;
+        }
         
-        // Get user's items
-        const items = await ItemService.getUserItems(user.id);
-        console.log('Loaded user items:', items);
+        // Skip if we've already checked in this session
+        if (checkedItemsRef.current || isUserInitialized(user.id, 'items')) {
+          console.log('App.js: Items already initialized according to tracker, skipping initialization');
+          // Still need to get user's items for the app state
+          const items = await ItemService.getUserItems(user.id);
+          if (items && Array.isArray(items)) {
+            console.log(`App.js: Loaded ${items.length} existing items for user ${user.id}`);
+            setUserItems(items);
+          }
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log('App.js: Checking if user needs item initialization...');
+        setIsLoading(true);
+        
+        // Get user's items first to check if initialization is needed
+        let items = await ItemService.getUserItems(user.id);
+        
+        // Only initialize if the user has no items
+        if (!items || items.length === 0) {
+          console.log('App.js: No items found, initializing items for user', user.id);
+          // Initialize user items data if needed
+          await ItemService.initUserItemsData(user.id);
+          // Get updated items after initialization
+          items = await ItemService.getUserItems(user.id);
+          console.log(`App.js: After initialization, user has ${items.length} items`);
+        } else {
+          console.log(`App.js: Items found for user, no initialization needed (${items.length} items)`);
+          // Still mark as initialized to prevent future checks
+          markUserInitialized(user.id, 'items');
+          markAppInitializedThisSession();
+        }
         
         if (items && Array.isArray(items)) {
           setUserItems(items);
         } else {
-          console.warn('Items not available or not an array:', items);
+          console.warn('App.js: Items not available or not an array:', items);
           setUserItems([]);
         }
+        
         setIsLoading(false);
+        
+        // Mark that we've checked items for this session
+        checkedItemsRef.current = true;
       } catch (error) {
-        console.error('Error fetching items:', error);
+        console.error('App.js: Error fetching items:', error);
         setUserItems([]);
         setIsLoading(false);
       }
