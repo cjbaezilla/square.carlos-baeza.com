@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { languageOptions } from '../../i18n';
 
 const LanguageSelector = () => {
-  const { i18n, t } = useTranslation();
+  // eslint-disable-next-line no-unused-vars
+  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 

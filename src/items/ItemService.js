@@ -685,4 +685,5 @@ class ItemService {
   }
 }
 
-export default new ItemService(); 
+const itemServiceInstance = new ItemService();
+export default itemServiceInstance; 

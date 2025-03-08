@@ -13,8 +13,6 @@ const sizeClasses = {
 // Component to display a single badge
 const Badge = ({ badge, size = 'md', showTooltip = true }) => {
   const [showDetails, setShowDetails] = useState(false);
-  // Using t for translations in the tooltip
-  const { t: translate } = useTranslation();
   
   const badgeSize = sizeClasses[size] || sizeClasses.md;
   

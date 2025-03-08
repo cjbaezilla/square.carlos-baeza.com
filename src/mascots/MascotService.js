@@ -315,4 +315,5 @@ class MascotService {
 }
 
 // Export a singleton instance
-export default new MascotService(); 
+const mascotServiceInstance = new MascotService();
+export default mascotServiceInstance; 

@@ -169,4 +169,5 @@ class PointsService {
 }
 
 // Export a singleton instance
-export default new PointsService(); 
+const pointsServiceInstance = new PointsService();
+export default pointsServiceInstance; 

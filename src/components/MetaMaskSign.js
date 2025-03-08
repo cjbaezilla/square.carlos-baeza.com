@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
@@ -20,6 +20,18 @@ const MetaMaskSign = () => {
     return typeof window !== 'undefined' && window.ethereum !== undefined;
   };
 
+  // Generate a message to sign
+  const generateMessage = useCallback(() => {
+    if (!user) return;
+    
+    const timestamp = new Date().toISOString();
+    const defaultMessage = t('metamaskSign.defaultMessage', 'I, user with Clerk ID {{userId}}, authorize this action at {{timestamp}}', {
+      userId: user.id,
+      timestamp: timestamp
+    });
+    setMessage(defaultMessage);
+  }, [user, t]);
+
   // Check for MetaMask on component mount
   useEffect(() => {
     setIsMetaMaskAvailable(isMetaMaskInstalled());
@@ -28,7 +40,7 @@ const MetaMaskSign = () => {
     if (user && isMetaMaskInstalled()) {
       generateMessage();
     }
-  }, [user]);
+  }, [user, generateMessage]);
 
   // Connect to MetaMask
   const connectWallet = async () => {
@@ -57,18 +69,6 @@ const MetaMaskSign = () => {
     } finally {
       setIsConnecting(false);
     }
-  };
-
-  // Generate a message to sign
-  const generateMessage = () => {
-    if (!user) return;
-    
-    const timestamp = new Date().toISOString();
-    const defaultMessage = t('metamaskSign.defaultMessage', 'I, user with Clerk ID {{userId}}, authorize this action at {{timestamp}}', {
-      userId: user.id,
-      timestamp: timestamp
-    });
-    setMessage(defaultMessage);
   };
 
   // Sign message with MetaMask

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
-import MascotService from './MascotService';
 import ItemService, { ITEM_RARITIES, ITEM_UPDATED_EVENT } from '../items/ItemService';
 
 const StatBar = ({ label, value, maxValue = 100, color, bonus = 0 }) => {

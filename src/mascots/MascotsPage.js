@@ -135,7 +135,7 @@ const MascotsPage = () => {
     
     // Add experience to the mascot
     const experienceGained = Math.floor(Math.random() * 10) + 5; // 5-15 exp
-    const updatedMascot = MascotService.addMascotExperience(user.id, trainingMascot.id, experienceGained);
+    MascotService.addMascotExperience(user.id, trainingMascot.id, experienceGained);
     
     // Award points to user for training
     PointsService.awardMascotTrainingPoints(user.id);
