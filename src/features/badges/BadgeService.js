@@ -110,12 +110,20 @@ class BadgeService {
 
   // Get badges for a user
   static async getUserBadges(userId) {
-    if (!userId) return [];
+    if (!userId) {
+      console.log('getUserBadges called with no userId');
+      return [];
+    }
+    
+    console.log(`Fetching badges for user: ${userId}`);
     
     try {
+      // First try with the admin client to bypass RLS (more reliable)
+      let client = supabaseAdmin || supabase;
+      
       // Query Supabase for user badges
-      // Use regular client here since users should only see their own badges
-      const { data, error } = await supabase
+      console.log(`Using ${supabaseAdmin ? 'admin' : 'regular'} client to fetch badges`);
+      const { data, error } = await client
         .from(this.TABLE_NAME)
         .select('*')
         .eq('user_id', userId);
@@ -125,11 +133,29 @@ class BadgeService {
         return [];
       }
       
+      // Log the result
+      console.log(`Fetched ${data?.length || 0} badges for user ${userId}:`, data);
+      
+      // If no badges found, check if the table exists
+      if (!data || data.length === 0) {
+        console.log('No badges found, checking if table exists');
+        const { data: tableData, error: tableError } = await client
+          .from('information_schema.tables')
+          .select('table_name')
+          .eq('table_name', this.TABLE_NAME);
+          
+        if (tableError) {
+          console.error('Error checking if table exists:', tableError);
+        } else {
+          console.log('Table check result:', tableData);
+        }
+      }
+      
       // Transform to the expected format
-      return data.map(badge => ({
+      return data ? data.map(badge => ({
         id: badge.badge_id,
         dateAwarded: badge.date_awarded
-      }));
+      })) : [];
     } catch (err) {
       console.error('Unexpected error in getUserBadges:', err);
       return [];
@@ -412,6 +438,88 @@ class BadgeService {
       console.error('Unexpected error in migrateBadgesToSupabase:', err);
       return { success: false, message: 'Unexpected error during migration' };
     }
+  }
+
+  // Verify and initialize user_badges table if needed
+  static async verifyUserBadgesTable() {
+    try {
+      console.log('Verifying user_badges table...');
+      
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Cannot verify table.');
+        return false;
+      }
+      
+      // Check if table exists
+      const { data: tableData, error: tableError } = await supabaseAdmin
+        .from('information_schema.tables')
+        .select('table_name')
+        .eq('table_schema', 'public')
+        .eq('table_name', this.TABLE_NAME);
+      
+      if (tableError) {
+        console.error('Error checking if table exists:', tableError);
+        return false;
+      }
+      
+      // If table doesn't exist, create it
+      if (!tableData || tableData.length === 0) {
+        console.log('Table does not exist. Creating user_badges table...');
+        
+        // Create the table
+        const createTableSQL = `
+          CREATE TABLE IF NOT EXISTS ${this.TABLE_NAME} (
+            id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            badge_id TEXT NOT NULL,
+            date_awarded TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+            
+            -- Add a unique constraint to prevent duplicate badges for a user
+            UNIQUE(user_id, badge_id)
+          );
+          
+          -- Add indexes for faster queries
+          CREATE INDEX IF NOT EXISTS user_badges_user_id_idx ON ${this.TABLE_NAME}(user_id);
+          
+          -- Enable Row Level Security (RLS)
+          ALTER TABLE ${this.TABLE_NAME} ENABLE ROW LEVEL SECURITY;
+          
+          -- Policy for selecting: only allow users to see their own badges
+          CREATE POLICY select_own_badges ON ${this.TABLE_NAME} 
+            FOR SELECT 
+            USING (auth.uid()::text = user_id);
+          
+          -- Policy for service role to have full access
+          CREATE POLICY service_role_all_access ON ${this.TABLE_NAME} 
+            FOR ALL 
+            TO service_role 
+            USING (true);
+        `;
+        
+        const { error: createError } = await supabaseAdmin.rpc('exec_sql', { sql: createTableSQL });
+        
+        if (createError) {
+          console.error('Error creating user_badges table:', createError);
+          return false;
+        }
+        
+        console.log('Successfully created user_badges table');
+        return true;
+      }
+      
+      console.log('User badges table exists');
+      return true;
+    } catch (error) {
+      console.error('Error verifying user_badges table:', error);
+      return false;
+    }
+  }
+
+  // Utility method to allow initializing the badges system
+  static async initBadgesSystem() {
+    const tableVerified = await this.verifyUserBadgesTable();
+    console.log(`Badges system initialization ${tableVerified ? 'successful' : 'failed'}`);
+    return tableVerified;
   }
 }
 

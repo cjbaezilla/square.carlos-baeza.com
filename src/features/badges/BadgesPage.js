@@ -17,15 +17,40 @@ const BadgesPage = () => {
   
   // Function to fetch user badges
   const fetchUserBadges = async (userId) => {
-    if (!userId) return;
+    if (!userId) {
+      console.error('Cannot fetch badges: No user ID provided');
+      return;
+    }
     
     setIsLoading(true);
+    console.log(`BadgesPage: Fetching badges for user ${userId}`);
+    
     try {
       const badges = await BadgeService.getUserBadges(userId);
+      console.log(`BadgesPage: Received ${badges.length} badges:`, badges);
+      
       setUserBadgeData(badges);
       setUserBadgeIds(badges.map(badge => badge.id));
+      
+      // If no badges found, check if we should trigger migration from localStorage
+      if (badges.length === 0) {
+        const localStorageKey = `user_badges_${userId}`;
+        const storedBadges = localStorage.getItem(localStorageKey);
+        
+        if (storedBadges) {
+          console.log('Found badges in localStorage, consider migrating them');
+          setMigrationStatus({ 
+            status: 'info', 
+            message: 'We found some badges stored locally. Consider migrating them to your account.' 
+          });
+        }
+      }
     } catch (error) {
       console.error('Error fetching user badges:', error);
+      setMigrationStatus({ 
+        status: 'error', 
+        message: 'Error loading badges. Please try again later.' 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +100,21 @@ const BadgesPage = () => {
   
   useEffect(() => {
     if (isLoaded && user) {
-      fetchUserBadges(user.id);
+      // Initialize badges system first
+      BadgeService.initBadgesSystem().then(initialized => {
+        if (initialized) {
+          console.log('Badges system initialized successfully');
+        } else {
+          console.warn('Badges system initialization failed');
+          setMigrationStatus({ 
+            status: 'error', 
+            message: 'Could not initialize badges system. Some features may not work properly.' 
+          });
+        }
+        
+        // Proceed with fetching badges regardless
+        fetchUserBadges(user.id);
+      });
     }
   }, [isLoaded, user]);
   
