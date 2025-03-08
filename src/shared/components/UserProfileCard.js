@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -10,17 +10,35 @@ import PointsBadge from '../../features/rewards/PointsBadge';
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
   const { t } = useTranslation();
+  const [userBadges, setUserBadges] = useState([]);
 
   useEffect(() => {
     // Check for badges to award whenever the user profile loads
     if (user) {
-      BadgeService.checkAndAwardBadges(user);
+      const checkBadgesAndPoints = async () => {
+        try {
+          // Handle async badge checks
+          await BadgeService.checkAndAwardBadges(user);
+          
+          // Load user's badges
+          const badges = BadgeService.getUserBadges(user.id);
+          setUserBadges(badges);
+          
+          // Check if user has completed their profile to award points
+          const isProfileComplete = checkProfileCompletion(user);
+          if (isProfileComplete) {
+            try {
+              await PointsService.awardProfileCompletionPoints(user.id);
+            } catch (error) {
+              console.error('Error awarding profile completion points:', error);
+            }
+          }
+        } catch (error) {
+          console.error('Error checking badges:', error);
+        }
+      };
       
-      // Check if user has completed their profile to award points
-      const isProfileComplete = checkProfileCompletion(user);
-      if (isProfileComplete) {
-        PointsService.awardProfileCompletionPoints(user.id);
-      }
+      checkBadgesAndPoints();
     }
   }, [user]);
 
@@ -139,7 +157,7 @@ const UserProfileCard = () => {
         </div>
         
         {/* Badge Link - Only show if user has badges */}
-        {BadgeService.getUserBadges(user.id).length > 0 && (
+        {userBadges.length > 0 && (
           <Link 
             to="/badges" 
             className="text-blue-400 hover:text-blue-300 text-sm mt-2 transition-colors duration-200"

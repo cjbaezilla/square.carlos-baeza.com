@@ -117,7 +117,7 @@ class BadgeService {
   }
 
   // Award a badge to a user
-  static awardBadge(userId, badgeId) {
+  static async awardBadge(userId, badgeId) {
     if (!userId || !badgeId || !this.isValidBadgeId(badgeId)) {
       return false;
     }
@@ -136,8 +136,12 @@ class BadgeService {
     // Save updated badges
     localStorage.setItem(`user_badges_${userId}`, JSON.stringify(userBadges));
 
-    // Award points for earning a badge
-    PointsService.awardBadgePoints(userId);
+    try {
+      // Award points for earning a badge (async)
+      await PointsService.awardBadgePoints(userId);
+    } catch (error) {
+      console.error('Error awarding badge points:', error);
+    }
 
     return true;
   }
@@ -184,7 +188,7 @@ class BadgeService {
   }
 
   // Method to automatically check and award badges based on user actions/state
-  static checkAndAwardBadges(user) {
+  static async checkAndAwardBadges(user) {
     if (!user) return;
     
     const userId = user.id;
@@ -197,13 +201,13 @@ class BadgeService {
       
       // Only award if the date is valid
       if (!isNaN(registrationDate.getTime()) && registrationDate < launchEndDate) {
-        this.awardBadge(userId, 'early_adopter');
+        await this.awardBadge(userId, 'early_adopter');
       }
     }
     
     // Logic for Web3 Explorer badge - if user has connected a wallet
     if (user.primaryWeb3Wallet?.web3Wallet) {
-      this.awardBadge(userId, 'web3_explorer');
+      await this.awardBadge(userId, 'web3_explorer');
     }
     
     // Additional logic for other badges would go here
