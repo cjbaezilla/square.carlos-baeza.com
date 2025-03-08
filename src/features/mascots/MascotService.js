@@ -234,6 +234,65 @@ export const MASCOTS = [
           <line x1="32" y1="14" x2="32" y2="10" stroke="#95a5a6" />
           <circle cx="32" cy="9" r="1" stroke="#95a5a6" fill="#ecf0f1" />
         </svg>`
+  },
+  {
+    id: 'nano-assembler',
+    name: 'Nano Assembler',
+    description: 'A microscale robot capable of incredible precision engineering and self-replication.',
+    price: 80,
+    stats: { hp: 15, mp: 50, agility: 9, power: 3, defense: 2 },
+    rarity: 'common',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <rect x="22" y="16" width="20" height="18" rx="2" stroke="#95a5a6" fill="#d5dbdb" />
+          <circle cx="29" cy="24" r="2" stroke="#95a5a6" fill="#ecf0f1" />
+          <circle cx="35" cy="24" r="2" stroke="#95a5a6" fill="#ecf0f1" />
+          <rect x="28" y="34" width="8" height="14" rx="1" stroke="#95a5a6" fill="#d5dbdb" />
+          <path d="M22 20 L18 16 M42 20 L46 16" stroke="#95a5a6" />
+          <circle cx="32" cy="12" r="3" stroke="#95a5a6" fill="#ecf0f1" />
+          <line x1="28" y1="41" x2="36" y2="41" stroke="#95a5a6" />
+          <path d="M32 48 L28 56 L36 56" stroke="#95a5a6" />
+        </svg>`
+  },
+  {
+    id: 'war-machine',
+    name: 'War Machine',
+    description: 'A heavily armored combat robot with integrated weapon systems and tactical analysis.',
+    price: 190,
+    stats: { hp: 80, mp: 30, agility: 5, power: 9, defense: 8 },
+    rarity: 'rare',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <rect x="14" y="12" width="36" height="26" rx="2" stroke="#e74c3c" fill="#f5b7b1" />
+          <circle cx="26" cy="24" r="4" stroke="#e74c3c" fill="#f9e79f" />
+          <circle cx="38" cy="24" r="4" stroke="#e74c3c" fill="#f9e79f" />
+          <rect x="20" y="38" width="24" height="14" rx="0" stroke="#e74c3c" fill="#f5b7b1" />
+          <path d="M8 24 L14 20 M56 24 L50 20" stroke="#e74c3c" />
+          <path d="M14 28 L6 32 L6 40 L14 37" stroke="#e74c3c" fill="#f5b7b1" />
+          <path d="M50 28 L58 32 L58 40 L50 37" stroke="#e74c3c" fill="#f5b7b1" />
+          <rect x="24" y="12" width="16" height="4" rx="1" stroke="#e74c3c" fill="#f5b7b1" />
+          <line x1="20" y1="45" x2="44" y2="45" stroke="#e74c3c" />
+        </svg>`
+  },
+  {
+    id: 'data-nexus',
+    name: 'Data Nexus',
+    description: 'A sophisticated AI hub capable of processing vast amounts of information and manipulating digital realities.',
+    price: 290,
+    stats: { hp: 50, mp: 95, agility: 6, power: 8, defense: 7 },
+    rarity: 'epic',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <circle cx="32" cy="20" r="14" stroke="#9b59b6" fill="#d7bde2" />
+          <circle cx="32" cy="20" r="8" stroke="#9b59b6" fill="#f4ecf7" />
+          <circle cx="32" cy="20" r="3" stroke="#9b59b6" fill="#9b59b6" />
+          <rect x="24" y="34" width="16" height="16" rx="2" stroke="#9b59b6" fill="#d7bde2" />
+          <path d="M24 38 L16 34 M40 38 L48 34" stroke="#9b59b6" />
+          <line x1="26" y1="34" x2="26" y2="50" stroke="#9b59b6" />
+          <line x1="30" y1="34" x2="30" y2="50" stroke="#9b59b6" />
+          <line x1="34" y1="34" x2="34" y2="50" stroke="#9b59b6" />
+          <line x1="38" y1="34" x2="38" y2="50" stroke="#9b59b6" />
+          <line x1="24" y1="42" x2="40" y2="42" stroke="#9b59b6" />
+          <path d="M32 6 L32 2" stroke="#9b59b6" />
+          <circle cx="32" cy="2" r="1" stroke="#9b59b6" fill="#9b59b6" />
+        </svg>`
   }
 ];
 

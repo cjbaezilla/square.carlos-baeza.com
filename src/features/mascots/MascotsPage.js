@@ -518,26 +518,109 @@ const MascotsPage = () => {
                 <div className="mb-4">
                   <p className="text-gray-300">{t('mascot.shopDescription', 'Purchase unique robot mascots using your earned points.')}</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {availableMascots
-                    .filter(mascot => !userMascots.some(m => m.id === mascot.id))
-                    .map(mascot => (
-                      <MascotDisplay
-                        key={mascot.id}
-                        mascot={mascot}
-                        isOwned={false}
-                        onPurchase={handlePurchase}
-                      />
-                    ))}
-
-                  {availableMascots.length === userMascots.length && (
-                    <div className="col-span-full text-center py-8">
-                      <p className="text-green-400 text-lg">
-                        {t('mascot.collectionComplete', 'Congratulations! You have collected all available mascots.')}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                
+                {/* Group and display mascots by rarity */}
+                {availableMascots.length === userMascots.length ? (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-green-400 text-lg">
+                      {t('mascot.collectionComplete', 'Congratulations! You have collected all available mascots.')}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Get available mascots (not owned) */}
+                    {(() => {
+                      const availableMascotsFiltered = availableMascots
+                        .filter(mascot => !userMascots.some(m => m.id === mascot.id));
+                      
+                      // Group mascots by rarity
+                      const legendaryMascots = availableMascotsFiltered.filter(m => m.rarity === 'legendary');
+                      const epicMascots = availableMascotsFiltered.filter(m => m.rarity === 'epic');
+                      const rareMascots = availableMascotsFiltered.filter(m => m.rarity === 'rare');
+                      const commonMascots = availableMascotsFiltered.filter(m => m.rarity === 'common');
+                      
+                      return (
+                        <>
+                          {/* Common Mascots - Now First */}
+                          {commonMascots.length > 0 && (
+                            <div className="mb-6">
+                              <h3 className="text-lg font-bold text-gray-400 mb-2 border-b border-gray-700 pb-1">
+                                {t('mascot.rarity.common', 'Common Robots')}
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {commonMascots.map(mascot => (
+                                  <MascotDisplay
+                                    key={mascot.id}
+                                    mascot={mascot}
+                                    isOwned={false}
+                                    onPurchase={handlePurchase}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Rare Mascots */}
+                          {rareMascots.length > 0 && (
+                            <div className="mb-6">
+                              <h3 className="text-lg font-bold text-blue-400 mb-2 border-b border-blue-900 pb-1">
+                                {t('mascot.rarity.rare', 'Rare Robots')}
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {rareMascots.map(mascot => (
+                                  <MascotDisplay
+                                    key={mascot.id}
+                                    mascot={mascot}
+                                    isOwned={false}
+                                    onPurchase={handlePurchase}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Epic Mascots */}
+                          {epicMascots.length > 0 && (
+                            <div className="mb-6">
+                              <h3 className="text-lg font-bold text-purple-400 mb-2 border-b border-purple-900 pb-1">
+                                {t('mascot.rarity.epic', 'Epic Robots')}
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {epicMascots.map(mascot => (
+                                  <MascotDisplay
+                                    key={mascot.id}
+                                    mascot={mascot}
+                                    isOwned={false}
+                                    onPurchase={handlePurchase}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Legendary Mascots - Now Last */}
+                          {legendaryMascots.length > 0 && (
+                            <div className="mb-6">
+                              <h3 className="text-lg font-bold text-yellow-400 mb-2 border-b border-yellow-900 pb-1">
+                                {t('mascot.rarity.legendary', 'Legendary Robots')}
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {legendaryMascots.map(mascot => (
+                                  <MascotDisplay
+                                    key={mascot.id}
+                                    mascot={mascot}
+                                    isOwned={false}
+                                    onPurchase={handlePurchase}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </>
+                )}
               </>
             )}
           </>
