@@ -288,18 +288,8 @@ class BadgeService {
 
   // Clear all localStorage data for badges (transitional method)
   static clearLocalStorageBadges() {
-    // Get all localStorage keys
-    const keys = Object.keys(localStorage);
-    
-    // Filter badge-related keys
-    const badgeKeys = keys.filter(key => key.startsWith('user_badges_'));
-    
-    // Remove each badge key
-    badgeKeys.forEach(key => {
-      localStorage.removeItem(key);
-    });
-    
-    return badgeKeys.length;
+    // Method kept but emptied as localStorage references are removed
+    console.log('localStorage references have been removed');
   }
 
   // Get badge details by ID
@@ -351,93 +341,11 @@ class BadgeService {
     if (!userId) return { success: false, message: 'No user ID provided' };
     
     try {
-      // Get badges from localStorage
-      const localStorageKey = `user_badges_${userId}`;
-      const storedBadges = localStorage.getItem(localStorageKey);
-      
-      if (!storedBadges) {
-        return { success: true, message: 'No badges to migrate for this user' };
-      }
-      
-      const userBadges = JSON.parse(storedBadges);
-      if (!Array.isArray(userBadges) || userBadges.length === 0) {
-        return { success: true, message: 'No badges to migrate for this user' };
-      }
-      
-      // Add badges to Supabase
-      const badgesToInsert = userBadges.map(badge => ({
-        user_id: userId,
-        badge_id: badge.id,
-        date_awarded: badge.dateAwarded || new Date().toISOString()
-      }));
-      
-      // Use admin client to bypass RLS for migration
-      if (!supabaseAdmin) {
-        return { success: false, message: 'Admin client not available. Cannot migrate badges.' };
-      }
-      
-      // Individually insert each badge to handle duplicates better
-      let successCount = 0;
-      let errorCount = 0;
-      
-      for (const badge of badgesToInsert) {
-        try {
-          // Check if badge already exists
-          const { data, error: checkError } = await supabaseAdmin
-            .from(this.TABLE_NAME)
-            .select('id')
-            .eq('user_id', badge.user_id)
-            .eq('badge_id', badge.badge_id);
-            
-          if (checkError) {
-            console.error('Error checking badge existence:', checkError);
-            errorCount++;
-            continue;
-          }
-          
-          // Skip if badge already exists
-          if (data && data.length > 0) {
-            console.log(`Badge ${badge.badge_id} already exists for user ${badge.user_id}`);
-            successCount++;
-            continue;
-          }
-          
-          // Insert the badge
-          const { error: insertError } = await supabaseAdmin
-            .from(this.TABLE_NAME)
-            .insert(badge);
-            
-          if (insertError) {
-            if (insertError.code === '23505') {
-              // Duplicate key error - consider it a success since badge exists
-              console.log(`Badge ${badge.badge_id} already exists for user ${badge.user_id}`);
-              successCount++;
-            } else {
-              console.error('Error inserting badge:', insertError);
-              errorCount++;
-            }
-          } else {
-            successCount++;
-          }
-        } catch (err) {
-          console.error('Error processing badge:', err);
-          errorCount++;
-        }
-      }
-      
-      // Only remove from localStorage if all badges were processed
-      if (errorCount === 0) {
-        localStorage.removeItem(localStorageKey);
-      }
-      
-      return { 
-        success: true, 
-        message: `Successfully migrated ${successCount} badges to Supabase` +
-                 (errorCount > 0 ? ` (${errorCount} errors)` : '')
-      };
-    } catch (err) {
-      console.error('Unexpected error in migrateBadgesToSupabase:', err);
-      return { success: false, message: 'Unexpected error during migration' };
+      // Removed localStorage migration code
+      return { success: true, message: 'localStorage references have been removed' };
+    } catch (error) {
+      console.error('Error in badge migration:', error);
+      return { success: false, message: 'Error during migration process' };
     }
   }
 

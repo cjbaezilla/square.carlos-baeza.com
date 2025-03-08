@@ -24,14 +24,14 @@ class PointsService {
     this.actionsKey = 'user_completed_actions'; // Keep this for backward compatibility
     this.TABLE_NAME = 'user_points';
     
-    // Clean up localStorage on initialization
+    // Clean up localStorage on initialization - reference removed
     this.clearLocalStorageData();
   }
 
   // Clean all localStorage data for points
   clearLocalStorageData() {
-    localStorage.removeItem(this.pointsKey);
-    localStorage.removeItem(this.actionsKey);
+    // localStorage references removed
+    console.log('localStorage references have been removed');
   }
 
   // Initialize user points data if not exists

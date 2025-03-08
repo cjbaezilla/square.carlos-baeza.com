@@ -13,7 +13,7 @@ The items system allows users to:
 
 ## Files
 
-- `ItemService.js` - Service for managing items, including storage in localStorage, purchase logic, and equipping/unequipping
+- `ItemService.js` - Service for managing items, including purchase logic, and equipping/unequipping
 - `ItemsPage.js` - UI component for displaying the items interface
 - `README.md` - This documentation file
 
@@ -55,10 +55,10 @@ The total stats of a mascot are calculated by:
 
 ## Storage
 
-All item data is stored in localStorage with the following keys:
+All item data is stored in the database:
 
-- `user_items_data` - Stores all user inventory data
-- `mascot_items_data` - Stores which items are equipped to which mascots
+- User inventory data is stored in the `user_items` table
+- Equipped items are stored in the `mascot_equipped_items` table
 
 ## Events
 

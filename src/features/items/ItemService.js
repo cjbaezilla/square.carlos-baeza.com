@@ -343,14 +343,14 @@ class ItemService {
     this.USER_ITEMS_TABLE = 'user_items';
     this.MASCOT_ITEMS_TABLE = 'mascot_equipped_items';
     
-    // Clean up localStorage on initialization
+    // Clean up localStorage on initialization - reference removed
     this.clearLocalStorageData();
   }
   
   // Clean all localStorage data for items
   clearLocalStorageData() {
-    localStorage.removeItem('user_items_data');
-    localStorage.removeItem('mascot_items_data');
+    // localStorage references removed
+    console.log('localStorage references have been removed');
   }
   
   // Verify tables exist
