@@ -12,13 +12,20 @@
   },
   "nav": {
     "home": "Inicio",
-    "badges": "Insignias"
+    "badges": "Insignias",
+    "rewards": "Recompensas",
+    "mascots": "Mascotas",
+    "items": "Objetos"
   },
   "sections": {
     "blockchainBasics": "Fundamentos de Blockchain y Web3",
     "userProfile": "Perfil de Usuario",
     "web3Auth": "Autenticación Web3",
-    "badges": "Insignias de Usuario"
+    "badges": "Insignias de Usuario",
+    "rewards": "Recompensas y Puntos",
+    "mascots": "Mascotas Robot",
+    "items": "Objetos Robot",
+    "overview": "Resumen del Perfil"
   },
   "badges": {
     "title": "Insignias de Usuario",
@@ -162,6 +169,19 @@
     "requiresMetamask": "Esta función requiere MetaMask o una billetera web3 compatible para firmar mensajes.",
     "installMetamask": "Instalar MetaMask",
     "afterInstalling": "Después de instalar MetaMask:",
+    "defaultMessage": "Yo, usuario con ID de Clerk {{userId}}, autorizo esta acción en {{timestamp}}",
+    "errors": {
+      "notInstalled": "MetaMask no está instalado. Por favor, instala MetaMask para continuar.",
+      "noAccounts": "No se encontraron cuentas.",
+      "connectionFailed": "Falló la conexión de la billetera",
+      "connectFirst": "Por favor, conecta tu billetera primero",
+      "noMessage": "Por favor, genera un mensaje para firmar",
+      "signingFailed": "Falló la firma del mensaje"
+    },
+    "success": {
+      "connected": "¡Billetera conectada con éxito!",
+      "signed": "¡Mensaje firmado con éxito!"
+    },
     "steps": [
       "Crea o importa una billetera",
       "Conéctate a la red Ethereum",
@@ -192,5 +212,154 @@
       "years": "hace {{count}} año",
       "years_plural": "hace {{count}} años"
     }
-  }
+  },
+  "rewards": {
+    "points": "Puntos",
+    "level": "Nivel",
+    "pointsToNextLevel": "puntos para el siguiente nivel",
+    "viewGuide": "Ver Guía",
+    "viewGuideDesc": "Aprende sobre los conceptos básicos de blockchain",
+    "completeProfile": "Completar Perfil",
+    "completeProfileDesc": "Completa tu perfil de usuario",
+    "viewed": "visto",
+    "notViewed": "No visto",
+    "completed": "Completado",
+    "incomplete": "Incompleto",
+    "recentActivity": "Actividad Reciente",
+    "dailyLogin": "Inicio de Sesión Diario",
+    "viewedGuide": "Guía Visualizada",
+    "profileCompleted": "Perfil Completado",
+    "noActivityYet": "Aún no hay actividad. ¡Comienza a ganar puntos!",
+    "signInPrompt": "Inicia sesión para seguir tus recompensas",
+    "pointsDescription": "¡Gana puntos completando acciones y alcanza nuevos niveles!",
+    "description": "Gana puntos completando acciones",
+    "manage": "Gestionar recompensas",
+    "Your Points": "Tus Puntos"
+  },
+  "mascot": {
+    "purchaseSuccess": "¡Mascota comprada con éxito!",
+    "activateSuccess": "¡Mascota activada!",
+    "trainingSuccess": "¡Entrenamiento completo! {{name}} ganó {{exp}} de experiencia.",
+    "signInPrompt": "Inicia sesión para ver tus mascotas",
+    "description": "¡Colecciona mascotas robot únicas con diferentes habilidades!",
+    "submenu": {
+      "overview": "Resumen",
+      "collection": "Mis Mascotas",
+      "store": "Tienda de Mascotas",
+      "training": "Centro de Entrenamiento",
+      "stats": "Estadísticas de Mascotas"
+    },
+    "overview": {
+      "title": "Tu Colección de Mascotas Robot",
+      "collection": "Progreso de la Colección",
+      "mascotsCollected": "Mascotas Coleccionadas",
+      "collectionDescription": "¡Colecciona todas las mascotas para completar tu colección de robots!",
+      "activeMascot": "Mascota Activa",
+      "noActiveMascot": "No tienes ninguna mascota activa. ¡Activa una de tu colección!",
+      "points": "Tus Puntos",
+      "shopNow": "Comprar nuevas mascotas",
+      "quickActions": "Acciones Rápidas",
+      "viewCollection": "Ver Colección",
+      "visitStore": "Visitar Tienda",
+      "trainMascots": "Entrenar Mascotas"
+    },
+    "noMascots": "Aún no tienes ninguna mascota.",
+    "goToStore": "Visitar Tienda de Mascotas",
+    "storeDescription": "Compra mascotas robot únicas usando tus puntos ganados.",
+    "collectionComplete": "¡Felicidades! Has coleccionado todas las mascotas disponibles.",
+    "trainingCenter": {
+      "title": "Centro de Entrenamiento de Mascotas",
+      "description": "Elige una mascota para entrenar. ¡El entrenamiento mejora sus estadísticas y te da puntos!"
+    },
+    "level": "Nivel",
+    "exp": "EXP",
+    "trainMascot": "Entrenar esta Mascota",
+    "stats": {
+      "title": "Comparación de Estadísticas de Mascotas",
+      "description": "Compara las estadísticas de tus mascotas para ver sus fortalezas y debilidades.",
+      "mascot": "Mascota",
+      "level": "Nivel",
+      "hp": "HP",
+      "mp": "MP",
+      "agility": "Agilidad",
+      "power": "Poder",
+      "defense": "Defensa"
+    },
+    "active": "Activa",
+    "yourMascots": "Tus Mascotas Robot",
+    "training": "Entrenando a {{name}}",
+    "trainingDescription": "Entrenar a tu mascota aumentará su experiencia y nivel, haciéndola más fuerte.",
+    "trainingReward": "Ganarás {{points}} puntos por completar esta sesión de entrenamiento.",
+    "cancel": "Cancelar",
+    "completeTraining": "Completar Entrenamiento"
+  },
+  "mascots": {
+    "stats": "Estadísticas de Mascota",
+    "active": "Activa",
+    "activate": "Activar",
+    "purchase": "Comprar",
+    "active_robot": "Mascota Activa",
+    "your_mascots": "Tus Mascotas",
+    "you_have": "Tienes",
+    "mascot": "mascota",
+    "mascots": "mascotas",
+    "description": "Colecciona y entrena mascotas robot",
+    "active_mascot": "Mascota Activa",
+    "manage": "Gestionar mascotas",
+    "get_mascots": "Obtener mascotas"
+  },
+  "items": {
+    "equipped": "objetos equipados",
+    "equipped_items": "Objetos Equipados",
+    "equip_items": "Equipar Objetos",
+    "manage_items": "Gestionar Objetos",
+    "inventory": "Inventario",
+    "shop": "Tienda de Objetos",
+    "mystery_item": "Tienda de Piezas de Robot",
+    "shop_description": "¡Desbloquea poderosas piezas de robot para mejorar tus mascotas y dominar la arena!",
+    "your_balance": "TU SALDO",
+    "purchase_mystery_item": "Desbloquear Objeto Misterioso",
+    "what_you_get": "Lo que podrías obtener",
+    "type_head_armor": "Armadura de Cabeza",
+    "increases_defense": "Aumenta las estadísticas de defensa",
+    "type_power_core": "Núcleo de Poder",
+    "increases_energy": "Aumenta la energía y el poder de ataque",
+    "type_cpu": "CPU",
+    "increases_logic": "Mejora las capacidades lógicas",
+    "why_unlock": "¿Por qué desbloquear objetos?",
+    "benefit_stronger": "Haz que tus mascotas sean más fuertes en las batallas",
+    "benefit_rare": "Colecciona piezas raras y legendarias para tu colección",
+    "benefit_customize": "Personaliza y construye equipamientos únicos para tus mascotas",
+    "benefit_achieve": "Completa logros y colecciones",
+    "need_more_points": "¿Necesitas más puntos?",
+    "earn_points_message": "¡Completa actividades y tareas para ganar más puntos y desbloquear objetos emocionantes para tu colección!",
+    "you_got": "¡Has conseguido!",
+    "awesome": "¡Genial!",
+    "auto_inventory": "Objeto añadido automáticamente a tu inventario",
+    "no_items_title": "Tu Inventario está Vacío",
+    "no_items": "Aún no tienes ningún objeto. ¡Visita la tienda para comprar algunos!",
+    "go_to_shop": "Ir a la Tienda",
+    "your_items": "Tus Objetos",
+    "select_mascot": "Seleccionar mascota:",
+    "select_mascot_prompt": "-- Selecciona una mascota --",
+    "unequip": "Desequipar",
+    "equip": "Equipar",
+    "select_mascot_first": "Por favor, selecciona una mascota para ver los objetos equipados.",
+    "no_equipped_items": "Esta mascota no tiene ningún objeto equipado. ¡Ve a tu inventario para equipar algunos!",
+    "mascot_stats": "Estadísticas de la Mascota",
+    "empty_slot": "Ranura vacía",
+    "robot_items": "Objetos Robot",
+    "description": "Colecciona objetos especiales para mejorar tus mascotas",
+    "manage": "Gestionar todos los objetos",
+    "get_items": "Obtener objetos"
+  },
+  "blockchain": {
+    "tools": "Herramientas Blockchain"
+  },
+  "auth": {
+    "sign_in": "Iniciar Sesión",
+    "welcome": "Bienvenido a Square",
+    "description": "Por favor, inicia sesión para acceder a tu perfil Web3"
+  },
+  "points": "Puntos"
 } 
