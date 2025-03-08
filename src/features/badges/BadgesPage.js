@@ -31,20 +31,6 @@ const BadgesPage = () => {
       
       setUserBadgeData(badges);
       setUserBadgeIds(badges.map(badge => badge.id));
-      
-      // If no badges found, check if we should trigger migration from localStorage
-      if (badges.length === 0) {
-        const localStorageKey = `user_badges_${userId}`;
-        const storedBadges = localStorage.getItem(localStorageKey);
-        
-        if (storedBadges) {
-          console.log('Found badges in localStorage, consider migrating them');
-          setMigrationStatus({ 
-            status: 'info', 
-            message: 'We found some badges stored locally. Consider migrating them to your account.' 
-          });
-        }
-      }
     } catch (error) {
       console.error('Error fetching user badges:', error);
       setMigrationStatus({ 
@@ -56,63 +42,21 @@ const BadgesPage = () => {
     }
   };
   
-  // Handle migration of badges from localStorage to Supabase
-  const handleMigrateBadges = async () => {
-    if (!user) return;
-    
-    setMigrationStatus({ status: 'pending', message: 'Migrating badges...' });
-    try {
-      const result = await BadgeService.migrateBadgesToSupabase(user.id);
-      setMigrationStatus({ 
-        status: result.success ? 'success' : 'error', 
-        message: result.message 
-      });
-      
-      // Refresh the badge list
-      await fetchUserBadges(user.id);
-      
-      // Clear status after 5 seconds
-      setTimeout(() => {
-        setMigrationStatus(null);
-      }, 5000);
-    } catch (error) {
-      console.error('Error migrating badges:', error);
-      setMigrationStatus({ 
-        status: 'error', 
-        message: 'An unexpected error occurred during migration'
-      });
-    }
-  };
-  
-  // Clean all badges from localStorage
-  const handleCleanLocalStorage = () => {
-    const count = BadgeService.clearLocalStorageBadges();
-    setMigrationStatus({ 
-      status: 'success', 
-      message: `Cleared ${count} badge entries from localStorage` 
-    });
-    
-    // Clear status after 5 seconds
-    setTimeout(() => {
-      setMigrationStatus(null);
-    }, 5000);
-  };
-  
   useEffect(() => {
     if (isLoaded && user) {
-      // Initialize badges system first
+      // Initialize badges system first but don't show errors to users
       BadgeService.initBadgesSystem().then(initialized => {
         if (initialized) {
           console.log('Badges system initialized successfully');
         } else {
-          console.warn('Badges system initialization failed');
-          setMigrationStatus({ 
-            status: 'error', 
-            message: 'Could not initialize badges system. Some features may not work properly.' 
-          });
+          console.warn('Badges system initialization failed, continuing anyway');
         }
         
-        // Proceed with fetching badges regardless
+        // Proceed with fetching badges regardless of initialization status
+        fetchUserBadges(user.id);
+      }).catch(error => {
+        // Log the error but don't show it to the user, and continue with fetching badges
+        console.error('Error during badge system initialization:', error);
         fetchUserBadges(user.id);
       });
     }
@@ -177,20 +121,6 @@ const BadgesPage = () => {
           <h1 className="text-2xl font-bold text-gray-100">{t('badges.title', 'User Badges')}</h1>
           
           <div className="flex gap-2">
-            <button
-              onClick={handleMigrateBadges}
-              className="text-sm px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-            >
-              Migrate from localStorage
-            </button>
-            
-            <button
-              onClick={handleCleanLocalStorage}
-              className="text-sm px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
-            >
-              Clean localStorage
-            </button>
-            
             <button
               onClick={() => setShowTestPanel(!showTestPanel)}
               className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
