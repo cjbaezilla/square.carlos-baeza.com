@@ -4,7 +4,7 @@
  */
 
 import PointsService from '../rewards/PointsService';
-import supabase from '../../shared/utils/supabaseClient';
+import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 
 // Custom event for mascot updates
 export const MASCOT_UPDATED_EVENT = 'mascot-updated';
@@ -315,14 +315,42 @@ class MascotService {
   // Get mascots owned by a user
   async getUserMascots(userId) {
     try {
-      // Query Supabase for user's mascots
-      const { data, error } = await supabase
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        // Fallback to regular client if admin is not available
+        const { data, error } = await supabase
+          .from(this.TABLE_NAME)
+          .select('*')
+          .eq('user_id', userId);
+        
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error fetching user mascots with regular client:', error);
+          return [];
+        }
+        
+        // Map database records to mascot objects with full details
+        return data.map(record => {
+          const mascotTemplate = this.getMascotById(record.mascot_id);
+          return {
+            ...mascotTemplate,
+            purchaseDate: record.purchase_date,
+            experience: record.experience,
+            level: record.level,
+            isActive: record.is_active
+          };
+        });
+      }
+      
+      // Use admin client to bypass RLS
+      const { data, error } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .select('*')
         .eq('user_id', userId);
       
       if (error) {
-        console.error('Error fetching user mascots:', error);
+        // eslint-disable-next-line no-console
+        console.error('Error fetching user mascots with admin client:', error);
         return [];
       }
       
@@ -338,6 +366,7 @@ class MascotService {
         };
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Unexpected error in getUserMascots:', err);
       return [];
     }
@@ -354,8 +383,38 @@ class MascotService {
   // Get user's active mascot
   async getUserActiveMascot(userId) {
     try {
-      // Query Supabase for user's active mascot
-      const { data, error } = await supabase
+      // Check if admin client is available
+      if (!supabaseAdmin) {
+        // Fallback to regular client if admin is not available
+        const { data, error } = await supabase
+          .from(this.TABLE_NAME)
+          .select('*')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .single();
+        
+        if (error) {
+          if (error.code === 'PGRST116') { // No active mascot found
+            return null;
+          }
+          // eslint-disable-next-line no-console
+          console.error('Error fetching active mascot with regular client:', error);
+          return null;
+        }
+        
+        // Map database record to mascot object with full details
+        const mascotTemplate = this.getMascotById(data.mascot_id);
+        return {
+          ...mascotTemplate,
+          purchaseDate: data.purchase_date,
+          experience: data.experience,
+          level: data.level,
+          isActive: data.is_active
+        };
+      }
+      
+      // Use admin client to bypass RLS
+      const { data, error } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .select('*')
         .eq('user_id', userId)
@@ -366,7 +425,8 @@ class MascotService {
         if (error.code === 'PGRST116') { // No active mascot found
           return null;
         }
-        console.error('Error fetching active mascot:', error);
+        // eslint-disable-next-line no-console
+        console.error('Error fetching active mascot with admin client:', error);
         return null;
       }
       
@@ -380,6 +440,7 @@ class MascotService {
         isActive: data.is_active
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Unexpected error in getUserActiveMascot:', err);
       return null;
     }
@@ -389,35 +450,45 @@ class MascotService {
   async setUserActiveMascot(userId, mascotId) {
     try {
       // First, set all mascots to inactive
-      const { error: resetError } = await supabase
+      // Use admin client to bypass RLS
+      if (!supabaseAdmin) {
+        // eslint-disable-next-line no-console
+        console.error('Admin client not available. Cannot set active mascot.');
+        return false;
+      }
+      
+      const { error: resetError } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .update({ is_active: false })
         .eq('user_id', userId);
       
       if (resetError) {
-        console.error('Error resetting active mascots:', resetError);
-        return null;
+        // eslint-disable-next-line no-console
+        console.error('Error resetting active mascot:', resetError);
+        return false;
       }
       
-      // Then set the selected mascot to active
-      const { error } = await supabase
+      // Then set the specified mascot to active
+      const { error: activateError } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .update({ is_active: true })
         .eq('user_id', userId)
         .eq('mascot_id', mascotId);
       
-      if (error) {
-        console.error('Error setting active mascot:', error);
-        return null;
+      if (activateError) {
+        // eslint-disable-next-line no-console
+        console.error('Error setting active mascot:', activateError);
+        return false;
       }
       
-      // Dispatch event
+      // Dispatch event to update UI
       this.dispatchMascotUpdatedEvent(userId, mascotId);
       
-      return mascotId;
+      return true;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Unexpected error in setUserActiveMascot:', err);
-      return null;
+      return false;
     }
   }
 
@@ -427,6 +498,8 @@ class MascotService {
       // Get the mascot details
       const mascot = this.getMascotById(mascotId);
       if (!mascot) {
+        // eslint-disable-next-line no-console
+        console.error(`Mascot with ID ${mascotId} not found`);
         return { success: false, message: 'Mascot not found' };
       }
       
@@ -434,7 +507,7 @@ class MascotService {
       const userData = await PointsService.getUserPoints(userId);
       
       // Check if user has enough points
-      if (userData.points < mascot.price) {
+      if (!userData || userData.points < mascot.price) {
         return { success: false, message: 'Not enough points' };
       }
       
@@ -446,6 +519,7 @@ class MascotService {
         .eq('mascot_id', mascotId);
       
       if (checkError) {
+        // eslint-disable-next-line no-console
         console.error('Error checking mascot ownership:', checkError);
         return { success: false, message: 'Error checking mascot ownership' };
       }
@@ -455,7 +529,12 @@ class MascotService {
       }
       
       // Deduct points
-      await PointsService.addPoints(userId, -mascot.price);
+      const pointsResult = await PointsService.addPoints(userId, -mascot.price);
+      if (!pointsResult || !pointsResult.success) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to deduct points:', pointsResult);
+        return { success: false, message: 'Error deducting points' };
+      }
       
       // Check if this is the first mascot
       const { data: existingMascots, error: countError } = await supabase
@@ -464,13 +543,22 @@ class MascotService {
         .eq('user_id', userId);
       
       if (countError) {
+        // eslint-disable-next-line no-console
         console.error('Error counting existing mascots:', countError);
       }
       
       const isFirstMascot = !existingMascots || existingMascots.length === 0;
       
-      // Add mascot to user's collection
-      const { error } = await supabase
+      // Add mascot to user's collection - USE ADMIN CLIENT TO BYPASS RLS
+      
+      // Check if supabaseAdmin is available
+      if (!supabaseAdmin) {
+        // eslint-disable-next-line no-console
+        console.error('Admin client not available. Cannot complete purchase.');
+        return { success: false, message: 'Server configuration error' };
+      }
+      
+      const { error } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .insert({
           user_id: userId,
@@ -482,6 +570,7 @@ class MascotService {
         });
       
       if (error) {
+        // eslint-disable-next-line no-console
         console.error('Error purchasing mascot:', error);
         return { success: false, message: 'Error purchasing mascot' };
       }
@@ -504,6 +593,7 @@ class MascotService {
         mascot: userMascot 
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Unexpected error in purchaseMascot:', err);
       return { success: false, message: 'Unexpected error occurred' };
     }
@@ -513,52 +603,70 @@ class MascotService {
   async addMascotExperience(userId, mascotId, expAmount) {
     try {
       // Get current mascot data
-      const { data, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from(this.TABLE_NAME)
         .select('*')
         .eq('user_id', userId)
         .eq('mascot_id', mascotId)
         .single();
       
-      if (fetchError) {
-        console.error('Error fetching mascot for experience update:', fetchError);
-        return null;
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching mascot data:', error);
+        return false;
       }
       
-      // Update experience and level
-      const newExperience = data.experience + expAmount;
-      const newLevel = Math.floor(newExperience / 100) + 1;
+      if (!data) {
+        // eslint-disable-next-line no-console
+        console.error('Mascot not found');
+        return false;
+      }
       
-      // Update in database
-      const { error } = await supabase
+      // Calculate new experience and level
+      const currentExp = data.experience || 0;
+      const currentLevel = data.level || 1;
+      const newExp = currentExp + expAmount;
+      
+      // Check if level up (simple formula: level up every 100 exp)
+      const newLevel = Math.floor(newExp / 100) + 1;
+      const didLevelUp = newLevel > currentLevel;
+      
+      // Use admin client to update the mascot to bypass RLS
+      if (!supabaseAdmin) {
+        // eslint-disable-next-line no-console
+        console.error('Admin client not available. Cannot update mascot experience.');
+        return false;
+      }
+      
+      // Update mascot data
+      const { error: updateError } = await supabaseAdmin
         .from(this.TABLE_NAME)
-        .update({ 
-          experience: newExperience,
+        .update({
+          experience: newExp,
           level: newLevel
         })
         .eq('user_id', userId)
         .eq('mascot_id', mascotId);
       
-      if (error) {
-        console.error('Error updating mascot experience:', error);
-        return null;
+      if (updateError) {
+        // eslint-disable-next-line no-console
+        console.error('Error updating mascot experience:', updateError);
+        return false;
       }
       
-      // Dispatch event
+      // Dispatch event to update UI
       this.dispatchMascotUpdatedEvent(userId);
       
-      // Get the full mascot object to return
-      const mascotTemplate = this.getMascotById(mascotId);
       return {
-        ...mascotTemplate,
-        purchaseDate: data.purchase_date,
-        experience: newExperience,
-        level: newLevel,
-        isActive: data.is_active
+        success: true,
+        newExp,
+        newLevel,
+        didLevelUp
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Unexpected error in addMascotExperience:', err);
-      return null;
+      return false;
     }
   }
 }

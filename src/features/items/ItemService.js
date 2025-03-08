@@ -463,17 +463,41 @@ class ItemService {
   
   // Helper method to format items response
   formatItemsResponse(data) {
-    // Transform to match the expected structure
-    return data ? data.map(item => ({
-      id: item.item_id,
-      instanceId: item.instance_id,
-      name: item.name,
-      description: item.description,
-      type: item.type,
-      rarity: item.rarity,
-      stats: item.stats,
-      svg: item.svg
-    })) : [];
+    // Ensure data is valid
+    if (!data) {
+      // eslint-disable-next-line no-console
+      console.warn('formatItemsResponse received no data');
+      return [];
+    }
+    
+    // Ensure data is an array
+    if (!Array.isArray(data)) {
+      // eslint-disable-next-line no-console
+      console.error('formatItemsResponse expected an array but got:', typeof data);
+      return [];
+    }
+    
+    try {
+      // Transform to match the expected structure
+      return data.map(item => {
+        if (!item) return null;
+        
+        return {
+          id: item.item_id,
+          instanceId: item.instance_id,
+          name: item.name,
+          description: item.description,
+          type: item.type,
+          rarity: item.rarity,
+          stats: item.stats || {},
+          svg: item.svg
+        };
+      }).filter(Boolean); // Remove any null items
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error formatting items response:', error);
+      return [];
+    }
   }
   
   // Add item to user's inventory
@@ -635,15 +659,17 @@ class ItemService {
   // Get mascot equipped items
   async getMascotItems(userId, mascotId) {
     if (!userId || !mascotId) {
+      // eslint-disable-next-line no-console
       console.error('getMascotItems called with invalid parameters:', userId, mascotId);
-      return [];
+      return Promise.resolve([]);
     }
     
     try {
       // Check if admin client is available
       if (!supabaseAdmin) {
+        // eslint-disable-next-line no-console
         console.error('Admin client not available. Check environment variables.');
-        return [];
+        return Promise.resolve([]);
       }
       
       // Get equipped item instances from the join table - use admin client
@@ -654,6 +680,7 @@ class ItemService {
         .eq('mascot_id', mascotId);
         
       if (equippedError) {
+        // eslint-disable-next-line no-console
         console.error('Error getting equipped items:', equippedError);
         return [];
       }
@@ -673,13 +700,22 @@ class ItemService {
         .in('instance_id', itemInstanceIds);
         
       if (itemsError) {
+        // eslint-disable-next-line no-console
         console.error('Error getting item details:', itemsError);
         return [];
       }
       
+      if (!itemsData) {
+        // eslint-disable-next-line no-console
+        console.warn('No item data returned for mascot:', mascotId);
+        return [];
+      }
+      
       // Use the helper method to format the response
-      return this.formatItemsResponse(itemsData);
+      const formattedItems = this.formatItemsResponse(itemsData);
+      return Array.isArray(formattedItems) ? formattedItems : [];
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Error getting mascot items:', err);
       return [];
     }
@@ -890,23 +926,56 @@ class ItemService {
   
   // Calculate total mascot stats with equipped items
   calculateTotalMascotStats(mascot, equippedItems = []) {
-    if (!mascot || !mascot.stats) return null;
-    
-    // Start with the mascot's base stats
-    const totalStats = { ...mascot.stats };
-    
-    // Add stats from all equipped items
-    for (const item of equippedItems) {
-      if (item.stats) {
-        for (const [stat, value] of Object.entries(item.stats)) {
-          if (totalStats[stat] !== undefined) {
-            totalStats[stat] += value;
+    try {
+      // Check if mascot is valid
+      if (!mascot || !mascot.stats) {
+        // eslint-disable-next-line no-console
+        console.error('Invalid mascot or mascot stats provided to calculateTotalMascotStats');
+        return mascot?.stats || {};
+      }
+      
+      // Ensure equippedItems is an array and not a Promise
+      if (!Array.isArray(equippedItems)) {
+        // Check if it's a Promise
+        if (equippedItems && typeof equippedItems.then === 'function') {
+          // eslint-disable-next-line no-console
+          console.error('Promise passed to calculateTotalMascotStats instead of an array. Did you forget to await getMascotItems?', equippedItems);
+          // Return mascot base stats as fallback
+          return { ...mascot.stats };
+        }
+        
+        // eslint-disable-next-line no-console
+        console.error('equippedItems is not an array in calculateTotalMascotStats:', equippedItems);
+        equippedItems = [];
+      }
+      
+      // Start with the mascot's base stats
+      const totalStats = { ...mascot.stats };
+      
+      // Add stats from all equipped items
+      for (const item of equippedItems) {
+        // Skip invalid items
+        if (!item || !item.stats) continue;
+        
+        try {
+          for (const [stat, value] of Object.entries(item.stats)) {
+            if (totalStats[stat] !== undefined && typeof value === 'number') {
+              totalStats[stat] += value;
+            }
           }
+        } catch (statError) {
+          // eslint-disable-next-line no-console
+          console.error('Error processing item stats:', statError, item);
+          // Continue with next item
         }
       }
+      
+      return totalStats;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error in calculateTotalMascotStats:', error);
+      return mascot?.stats || {};
     }
-    
-    return totalStats;
   }
   
   // Check if an item is equipped to any mascot

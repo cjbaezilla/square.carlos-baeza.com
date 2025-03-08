@@ -31,20 +31,48 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
   const [equippedItems, setEquippedItems] = useState([]);
   const [totalStats, setTotalStats] = useState(mascot ? { ...mascot.stats } : null);
   
+  // Log mascot data for debugging - remove this in production
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('MascotDisplay - mascot data:', mascot);
+    // eslint-disable-next-line no-console
+    console.log('MascotDisplay - props:', { isOwned, isActive });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mascot]); // Only depend on mascot to avoid too many rerenders
+  
   // Load equipped items when component mounts
   useEffect(() => {
-    if (isSignedIn && user && mascot && isOwned) {
-      const userId = user.id;
-      const mascotId = mascot.id;
-      
-      // Get items equipped to the mascot
-      const items = ItemService.getMascotItems(userId, mascotId);
-      setEquippedItems(items);
-      
-      // Calculate total stats with equipped items
-      const enhancedStats = ItemService.calculateTotalMascotStats(mascot, items);
-      setTotalStats(enhancedStats);
-    }
+    const loadEquippedItems = async () => {
+      if (isSignedIn && user && mascot && isOwned) {
+        const userId = user.id;
+        const mascotId = mascot.id;
+        
+        try {
+          // Get items equipped to the mascot - AWAIT THE PROMISE
+          const items = await ItemService.getMascotItems(userId, mascotId);
+          
+          // Make sure items is an array before setting state
+          if (Array.isArray(items)) {
+            setEquippedItems(items);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error('Expected items to be an array but got:', items);
+            setEquippedItems([]);
+          }
+          
+          // Calculate total stats with equipped items (ensuring items is an array)
+          const itemsToUse = Array.isArray(items) ? items : [];
+          const enhancedStats = ItemService.calculateTotalMascotStats(mascot, itemsToUse);
+          setTotalStats(enhancedStats);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error loading equipped items:', error);
+          setEquippedItems([]);
+        }
+      }
+    };
+    
+    loadEquippedItems();
   }, [isSignedIn, user, mascot, isOwned]);
   
   // Update equipped items when items change
@@ -56,13 +84,32 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
         
         // If this mascot's items were updated
         if (event.detail.mascotId === mascotId) {
-          // Get updated items
-          const items = ItemService.getMascotItems(userId, mascotId);
-          setEquippedItems(items);
+          const updateEquippedItems = async () => {
+            try {
+              // Get updated items - AWAIT THE PROMISE
+              const items = await ItemService.getMascotItems(userId, mascotId);
+              
+              // Make sure items is an array
+              if (Array.isArray(items)) {
+                setEquippedItems(items);
+              } else {
+                // eslint-disable-next-line no-console
+                console.error('Expected updated items to be an array but got:', items);
+                setEquippedItems([]);
+              }
+              
+              // Recalculate total stats (ensuring items is an array)
+              const itemsToUse = Array.isArray(items) ? items : [];
+              const enhancedStats = ItemService.calculateTotalMascotStats(mascot, itemsToUse);
+              setTotalStats(enhancedStats);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error('Error updating equipped items:', error);
+              setEquippedItems([]);
+            }
+          };
           
-          // Recalculate total stats
-          const enhancedStats = ItemService.calculateTotalMascotStats(mascot, items);
-          setTotalStats(enhancedStats);
+          updateEquippedItems();
         }
       }
     };
@@ -73,6 +120,17 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
       document.removeEventListener(ITEM_UPDATED_EVENT, handleItemUpdate);
     };
   }, [isSignedIn, user, mascot, isOwned]);
+  
+  // Validation check - MOVED AFTER ALL HOOKS
+  if (!mascot) {
+    // eslint-disable-next-line no-console
+    console.error('MascotDisplay: Mascot prop is null or undefined');
+    return (
+      <div className="bg-red-900/30 p-4 rounded-lg border border-red-700">
+        <p className="text-red-400">Error: Invalid mascot data</p>
+      </div>
+    );
+  }
   
   // Define colors for different stats
   const statColors = {
@@ -118,13 +176,14 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
           />
           
           {/* Equipped items indicators */}
-          {equippedItems.length > 0 && (
+          {Array.isArray(equippedItems) && equippedItems.length > 0 && (
             <div className="absolute top-0 right-0 flex space-x-1">
               {equippedItems.map((item, index) => {
-                const rarityInfo = ITEM_RARITIES[item.rarity];
+                if (!item) return null; // Skip undefined/null items
+                const rarityInfo = ITEM_RARITIES[item.rarity] || ITEM_RARITIES.COMMON;
                 return (
                   <div 
-                    key={item.instanceId} 
+                    key={item.instanceId || index} 
                     className="w-5 h-5 rounded-full flex items-center justify-center" 
                     style={{ backgroundColor: rarityInfo.color }}
                     title={item.name}
@@ -145,7 +204,7 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
           <div className="mt-3">
             <h4 className="text-sm font-semibold text-gray-200 mb-2">
               {t('mascots.stats', 'Mascot Stats')}
-              {equippedItems.length > 0 && (
+              {Array.isArray(equippedItems) && equippedItems.length > 0 && (
                 <span className="text-xs font-normal text-gray-400 ml-2">
                   ({equippedItems.length} {t('items.equipped', 'items equipped')})
                 </span>
@@ -238,7 +297,16 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
           <div className="mt-4">
             <button
               className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-              onClick={() => onPurchase && onPurchase(mascot.id)}
+              onClick={() => {
+                // eslint-disable-next-line no-console
+                console.log('Purchase button clicked for mascot:', mascot.id);
+                if (onPurchase) {
+                  onPurchase(mascot.id);
+                } else {
+                  // eslint-disable-next-line no-console
+                  console.error('onPurchase handler is not defined');
+                }
+              }}
             >
               {t('mascots.purchase', 'Purchase')} ({mascot.price} {t('points', 'Points')})
             </button>

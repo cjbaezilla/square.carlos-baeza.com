@@ -28,28 +28,71 @@ const MascotsPage = () => {
         const userId = user.id;
         
         try {
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Loading data for user', userId);
+          
+          // Get all available mascots first for comparison
+          const allMascots = MascotService.getAllMascots();
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Available mascots in catalog:', allMascots.length);
+          setAvailableMascots(allMascots);
+          
           // Get user's mascots
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Fetching user mascots...');
           const mascots = await MascotService.getUserMascots(userId);
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: User has', mascots.length, 'mascots:', mascots);
           setUserMascots(mascots);
           
           // Get user's active mascot
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Fetching active mascot...');
           const activeMascot = await MascotService.getUserActiveMascot(userId);
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Active mascot:', activeMascot);
           if (activeMascot) {
             setActiveMascotId(activeMascot.id);
           }
           
           // Get user's points
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Fetching user points...');
           const userData = await PointsService.getUserPoints(userId);
           if (userData) {
+            // eslint-disable-next-line no-console
+            console.log('MascotsPage: User points:', userData.points);
             setUserPoints(userData.points);
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn('MascotsPage: No user points data returned');
           }
-          
-          // Get all available mascots
-          setAvailableMascots(MascotService.getAllMascots());
           
           setIsLoading(false);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Error loading mascot data:', error);
+          
+          // Try to provide more detailed error information
+          if (error.message) {
+            // eslint-disable-next-line no-console
+            console.error('Error message:', error.message);
+          }
+          
+          if (error.stack) {
+            // eslint-disable-next-line no-console
+            console.error('Error stack:', error.stack);
+          }
+          
+          // Still set available mascots even if user data fails
+          try {
+            const allMascots = MascotService.getAllMascots();
+            setAvailableMascots(allMascots);
+          } catch (catalogError) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to load mascot catalog:', catalogError);
+          }
+          
           setIsLoading(false);
         }
       }
@@ -786,13 +829,70 @@ const MascotsPage = () => {
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
-      {/* Points display */}
+      {/* Points display and buttons */}
       <div className="mb-6 flex justify-between items-center">
         <h3 className="text-xl font-bold text-purple-400">
           {t('mascot.yourMascots', 'Your Robot Mascots')}
         </h3>
-        <div className="px-4 py-2 bg-purple-900/50 rounded-lg">
-          <span className="text-lg font-bold text-purple-300">{userPoints} {t('rewards.points', 'Points')}</span>
+        <div className="flex items-center space-x-3">
+          <button 
+            onClick={async () => {
+              if (!isSignedIn || !user) return;
+              
+              setIsLoading(true);
+              try {
+                // eslint-disable-next-line no-console
+                console.log('Manually refreshing mascot data...');
+                const mascots = await MascotService.getUserMascots(user.id);
+                setUserMascots(mascots);
+                
+                const activeMascot = await MascotService.getUserActiveMascot(user.id);
+                if (activeMascot) {
+                  setActiveMascotId(activeMascot.id);
+                }
+                
+                const userData = await PointsService.getUserPoints(user.id);
+                if (userData) {
+                  setUserPoints(userData.points);
+                }
+                
+                setNotification({
+                  type: 'success',
+                  message: t('mascot.refreshSuccess', 'Data refreshed successfully!')
+                });
+                
+                setTimeout(() => setNotification(null), 3000);
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Error refreshing data:', error);
+                setNotification({
+                  type: 'error',
+                  message: t('mascot.refreshError', 'Error refreshing data')
+                });
+                
+                setTimeout(() => setNotification(null), 3000);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            className="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded mr-3"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {t('mascot.refreshing', 'Refreshing...')}
+              </span>
+            ) : (
+              t('mascot.refresh', 'Refresh Data')
+            )}
+          </button>
+          <div className="px-4 py-2 bg-purple-900/50 rounded-lg">
+            <span className="text-lg font-bold text-purple-300">{userPoints} {t('rewards.points', 'Points')}</span>
+          </div>
         </div>
       </div>
       

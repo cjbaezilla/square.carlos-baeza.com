@@ -91,6 +91,29 @@ function App() {
     loadUserData();
   }, [isSignedIn, user, fetchAndUpdateItems, fetchAndUpdateMascots]);
 
+  // Add global error listener for better error tracking
+  useEffect(() => {
+    const handleGlobalError = (event) => {
+      // eslint-disable-next-line no-console
+      console.error('Global error detected:', event.error || event.message);
+      // eslint-disable-next-line no-console
+      console.error('Error details:', event);
+    };
+
+    // Listen for unhandled errors
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', (event) => {
+      // eslint-disable-next-line no-console
+      console.error('Unhandled Promise Rejection:', event.reason);
+    });
+
+    // Clean up
+    return () => {
+      window.removeEventListener('error', handleGlobalError);
+      window.removeEventListener('unhandledrejection', handleGlobalError);
+    };
+  }, []);
+
   // Listen for mascot updates
   useEffect(() => {
     const handleMascotUpdate = async (event) => {

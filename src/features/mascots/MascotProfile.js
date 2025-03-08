@@ -71,37 +71,71 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
 
   // Load equipped items when component mounts or mascot changes
   useEffect(() => {
-    if (isSignedIn && user && activeMascot) {
-      const userId = user.id;
-      const mascotId = activeMascot.id;
-      
-      // Get items equipped to the mascot
-      const items = ItemService.getMascotItems(userId, mascotId);
-      setEquippedItems(items);
-      
-      // Calculate total stats with equipped items
-      const enhancedStats = ItemService.calculateTotalMascotStats(activeMascot, items);
-      setTotalStats(enhancedStats);
-    }
+    const loadEquippedItems = async () => {
+      if (isSignedIn && user && activeMascot) {
+        try {
+          const userId = user.id;
+          const mascotId = activeMascot.id;
+          
+          // Get items equipped to the mascot - AWAIT THE PROMISE
+          const items = await ItemService.getMascotItems(userId, mascotId);
+          
+          // Ensure items is an array
+          if (Array.isArray(items)) {
+            setEquippedItems(items);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error('Expected items to be an array but got:', items);
+            setEquippedItems([]);
+          }
+          
+          // Calculate total stats with equipped items
+          const itemsToUse = Array.isArray(items) ? items : [];
+          const enhancedStats = ItemService.calculateTotalMascotStats(activeMascot, itemsToUse);
+          setTotalStats(enhancedStats);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error loading equipped items:', error);
+          setEquippedItems([]);
+        }
+      }
+    };
+    
+    loadEquippedItems();
   }, [isSignedIn, user, activeMascot]);
   
   // Update equipped items when items change
   useEffect(() => {
     const handleItemUpdate = (event) => {
-      if (isSignedIn && user && activeMascot) {
-        const userId = user.id;
-        const mascotId = activeMascot.id;
+      if (isSignedIn && user && activeMascot && event.detail.mascotId === activeMascot.id) {
+        const updateItems = async () => {
+          try {
+            const userId = user.id;
+            const mascotId = activeMascot.id;
+            
+            // Get updated items - AWAIT THE PROMISE
+            const items = await ItemService.getMascotItems(userId, mascotId);
+            
+            // Ensure items is an array
+            if (Array.isArray(items)) {
+              setEquippedItems(items);
+            } else {
+              // eslint-disable-next-line no-console
+              console.error('Expected updated items to be an array but got:', items);
+              setEquippedItems([]);
+            }
+            
+            // Recalculate total stats
+            const itemsToUse = Array.isArray(items) ? items : [];
+            const enhancedStats = ItemService.calculateTotalMascotStats(activeMascot, itemsToUse);
+            setTotalStats(enhancedStats);
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Error updating equipped items:', error);
+          }
+        };
         
-        // If this mascot's items were updated
-        if (event.detail.mascotId === mascotId) {
-          // Get updated items
-          const items = ItemService.getMascotItems(userId, mascotId);
-          setEquippedItems(items);
-          
-          // Recalculate total stats
-          const enhancedStats = ItemService.calculateTotalMascotStats(activeMascot, items);
-          setTotalStats(enhancedStats);
-        }
+        updateItems();
       }
     };
     
