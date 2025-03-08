@@ -26,10 +26,10 @@ function App() {
       try {
         setIsLoading(true);
         // Force initialization of user items data structure if it doesn't exist
-        ItemService.initUserItemsData(user.id);
+        await ItemService.initUserItemsData(user.id);
         
-        // Get user's items, adding samples if needed
-        const items = ensureUserHasSampleItems(user.id);
+        // Get user's items
+        const items = await ItemService.getUserItems(user.id);
         console.log('Loaded user items:', items);
         
         if (items && Array.isArray(items)) {
@@ -73,14 +73,23 @@ function App() {
   useEffect(() => {
     const loadUserData = async () => {
       if (isSignedIn && user) {
-        // Fetch mascots and items
-        await fetchAndUpdateMascots();
-        await fetchAndUpdateItems();
+        try {
+          // Verify tables exist in Supabase
+          await ItemService.verifyTables();
+          
+          // Fetch items
+          fetchAndUpdateItems();
+          
+          // Fetch mascots and items
+          await fetchAndUpdateMascots();
+        } catch (error) {
+          console.error('Error loading user data:', error);
+        }
       }
     };
     
     loadUserData();
-  }, [isSignedIn, user, fetchAndUpdateMascots, fetchAndUpdateItems]);
+  }, [isSignedIn, user, fetchAndUpdateItems, fetchAndUpdateMascots]);
 
   // Listen for mascot updates
   useEffect(() => {
@@ -99,10 +108,14 @@ function App() {
 
   // Listen for item updates
   useEffect(() => {
-    const handleItemUpdate = (event) => {
-      console.log('Item update event received:', event.detail);
+    const handleItemUpdate = async (event) => {
       if (isSignedIn && user) {
-        fetchAndUpdateItems();
+        try {
+          // Fetch updated items
+          await fetchAndUpdateItems();
+        } catch (error) {
+          console.error('Error handling item update:', error);
+        }
       }
     };
     

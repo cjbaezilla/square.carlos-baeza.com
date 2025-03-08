@@ -21,6 +21,7 @@ const ItemsPage = () => {
   const [mascotStats, setMascotStats] = useState(null);
   const [mascotTotalStats, setMascotTotalStats] = useState(null);
   const pointsTimerRef = useRef(null);
+  const [isItemEquippedState, setIsItemEquippedState] = useState({});
 
   // Load user's items and mascots
   useEffect(() => {
@@ -30,8 +31,8 @@ const ItemsPage = () => {
           setIsLoading(true);
           const userId = user.id;
           
-          // Get user's items
-          const items = ItemService.getUserItems(userId);
+          // Get user's items - now async
+          const items = await ItemService.getUserItems(userId);
           setUserItems(items);
           
           // Get user's mascots - using await for async call
@@ -43,8 +44,8 @@ const ItemsPage = () => {
           if (activeMascot) {
             setSelectedMascot(activeMascot);
             
-            // Get items equipped to the active mascot
-            const mascotItems = ItemService.getMascotItems(userId, activeMascot.id);
+            // Get items equipped to the active mascot - now async
+            const mascotItems = await ItemService.getMascotItems(userId, activeMascot.id);
             setEquippedItems(mascotItems);
             
             // Calculate base and total stats
@@ -99,17 +100,17 @@ const ItemsPage = () => {
 
   // Listen for item updates
   useEffect(() => {
-    const handleItemUpdate = (event) => {
+    const handleItemUpdate = async (event) => {
       if (isSignedIn && user) {
         const userId = user.id;
         
-        // Update user's items
-        const items = ItemService.getUserItems(userId);
+        // Update user's items - now async
+        const items = await ItemService.getUserItems(userId);
         setUserItems(items);
         
         // Update equipped items if the selected mascot is affected
         if (selectedMascot && event.detail.mascotId === selectedMascot.id) {
-          const mascotItems = ItemService.getMascotItems(userId, selectedMascot.id);
+          const mascotItems = await ItemService.getMascotItems(userId, selectedMascot.id);
           setEquippedItems(mascotItems);
           
           // Recalculate total stats
@@ -141,7 +142,7 @@ const ItemsPage = () => {
               setSelectedMascot(updatedMascot);
               
               // Refresh equipped items
-              const mascotItems = ItemService.getMascotItems(user.id, updatedMascot.id);
+              const mascotItems = await ItemService.getMascotItems(user.id, updatedMascot.id);
               setEquippedItems(mascotItems);
               
               // Update stats
@@ -177,7 +178,8 @@ const ItemsPage = () => {
       setSelectedMascot(mascot);
       
       const userId = user.id;
-      const mascotItems = ItemService.getMascotItems(userId, mascot.id);
+      // Get items equipped to this mascot - now async
+      const mascotItems = await ItemService.getMascotItems(userId, mascot.id);
       setEquippedItems(mascotItems);
       
       // Update stats
@@ -187,39 +189,51 @@ const ItemsPage = () => {
   };
 
   // Handle item purchase
-  const handlePurchaseItem = () => {
+  const handlePurchaseItem = async () => {
     if (isSignedIn && user) {
       const userId = user.id;
       
-      // Purchase random item
-      const result = ItemService.purchaseRandomItem(userId);
-      
-      if (result.success) {
-        // Show notification
-        setNotification({
-          type: 'success',
-          message: result.message
-        });
+      try {
+        // Purchase random item - now async
+        const result = await ItemService.purchaseRandomItem(userId);
         
-        // Show purchase animation and reveal the new item
-        setPurchaseAnimation(true);
-        setNewItem(result.item);
-        
-        // Update points display
-        setUserPoints(result.remainingPoints);
-        
-        // Hide notification after 3 seconds
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-      } else {
-        // Show error notification
+        if (result.success) {
+          // Show notification
+          setNotification({
+            type: 'success',
+            message: result.message
+          });
+          
+          // Show purchase animation and reveal the new item
+          setPurchaseAnimation(true);
+          setNewItem(result.item);
+          
+          // Update points display
+          setUserPoints(result.remainingPoints);
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+        } else {
+          // Show error notification
+          setNotification({
+            type: 'error',
+            message: result.message
+          });
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Error purchasing item:', error);
         setNotification({
           type: 'error',
-          message: result.message
+          message: 'An error occurred while purchasing the item'
         });
         
-        // Hide notification after 3 seconds
         setTimeout(() => {
           setNotification(null);
         }, 3000);
@@ -228,105 +242,96 @@ const ItemsPage = () => {
   };
 
   // Handle closing the purchase animation/reveal
-  const handleClosePurchase = () => {
+  const handleClosePurchase = async () => {
     setPurchaseAnimation(false);
     setNewItem(null);
     
-    // Update items list
+    // Update items list - now async
     if (isSignedIn && user) {
-      const items = ItemService.getUserItems(user.id);
+      const items = await ItemService.getUserItems(user.id);
       setUserItems(items);
     }
   };
 
   // Handle equipping an item to the selected mascot
-  const handleEquipItem = (itemInstanceId) => {
+  const handleEquipItem = async (itemInstanceId) => {
     if (isSignedIn && user && selectedMascot) {
       const userId = user.id;
       const mascotId = selectedMascot.id;
       
-      // Equip item
-      const result = ItemService.equipItemToMascot(userId, mascotId, itemInstanceId);
-      
-      if (result.success) {
+      try {
+        // Equip item - now async
+        const result = await ItemService.equipItemToMascot(userId, mascotId, itemInstanceId);
+        
         // Show notification
         setNotification({
-          type: 'success',
+          type: result.success ? 'success' : 'error',
           message: result.message
         });
-        
-        // Update equipped items
-        const mascotItems = ItemService.getMascotItems(userId, mascotId);
-        setEquippedItems(mascotItems);
-        
-        // Update total stats
-        setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
         
         // Hide notification after 3 seconds
         setTimeout(() => {
           setNotification(null);
         }, 3000);
-      } else {
-        // Show error notification
+        
+        if (result.success) {
+          // Update equipped items
+          const mascotItems = await ItemService.getMascotItems(userId, mascotId);
+          setEquippedItems(mascotItems);
+          
+          // Update total stats
+          setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
+        }
+      } catch (error) {
+        console.error('Error equipping item:', error);
         setNotification({
           type: 'error',
-          message: result.message
+          message: 'An error occurred while equipping the item'
         });
         
-        // Hide notification after 3 seconds
         setTimeout(() => {
           setNotification(null);
         }, 3000);
       }
-    } else {
-      // Show error notification if no mascot selected
-      setNotification({
-        type: 'error',
-        message: 'Please select a mascot first'
-      });
-      
-      // Hide notification after 3 seconds
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
     }
   };
 
   // Handle unequipping an item from the selected mascot
-  const handleUnequipItem = (itemInstanceId) => {
+  const handleUnequipItem = async (itemInstanceId) => {
     if (isSignedIn && user && selectedMascot) {
       const userId = user.id;
       const mascotId = selectedMascot.id;
       
-      // Unequip item
-      const result = ItemService.unequipItemFromMascot(userId, mascotId, itemInstanceId);
-      
-      if (result.success) {
+      try {
+        // Unequip item - now async
+        const result = await ItemService.unequipItemFromMascot(userId, mascotId, itemInstanceId);
+        
         // Show notification
         setNotification({
-          type: 'success',
+          type: result.success ? 'success' : 'error',
           message: result.message
         });
-        
-        // Update equipped items
-        const mascotItems = ItemService.getMascotItems(userId, mascotId);
-        setEquippedItems(mascotItems);
-        
-        // Update total stats
-        setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
         
         // Hide notification after 3 seconds
         setTimeout(() => {
           setNotification(null);
         }, 3000);
-      } else {
-        // Show error notification
+        
+        if (result.success) {
+          // Update equipped items
+          const mascotItems = await ItemService.getMascotItems(userId, mascotId);
+          setEquippedItems(mascotItems);
+          
+          // Update total stats
+          setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
+        }
+      } catch (error) {
+        console.error('Error unequipping item:', error);
         setNotification({
           type: 'error',
-          message: result.message
+          message: 'An error occurred while unequipping the item'
         });
         
-        // Hide notification after 3 seconds
         setTimeout(() => {
           setNotification(null);
         }, 3000);
@@ -619,7 +624,12 @@ const ItemsPage = () => {
 
   // Render the inventory tab
   const renderInventoryTab = () => {
-    if (userItems.length === 0) {
+    const filteredItems = userItems.filter(item => {
+      // Filter out items that are equipped to any mascot
+      return isSignedIn && user ? !isItemEquippedState[item.instanceId] : true;
+    });
+
+    if (filteredItems.length === 0) {
       return (
         <div className="bg-gray-800 text-gray-300 rounded-xl p-8 flex flex-col items-center text-center">
           <div className="mb-4 text-blue-400">
@@ -656,7 +666,7 @@ const ItemsPage = () => {
             </svg>
             {t('items.your_items', 'Your Items')} 
             <span className="ml-2 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full">
-              {userItems.length}
+              {filteredItems.length}
             </span>
           </h3>
           
@@ -685,9 +695,8 @@ const ItemsPage = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-          {userItems.map(item => {
+          {filteredItems.map(item => {
             const rarityInfo = ITEM_RARITIES[item.rarity];
-            const isEquipped = equippedItems.some(eqItem => eqItem.instanceId === item.instanceId);
             
             return (
               <div 
@@ -702,16 +711,6 @@ const ItemsPage = () => {
                   className="absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rotate-45 opacity-10"
                   style={{ backgroundColor: rarityInfo.color }}
                 />
-                
-                {/* Equipped badge */}
-                {isEquipped && (
-                  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    {t('items.equipped', 'Equipped')}
-                  </div>
-                )}
                 
                 <div 
                   className="w-full h-24 mb-3 flex items-center justify-center item-svg-container p-2 rounded-lg"
@@ -759,23 +758,6 @@ const ItemsPage = () => {
                     ) : null
                   ))}
                 </div>
-                
-                {isEquipped ? (
-                  <button 
-                    className="w-full px-3 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition-colors"
-                    onClick={() => handleUnequipItem(item.instanceId)}
-                  >
-                    {t('items.unequip', 'Unequip')}
-                  </button>
-                ) : (
-                  <button 
-                    className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handleEquipItem(item.instanceId)}
-                    disabled={!selectedMascot}
-                  >
-                    {t('items.equip', 'Equip')}
-                  </button>
-                )}
               </div>
             );
           })}
@@ -997,6 +979,25 @@ const ItemsPage = () => {
         return renderInventoryTab();
     }
   };
+
+  // Check which items are equipped
+  useEffect(() => {
+    const checkEquippedItems = async () => {
+      if (isSignedIn && user && userItems.length > 0) {
+        const userId = user.id;
+        const equippedState = {};
+        
+        // Check each item
+        for (const item of userItems) {
+          equippedState[item.instanceId] = await ItemService.isItemEquipped(userId, item.instanceId);
+        }
+        
+        setIsItemEquippedState(equippedState);
+      }
+    };
+    
+    checkEquippedItems();
+  }, [isSignedIn, user, userItems]);
 
   // Show loading spinner while data is being fetched
   if (isLoading) {

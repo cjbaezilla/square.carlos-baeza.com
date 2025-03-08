@@ -1,13 +1,64 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@clerk/clerk-react';
 import { UserProfileCard } from '../../../shared/components';
 import { MetaMaskSign, BlockchainGuide } from '..';
 import { MascotProfile } from '../../mascots';
 import { PointsBadge } from '../../rewards';
+import { ItemService } from '../../items';
 
-const HomePage = ({ userMascots = [], activeMascot, userItems }) => {
+const HomePage = () => {
   const { t } = useTranslation();
+  const { user, isSignedIn } = useUser();
+  const [userMascots, setUserMascots] = useState([]);
+  const [activeMascot, setActiveMascot] = useState(null);
+  const [userItems, setUserItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch data when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isSignedIn && user) {
+        try {
+          setIsLoading(true);
+          
+          // Get user's items from Supabase
+          const items = await ItemService.getUserItems(user.id);
+          setUserItems(items || []);
+          
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching data for HomePage:', error);
+          setUserItems([]);
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    fetchData();
+  }, [isSignedIn, user]);
+  
+  // Listen for item updates
+  useEffect(() => {
+    const handleItemUpdate = async (event) => {
+      if (isSignedIn && user) {
+        try {
+          // Update user's items
+          const items = await ItemService.getUserItems(user.id);
+          setUserItems(items || []);
+        } catch (error) {
+          console.error('Error updating items from event:', error);
+        }
+      }
+    };
+    
+    document.addEventListener('item-updated', handleItemUpdate);
+    
+    return () => {
+      document.removeEventListener('item-updated', handleItemUpdate);
+    };
+  }, [isSignedIn, user]);
   
   // Ensure userMascots is an array
   const mascots = Array.isArray(userMascots) ? userMascots : [];

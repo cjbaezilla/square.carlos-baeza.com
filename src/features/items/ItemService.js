@@ -1,8 +1,9 @@
 /**
  * ItemService.js
- * Service for managing item system with localStorage persistence
+ * Service for managing item system with Supabase persistence
  */
 
+import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 import PointsService from '../rewards/PointsService';
 
 // Custom event for item updates
@@ -307,337 +308,565 @@ export const ITEMS = [
   // In a real implementation, you would add all 90+ items as required.
 ];
 
-// Item generation logic
+// Helper function to generate a random item based on rarity weights
 export const generateRandomItem = () => {
-  // Determine rarity first based on weights
-  const rarityPool = [];
-  Object.entries(ITEM_RARITIES).forEach(([key, rarity]) => {
-    for (let i = 0; i < rarity.weight; i++) {
-      rarityPool.push(key);
-    }
-  });
+  // Calculate total weight
+  const totalWeight = Object.values(ITEM_RARITIES).reduce((sum, rarity) => sum + rarity.weight, 0);
   
-  const selectedRarity = rarityPool[Math.floor(Math.random() * rarityPool.length)];
+  // Generate a random number between 0 and total weight
+  let randomWeight = Math.random() * totalWeight;
+  
+  // Determine the rarity based on weight
+  let selectedRarity = null;
+  for (const [rarityKey, rarity] of Object.entries(ITEM_RARITIES)) {
+    randomWeight -= rarity.weight;
+    if (randomWeight <= 0) {
+      selectedRarity = rarityKey;
+      break;
+    }
+  }
+  
+  // Fallback to COMMON if something goes wrong
+  if (!selectedRarity) selectedRarity = 'COMMON';
   
   // Filter items by the selected rarity
-  const itemsOfRarity = ITEMS.filter(item => item.rarity === selectedRarity);
+  const itemsByRarity = ITEMS.filter(item => item.rarity === selectedRarity);
   
-  // Return a random item from the filtered list
-  return itemsOfRarity[Math.floor(Math.random() * itemsOfRarity.length)];
+  // Select a random item from the filtered list
+  const randomIndex = Math.floor(Math.random() * itemsByRarity.length);
+  return itemsByRarity[randomIndex];
 };
 
 // Item System Class
 class ItemService {
   constructor() {
-    this.userItemsKey = 'user_items_data';
-    this.mascotItemsKey = 'mascot_items_data';
+    this.USER_ITEMS_TABLE = 'user_items';
+    this.MASCOT_ITEMS_TABLE = 'mascot_equipped_items';
+    
+    // Clean up localStorage on initialization
+    this.clearLocalStorageData();
   }
   
-  // Initialize user items data if not exists
-  initUserItemsData(userId) {
-    const itemsData = this.getAllUserItemsData();
-    
-    if (!itemsData[userId]) {
-      itemsData[userId] = {
-        inventory: []
-      };
-      this.saveUserItemsData(itemsData);
+  // Clean all localStorage data for items
+  clearLocalStorageData() {
+    localStorage.removeItem('user_items_data');
+    localStorage.removeItem('mascot_items_data');
+  }
+  
+  // Verify tables exist
+  async verifyTables() {
+    try {
+      console.log('Verifying item tables...');
+      
+      // Check user_items table
+      const { error: itemsError } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('id')
+        .limit(1);
+        
+      if (itemsError) {
+        console.error('Error checking user_items table:', itemsError);
+        return false;
+      }
+      
+      // Check mascot_equipped_items table
+      const { error: equippedError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .select('id')
+        .limit(1);
+        
+      if (equippedError) {
+        console.error('Error checking mascot_equipped_items table:', equippedError);
+        return false;
+      }
+      
+      console.log('Item tables verified successfully');
+      return true;
+    } catch (err) {
+      console.error('Error verifying item tables:', err);
+      return false;
+    }
+  }
+  
+  // Initialize user items data if not exists - now just returns a promise
+  async initUserItemsData(userId) {
+    if (!userId) {
+      console.error('initUserItemsData called with no userId');
+      return null;
     }
     
-    return itemsData[userId];
-  }
-  
-  // Get items data for all users
-  getAllUserItemsData() {
-    const data = localStorage.getItem(this.userItemsKey);
-    return data ? JSON.parse(data) : {};
-  }
-  
-  // Save items data for all users
-  saveUserItemsData(data) {
-    localStorage.setItem(this.userItemsKey, JSON.stringify(data));
-    
-    // Dispatch a custom event when items are updated
-    // Include both the full data object and information about which user was updated
-    const updatedUserIds = Object.keys(data);
-    const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-      detail: { 
-        itemsData: data,
-        updatedUserIds: updatedUserIds,
-        timestamp: Date.now()
+    try {
+      // Check if user has any items
+      const { data, error } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('id')
+        .eq('user_id', userId)
+        .limit(1);
+        
+      if (error) {
+        console.error('Error checking if user has items:', error);
+        return null;
       }
-    });
-    console.log('Dispatching item update event:', updatedUserIds);
-    document.dispatchEvent(event);
+      
+      // If user has no items, return empty inventory structure
+      return {
+        inventory: []
+      };
+    } catch (err) {
+      console.error('Error initializing user items data:', err);
+      return { inventory: [] };
+    }
   }
   
   // Get user's items
-  getUserItems(userId) {
-    const itemsData = this.getAllUserItemsData();
-    if (!itemsData[userId]) {
-      return this.initUserItemsData(userId).inventory;
-    }
-    return itemsData[userId].inventory;
-  }
-  
-  // Add item to user's inventory
-  addItemToUserInventory(userId, item) {
-    console.log(`Adding item to user ${userId} inventory:`, item);
-    
-    const itemsData = this.getAllUserItemsData();
-    if (!itemsData[userId]) {
-      console.log(`Initializing items data for user ${userId}`);
-      this.initUserItemsData(userId);
-    }
-    
-    // Generate a unique instance ID for the item
-    const itemInstance = {
-      ...item,
-      instanceId: `${item.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      equippedTo: null
-    };
-    
-    console.log(`Created item instance:`, itemInstance);
-    
-    // Ensure inventory array exists
-    if (!itemsData[userId].inventory) {
-      console.log(`Creating inventory array for user ${userId}`);
-      itemsData[userId].inventory = [];
-    }
-    
-    // Add item to inventory
-    itemsData[userId].inventory.push(itemInstance);
-    console.log(`Updated inventory (${itemsData[userId].inventory.length} items)`);
-    
-    // Save updated data
-    this.saveUserItemsData(itemsData);
-    
-    return itemInstance;
-  }
-  
-  // Purchase a random item for user
-  purchaseRandomItem(userId) {
-    // Check if user has enough points
-    const userData = PointsService.getUserPoints(userId);
-    const itemPrice = 50; // Fixed price of 50 points
-    
-    if (userData.points < itemPrice) {
-      return {
-        success: false,
-        message: 'Not enough points to purchase an item',
-        requiredPoints: itemPrice,
-        currentPoints: userData.points
-      };
-    }
-    
-    // Deduct points
-    PointsService.addPoints(userId, -itemPrice, 'ITEM_PURCHASE');
-    
-    // Generate a random item
-    const newItem = generateRandomItem();
-    
-    // Add to user's inventory
-    const itemInstance = this.addItemToUserInventory(userId, newItem);
-    
-    return {
-      success: true,
-      item: itemInstance,
-      message: `Successfully purchased ${newItem.name}`,
-      pointsSpent: itemPrice,
-      remainingPoints: userData.points - itemPrice
-    };
-  }
-  
-  // Get mascot equipped items
-  getMascotItems(userId, mascotId) {
-    const data = localStorage.getItem(this.mascotItemsKey);
-    const mascotItemsData = data ? JSON.parse(data) : {};
-    
-    if (!mascotItemsData[userId] || !mascotItemsData[userId][mascotId]) {
+  async getUserItems(userId) {
+    if (!userId) {
+      console.error('getUserItems called with no userId');
       return [];
     }
     
-    return mascotItemsData[userId][mascotId];
+    try {
+      const { data, error } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId);
+        
+      if (error) {
+        console.error('Error getting user items:', error);
+        return [];
+      }
+      
+      // Transform to match the expected structure
+      return data ? data.map(item => ({
+        id: item.item_id,
+        instanceId: item.instance_id,
+        name: item.name,
+        description: item.description,
+        type: item.type,
+        rarity: item.rarity,
+        stats: item.stats,
+        svg: item.svg
+      })) : [];
+    } catch (err) {
+      console.error('Error getting user items:', err);
+      return [];
+    }
+  }
+  
+  // Add item to user's inventory
+  async addItemToUserInventory(userId, item) {
+    if (!userId || !item) {
+      console.error('Invalid parameters for addItemToUserInventory:', userId, item);
+      return null;
+    }
+    
+    try {
+      // Create a unique instance ID
+      const instanceId = `${item.id}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      
+      // Create the item instance
+      const itemInstance = {
+        user_id: userId,
+        item_id: item.id,
+        instance_id: instanceId,
+        name: item.name,
+        description: item.description,
+        type: item.type,
+        rarity: item.rarity,
+        stats: item.stats,
+        svg: item.svg
+      };
+      
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .insert(itemInstance)
+        .select();
+        
+      if (error) {
+        console.error('Error adding item to inventory:', error);
+        return null;
+      }
+      
+      // Dispatch event for UI updates
+      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
+        detail: { 
+          userId,
+          timestamp: Date.now()
+        }
+      });
+      document.dispatchEvent(event);
+      
+      // Return the newly created item in the expected format
+      return {
+        id: item.id,
+        instanceId,
+        name: item.name,
+        description: item.description,
+        type: item.type,
+        rarity: item.rarity,
+        stats: item.stats,
+        svg: item.svg
+      };
+    } catch (err) {
+      console.error('Error adding item to inventory:', err);
+      return null;
+    }
+  }
+  
+  // Purchase a random item for user
+  async purchaseRandomItem(userId) {
+    if (!userId) {
+      console.error('purchaseRandomItem called with no userId');
+      return {
+        success: false,
+        message: 'Invalid user ID'
+      };
+    }
+    
+    try {
+      // Check if user has enough points
+      const userData = await PointsService.getUserPoints(userId);
+      const itemPrice = 50; // Fixed price of 50 points
+      
+      if (userData.points < itemPrice) {
+        return {
+          success: false,
+          message: 'Not enough points to purchase an item',
+          requiredPoints: itemPrice,
+          currentPoints: userData.points
+        };
+      }
+      
+      // Deduct points
+      await PointsService.addPoints(userId, -itemPrice, 'ITEM_PURCHASE');
+      
+      // Generate a random item
+      const newItem = generateRandomItem();
+      
+      // Add to user's inventory
+      const itemInstance = await this.addItemToUserInventory(userId, newItem);
+      
+      if (!itemInstance) {
+        return {
+          success: false,
+          message: 'Failed to add item to inventory'
+        };
+      }
+      
+      // Get updated points
+      const updatedUserData = await PointsService.getUserPoints(userId);
+      
+      return {
+        success: true,
+        item: itemInstance,
+        message: `Successfully purchased ${newItem.name}`,
+        pointsSpent: itemPrice,
+        remainingPoints: updatedUserData.points
+      };
+    } catch (err) {
+      console.error('Error purchasing random item:', err);
+      return {
+        success: false,
+        message: 'An error occurred while purchasing the item'
+      };
+    }
+  }
+  
+  // Get mascot equipped items
+  async getMascotItems(userId, mascotId) {
+    if (!userId || !mascotId) {
+      console.error('getMascotItems called with invalid parameters:', userId, mascotId);
+      return [];
+    }
+    
+    try {
+      // Get equipped item instances from the join table
+      const { data: equippedData, error: equippedError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .select('item_instance_id')
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId);
+        
+      if (equippedError) {
+        console.error('Error getting equipped items:', equippedError);
+        return [];
+      }
+      
+      if (!equippedData || equippedData.length === 0) {
+        return [];
+      }
+      
+      // Get the instance IDs
+      const itemInstanceIds = equippedData.map(entry => entry.item_instance_id);
+      
+      // Get the actual items
+      const { data: itemsData, error: itemsError } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .in('instance_id', itemInstanceIds);
+        
+      if (itemsError) {
+        console.error('Error getting item details:', itemsError);
+        return [];
+      }
+      
+      // Transform to the expected format
+      return itemsData ? itemsData.map(item => ({
+        id: item.item_id,
+        instanceId: item.instance_id,
+        name: item.name,
+        description: item.description,
+        type: item.type,
+        rarity: item.rarity,
+        stats: item.stats,
+        svg: item.svg
+      })) : [];
+    } catch (err) {
+      console.error('Error getting mascot items:', err);
+      return [];
+    }
   }
   
   // Equip item to mascot
-  equipItemToMascot(userId, mascotId, itemInstanceId) {
-    const userItems = this.getUserItems(userId);
-    const item = userItems.find(item => item.instanceId === itemInstanceId);
-    
-    if (!item) {
+  async equipItemToMascot(userId, mascotId, itemInstanceId) {
+    if (!userId || !mascotId || !itemInstanceId) {
       return {
         success: false,
-        message: 'Item not found in inventory'
+        message: 'Missing required parameters'
       };
     }
     
-    // Get current equipped items
-    const data = localStorage.getItem(this.mascotItemsKey);
-    const mascotItemsData = data ? JSON.parse(data) : {};
-    
-    // Initialize if needed
-    if (!mascotItemsData[userId]) {
-      mascotItemsData[userId] = {};
-    }
-    
-    if (!mascotItemsData[userId][mascotId]) {
-      mascotItemsData[userId][mascotId] = [];
-    }
-    
-    // Check if mascot already has the maximum number of items (3)
-    if (mascotItemsData[userId][mascotId].length >= 3) {
-      return {
-        success: false,
-        message: 'Mascot already has the maximum number of items equipped (3)'
-      };
-    }
-    
-    // Check if item is already equipped to any mascot
-    for (const mascotKey in mascotItemsData[userId]) {
-      const itemIndex = mascotItemsData[userId][mascotKey].findIndex(
-        equippedItem => equippedItem.instanceId === itemInstanceId
-      );
+    try {
+      // Check if item exists in user's inventory
+      const { data: itemData, error: itemError } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('instance_id', itemInstanceId)
+        .single();
+        
+      if (itemError || !itemData) {
+        console.error('Error finding item:', itemError);
+        return {
+          success: false,
+          message: 'Item not found in inventory'
+        };
+      }
       
-      if (itemIndex !== -1) {
+      // Check if mascot already has the maximum number of items (3)
+      const { data: equippedData, error: equippedError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId);
+        
+      if (equippedError) {
+        console.error('Error checking equipped items:', equippedError);
+        return {
+          success: false,
+          message: 'Error checking equipped items'
+        };
+      }
+      
+      if (equippedData && equippedData.length >= 3) {
+        return {
+          success: false,
+          message: 'Mascot already has the maximum number of items equipped (3)'
+        };
+      }
+      
+      // Check if item is already equipped to any mascot
+      const { data: existingEquipData, error: existingEquipError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('item_instance_id', itemInstanceId);
+        
+      if (existingEquipError) {
+        console.error('Error checking if item is already equipped:', existingEquipError);
+        return {
+          success: false,
+          message: 'Error checking if item is already equipped'
+        };
+      }
+      
+      if (existingEquipData && existingEquipData.length > 0) {
         return {
           success: false,
           message: 'Item is already equipped to another mascot'
         };
       }
-    }
-    
-    // Add item to mascot's equipped items
-    mascotItemsData[userId][mascotId].push(item);
-    
-    // Save to localStorage
-    localStorage.setItem(this.mascotItemsKey, JSON.stringify(mascotItemsData));
-    
-    // Dispatch event
-    const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-      detail: { 
-        userId,
-        mascotId,
-        itemsData: mascotItemsData 
+      
+      // Equip the item
+      const { error: insertError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .insert({
+          user_id: userId,
+          mascot_id: mascotId,
+          item_instance_id: itemInstanceId
+        });
+        
+      if (insertError) {
+        console.error('Error equipping item:', insertError);
+        return {
+          success: false,
+          message: 'Error equipping item to mascot'
+        };
       }
-    });
-    document.dispatchEvent(event);
-    
-    return {
-      success: true,
-      message: `${item.name} has been equipped to your mascot`,
-      equippedItem: item
-    };
+      
+      // Dispatch event
+      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
+        detail: { 
+          userId,
+          mascotId,
+          timestamp: Date.now()
+        }
+      });
+      document.dispatchEvent(event);
+      
+      return {
+        success: true,
+        message: `${itemData.name} has been equipped to your mascot`,
+        equippedItem: {
+          id: itemData.item_id,
+          instanceId: itemData.instance_id,
+          name: itemData.name,
+          description: itemData.description,
+          type: itemData.type,
+          rarity: itemData.rarity,
+          stats: itemData.stats,
+          svg: itemData.svg
+        }
+      };
+    } catch (err) {
+      console.error('Error equipping item to mascot:', err);
+      return {
+        success: false,
+        message: 'An error occurred while equipping the item'
+      };
+    }
   }
   
   // Unequip item from mascot
-  unequipItemFromMascot(userId, mascotId, itemInstanceId) {
-    const data = localStorage.getItem(this.mascotItemsKey);
-    const mascotItemsData = data ? JSON.parse(data) : {};
-    
-    if (!mascotItemsData[userId] || !mascotItemsData[userId][mascotId]) {
+  async unequipItemFromMascot(userId, mascotId, itemInstanceId) {
+    if (!userId || !mascotId || !itemInstanceId) {
       return {
         success: false,
-        message: 'No items equipped to this mascot'
+        message: 'Missing required parameters'
       };
     }
     
-    // Find the item index
-    const itemIndex = mascotItemsData[userId][mascotId].findIndex(
-      item => item.instanceId === itemInstanceId
-    );
-    
-    if (itemIndex === -1) {
-      return {
-        success: false,
-        message: 'Item not equipped to this mascot'
-      };
-    }
-    
-    // Remove the item
-    const removedItem = mascotItemsData[userId][mascotId].splice(itemIndex, 1)[0];
-    
-    // Save to localStorage
-    localStorage.setItem(this.mascotItemsKey, JSON.stringify(mascotItemsData));
-    
-    // Dispatch event
-    const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-      detail: { 
-        userId,
-        mascotId,
-        itemsData: mascotItemsData 
+    try {
+      // Get the item details first for the success message
+      const { data: itemData, error: itemError } = await supabase
+        .from(this.USER_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('instance_id', itemInstanceId)
+        .single();
+        
+      if (itemError) {
+        console.error('Error getting item details:', itemError);
+        return {
+          success: false,
+          message: 'Error getting item details'
+        };
       }
-    });
-    document.dispatchEvent(event);
-    
-    return {
-      success: true,
-      message: `${removedItem.name} has been unequipped from your mascot`,
-      unequippedItem: removedItem
-    };
+      
+      // Delete the equipment relationship
+      const { error: deleteError } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .delete()
+        .eq('user_id', userId)
+        .eq('mascot_id', mascotId)
+        .eq('item_instance_id', itemInstanceId);
+        
+      if (deleteError) {
+        console.error('Error unequipping item:', deleteError);
+        return {
+          success: false,
+          message: 'Error unequipping item from mascot'
+        };
+      }
+      
+      // Dispatch event
+      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
+        detail: { 
+          userId,
+          mascotId,
+          timestamp: Date.now()
+        }
+      });
+      document.dispatchEvent(event);
+      
+      return {
+        success: true,
+        message: `${itemData.name} has been unequipped from your mascot`,
+        unequippedItem: {
+          id: itemData.item_id,
+          instanceId: itemData.instance_id,
+          name: itemData.name,
+          description: itemData.description,
+          type: itemData.type,
+          rarity: itemData.rarity,
+          stats: itemData.stats,
+          svg: itemData.svg
+        }
+      };
+    } catch (err) {
+      console.error('Error unequipping item from mascot:', err);
+      return {
+        success: false,
+        message: 'An error occurred while unequipping the item'
+      };
+    }
   }
   
-  // Calculate total stats for a mascot including equipped items
+  // Calculate total mascot stats with equipped items
   calculateTotalMascotStats(mascot, equippedItems = []) {
-    if (!mascot) return null;
+    if (!mascot || !mascot.stats) return null;
     
-    // Start with base mascot stats
+    // Start with the mascot's base stats
     const totalStats = { ...mascot.stats };
     
-    // Add stats from equipped items
-    equippedItems.forEach(item => {
-      Object.entries(item.stats).forEach(([stat, value]) => {
-        totalStats[stat] = (totalStats[stat] || 0) + value;
-      });
-    });
-    
-    // Ensure no stats go below 1
-    Object.keys(totalStats).forEach(key => {
-      totalStats[key] = Math.max(1, totalStats[key]);
-    });
+    // Add stats from all equipped items
+    for (const item of equippedItems) {
+      if (item.stats) {
+        for (const [stat, value] of Object.entries(item.stats)) {
+          if (totalStats[stat] !== undefined) {
+            totalStats[stat] += value;
+          }
+        }
+      }
+    }
     
     return totalStats;
   }
   
   // Check if an item is equipped to any mascot
-  isItemEquipped(userId, itemInstanceId) {
+  async isItemEquipped(userId, itemInstanceId) {
+    if (!userId || !itemInstanceId) return false;
+    
     try {
-      const data = localStorage.getItem(this.mascotItemsKey);
-      if (!data) return false;
-      
-      const mascotItemsData = JSON.parse(data);
-      
-      // If user doesn't have any mascot items data
-      if (!mascotItemsData[userId]) return false;
-      
-      // Check all mascots for this user
-      for (const mascotId in mascotItemsData[userId]) {
-        // Check if this item is equipped to this mascot
-        const found = mascotItemsData[userId][mascotId].some(
-          equippedItem => equippedItem.instanceId === itemInstanceId
-        );
-        if (found) return true;
+      const { data, error } = await supabase
+        .from(this.MASCOT_ITEMS_TABLE)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('item_instance_id', itemInstanceId)
+        .limit(1);
+        
+      if (error) {
+        console.error('Error checking if item is equipped:', error);
+        return false;
       }
       
-      return false;
+      return data && data.length > 0;
     } catch (err) {
       console.error('Error checking if item is equipped:', err);
       return false;
     }
-  }
-  
-  // Get user points
-  getUserPoints(userId) {
-    // Get user's items
-    const userItems = this.getUserItems(userId);
-    
-    // Calculate total value of all items
-    let totalPoints = 0;
-    for (const item of userItems) {
-      totalPoints += this.getItemValue(item);
-    }
-    
-    return totalPoints;
   }
   
   // Get value of an item based on rarity
@@ -653,37 +882,36 @@ class ItemService {
     return rarityValues[item.rarity] || 0;
   }
   
-  // Get sample items for new users
+  // Get sample items for display
   getSampleItems() {
-    // Return first 10 items from the ITEMS array as samples
-    return ITEMS.slice(0, 10).map(item => {
-      // Add width/height/viewBox attributes if missing from the SVG
-      let enhancedSVG = item.svg;
-      
-      // Ensure the SVG has width and height attributes
-      if (!enhancedSVG.includes('width=') || !enhancedSVG.includes('height=')) {
-        enhancedSVG = enhancedSVG.replace('<svg', '<svg width="100%" height="100%"');
-      }
-      
-      // For better visibility, add fill attribute if it's "none"
-      if (enhancedSVG.includes('fill="none"')) {
-        enhancedSVG = enhancedSVG.replace('fill="none"', `fill="none" stroke-width="2"`);
-      }
-      
-      return {
-        ...item,
-        svg: enhancedSVG,
-        instanceId: `sample-${item.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        equippedTo: null
-      };
+    // Return one item of each rarity for display purposes
+    return ITEMS.filter((item, index, array) => {
+      // For each rarity, find the first item with that rarity
+      const rarityItems = array.filter(i => i.rarity === item.rarity);
+      return rarityItems.indexOf(item) === 0;
     });
   }
-  
-  // Create a random item instance
+
+  // Create a random item instance for testing only
   createRandomItemInstance() {
-    // ... existing code ...
+    const item = generateRandomItem();
+    
+    // Create instance ID
+    const instanceId = `${item.id}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    
+    return {
+      id: item.id,
+      instanceId: instanceId,
+      name: item.name,
+      description: item.description,
+      type: item.type,
+      rarity: item.rarity,
+      stats: item.stats,
+      svg: item.svg
+    };
   }
 }
 
+// Export a singleton instance
 const itemServiceInstance = new ItemService();
 export default itemServiceInstance; 
