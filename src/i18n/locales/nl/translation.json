@@ -1,0 +1,287 @@
+{
+  "common": {
+    "welcome": "Welkom bij Mijn React App",
+    "signIn": "Inloggen",
+    "signInWithClerk": "Inloggen met Clerk",
+    "signInMessage": "Log in om je profielinformatie te bekijken.",
+    "footer": "© {{year}} Mijn App. Alle rechten voorbehouden.",
+    "hello": "Hallo daar!"
+  },
+  "navbar": {
+    "selectLanguage": "Selecteer taal"
+  },
+  "nav": {
+    "home": "Home",
+    "badges": "Badges",
+    "rewards": "Beloningen"
+  },
+  "sections": {
+    "blockchainBasics": "Blockchain & Web3 Basis",
+    "userProfile": "Gebruikersprofiel",
+    "web3Auth": "Web3 Authenticatie",
+    "badges": "Gebruikersbadges",
+    "rewards": "Beloningen & Punten"
+  },
+  "badges": {
+    "title": "Gebruikersbadges",
+    "noBadges": "Nog geen badges verdiend",
+    "earned": "Verdiend",
+    "available": "Beschikbaar",
+    "all": "Alle Badges",
+    "earnedDescription": "Deze badges tonen je prestaties en deelname.",
+    "availableDescription": "Blijf deelnemen om deze badges te verdienen.",
+    "allDescription": "Overzicht van alle beschikbare badges op ons platform.",
+    "viewAll": "Bekijk alle badges",
+    "signInToView": "Log in om je badges te bekijken",
+    "keepParticipating": "Blijf deelnemen om deze badge te verdienen!",
+    "noEarnedBadges": "Je hebt nog geen badges verdiend. Blijf deelnemen!",
+    "noBadgesInCategory": "Geen badges in deze categorie.",
+    "showTestPanel": "Toon Testpaneel",
+    "hideTestPanel": "Verberg Testpaneel",
+    "testPanel": "Badge Testpaneel",
+    "testDescription": "Met dit paneel kun je het badge-systeem testen door handmatig badges toe te kennen en te verwijderen.",
+    "availableBadges": "Ken Badges Toe",
+    "award": "Toekennen",
+    "remove": "Verwijderen",
+    "badgeNames": {
+      "earlyAdopter": "Vroege Gebruiker",
+      "web3Explorer": "Web3 Verkenner",
+      "blockchainMaster": "Blockchain Meester",
+      "communityPillar": "Gemeenschapspilaar",
+      "cryptoWizard": "Crypto Tovenaar"
+    },
+    "badgeDescriptions": {
+      "earlyAdopter": "Lid geworden tijdens onze platformlanceringsfase",
+      "web3Explorer": "Een Web3-wallet verbonden aan hun account",
+      "blockchainMaster": "Diepgaande kennis van blockchain-concepten aangetoond",
+      "communityPillar": "Actieve bijdrager aan onze groeiende gemeenschap",
+      "cryptoWizard": "Met succes geavanceerde cryptotransacties voltooid"
+    }
+  },
+  "blockchainGuide": {
+    "title": "Blockchain & Web3 Gids",
+    "intro": "Nieuw met blockchain-technologie? Deze gids legt belangrijke concepten in eenvoudige bewoordingen uit om je te helpen de wereld van Web3, cryptocurrencies en digitale assets te begrijpen.",
+    "selectTopic": "Selecteer een onderwerp hierboven om er meer over te leren",
+    "evolving": "Deze technologieën ontwikkelen zich voortdurend! Deze gids biedt basisuitleg om je op weg te helpen.",
+    "close": "Sluiten",
+    "topics": {
+      "metamask": {
+        "title": "MetaMask",
+        "heading": "Wat is MetaMask?",
+        "description": "MetaMask is als een digitale portemonnee-app voor je webbrowser of mobiele telefoon. Zie het als een combinatie van een digitale portemonnee en een speciale sleutel waarmee je toegang krijgt tot blockchain-apps.",
+        "whatItDoes": "Dit is wat MetaMask doet:",
+        "items": [
+          "Slaat je digitale valuta op (zoals Ethereum)",
+          "Verbindt je met op blockchain gebaseerde websites en apps",
+          "Fungeert als je inloggegevens voor blockchain-applicaties (geen gebruikersnamen/wachtwoorden nodig!)"
+        ],
+        "comparison": "Net zoals je je Google- of Facebook-account gebruikt om in te loggen op verschillende websites, kun je met MetaMask je blockchain-adres gebruiken om te communiceren met blockchain-apps en -diensten."
+      },
+      "web3": {
+        "title": "Web3",
+        "heading": "Wat is Web3?",
+        "description": "Web3 is de volgende generatie van het internet dat gebouwd is met blockchain-technologie. Het is ontworpen om opener, gedecentraliseerder en meer door gebruikers beheerd te zijn dan het internet dat we vandaag gebruiken.",
+        "comparison": "Dit is hoe Web3 verschilt van het huidige internet:",
+        "items": [
+          "<strong>Web1 (jaren '90):</strong> Alleen-lezen websites. Je kon alleen content consumeren.",
+          "<strong>Web2 (2000-heden):</strong> Interactieve websites waar je zowel content kunt lezen als maken, maar grote bedrijven beheren je gegevens en de platforms (zoals Facebook, Google).",
+          "<strong>Web3 (opkomend):</strong> Een internet waar je eigenaar bent van je gegevens, digitale bezittingen en content. Geen enkel bedrijf heeft de controle over alles, en je kunt je digitale identiteit meenemen naar verschillende applicaties."
+        ],
+        "dapps": "Web3-applicaties worden vaak \"dApps\" (gedecentraliseerde applicaties) genoemd omdat ze draaien op gedecentraliseerde netwerken in plaats van servers die eigendom zijn van één bedrijf."
+      },
+      "ethereum": {
+        "title": "Ethereum",
+        "heading": "Wat is Ethereum?",
+        "description": "Ethereum is een blockchain-platform dat werkt als een wereldwijde, gedecentraliseerde computer. Terwijl Bitcoin voornamelijk was ontworpen als een digitale valuta, werd Ethereum gemaakt om veel meer te doen.",
+        "keyThings": "Belangrijke zaken om te weten over Ethereum:",
+        "items": [
+          "Het heeft zijn eigen cryptocurrency genaamd Ether (ETH), die wordt gebruikt om te betalen voor transacties en diensten op het netwerk",
+          "Het stelt ontwikkelaars in staat om \"smart contracts\" te bouwen en te implementeren — zelf-uitvoerende overeenkomsten met de voorwaarden rechtstreeks geschreven in code",
+          "Het voedt duizenden gedecentraliseerde applicaties (dApps) in financiën, kunst, gaming, sociale media en meer"
+        ],
+        "platform": "Zie Ethereum als een platform dat nieuwe soorten applicaties mogelijk maakt waar geen enkele entiteit controle heeft — in plaats daarvan worden de regels afgedwongen door code die op duizenden computers wereldwijd draait."
+      },
+      "evm": {
+        "title": "EVM (Ethereum Virtual Machine)",
+        "heading": "Wat is de EVM?",
+        "description": "De Ethereum Virtual Machine (EVM) is de motor die de Ethereum-blockchain aandrijft. Het is een speciale computeromgeving die smart contracts uitvoert.",
+        "understanding": "Om de EVM te begrijpen:",
+        "items": [
+          "Zie het als een gigantische, wereldwijde computer verspreid over duizenden individuele machines",
+          "Het voert programma's (smart contracts) exact op dezelfde manier uit op elke computer in het netwerk",
+          "Het zorgt ervoor dat operaties voorspelbaar en verifieerbaar zijn en niet kunnen worden gemanipuleerd"
+        ],
+        "importance": "De EVM is belangrijk omdat het een consistente omgeving creëert waar applicaties vertrouwensloos kunnen draaien — wat betekent dat je geen enkel bedrijf of persoon hoeft te vertrouwen om de code correct uit te voeren, aangezien het hele netwerk dit verifieert."
+      },
+      "defi": {
+        "title": "DeFi (Gedecentraliseerde Financiën)",
+        "heading": "Wat is DeFi?",
+        "description": "DeFi, of Gedecentraliseerde Financiën, hervormt financiële diensten door blockchain-technologie te gebruiken in plaats van traditionele banken en financiële instellingen.",
+        "allows": "DeFi-applicaties stellen je in staat om:",
+        "items": [
+          "Je crypto uit te lenen en rente te verdienen",
+          "Crypto te lenen door andere crypto als onderpand te gebruiken",
+          "Cryptocurrencies te verhandelen zonder een exchange of broker",
+          "Spaarrekening-achtige accounts te maken met doorgaans hogere rentetarieven dan traditionele banken",
+          "Verzekeringen, derivaten en andere financiële producten te kopen"
+        ],
+        "difference": "Het belangrijkste verschil is dat DeFi werkt zonder tussenpersonen. In plaats van een bank die je transacties goedkeurt en verwerkt, handelen smart contracts (geautomatiseerde code) alles af op basis van vooraf gedefinieerde regels. Dit betekent vaak lagere kosten, snellere verwerking en toegang voor iedereen met een internetverbinding, ongeacht hun locatie of achtergrond."
+      },
+      "nfts": {
+        "title": "NFTs (Non-Fungible Tokens)",
+        "heading": "Wat zijn NFTs?",
+        "description": "NFTs (Non-Fungible Tokens) zijn unieke digitale items met blockchain-beheerd eigendom. Zie ze als digitale verzamelobjecten met ingebouwd bewijs van authenticiteit en eigendom.",
+        "nonFungible": "\"Non-fungible\" betekent simpelweg dat elk item uniek is en niet kan worden vervangen door een ander identiek item. Dit is anders dan cryptocurrencies zoals Bitcoin waarbij elke munt identiek is aan een andere (fungible).",
+        "represent": "NFTs kunnen het volgende vertegenwoordigen:",
+        "items": [
+          "Digitale kunst en illustraties",
+          "Muziek en video's",
+          "Virtueel land en items in games",
+          "Tickets voor evenementen",
+          "Lidmaatschappen en toegangspassen",
+          "Zelfs representaties van items uit de echte wereld"
+        ],
+        "ownership": "Wanneer je een NFT bezit, dient de blockchain als een openbaar register dat bewijst dat jij de eigenaar bent van dat specifieke digitale item. Je kunt het houden, tonen of verkopen aan iemand anders. Artiesten en makers gebruiken NFTs vaak om hun werk rechtstreeks aan fans te verkopen zonder galerijen of andere tussenpersonen nodig te hebben."
+      }
+    }
+  },
+  "metamaskSign": {
+    "title": "Onderteken Bericht met MetaMask",
+    "walletConnection": "Wallet-verbinding",
+    "connectedAccount": "Verbonden Account:",
+    "connect": "Verbind MetaMask",
+    "connecting": "Verbinden...",
+    "messageToSign": "Te Ondertekenen Bericht",
+    "messagePlaceholder": "Voer een bericht in om te ondertekenen",
+    "regenerate": "Standaardbericht Opnieuw Genereren",
+    "signButton": "Onderteken Bericht met MetaMask",
+    "signing": "Ondertekenen...",
+    "signature": "Handtekening",
+    "information": "Met deze functie kun je berichten ondertekenen met je Ethereum-wallet via MetaMask.",
+    "verify": "De handtekening kan worden gebruikt om je eigendom van het verbonden wallet-adres te verifiëren.",
+    "walletRequired": "Web3 Wallet Vereist",
+    "metamaskNotInstalled": "MetaMask is niet geïnstalleerd",
+    "requiresMetamask": "Deze functie vereist MetaMask of een compatibele web3-wallet om berichten te ondertekenen.",
+    "installMetamask": "Installeer MetaMask",
+    "afterInstalling": "Na het installeren van MetaMask:",
+    "defaultMessage": "Ik, gebruiker met Clerk ID {{userId}}, autoriseer deze actie op {{timestamp}}",
+    "errors": {
+      "notInstalled": "MetaMask is niet geïnstalleerd. Installeer MetaMask om door te gaan.",
+      "noAccounts": "Geen accounts gevonden.",
+      "connectionFailed": "Kan wallet niet verbinden",
+      "connectFirst": "Verbind eerst je wallet",
+      "noMessage": "Genereer een bericht om te ondertekenen",
+      "signingFailed": "Kan bericht niet ondertekenen"
+    },
+    "success": {
+      "connected": "Wallet succesvol verbonden!",
+      "signed": "Bericht succesvol ondertekend!"
+    },
+    "steps": [
+      "Maak een wallet aan of importeer deze",
+      "Verbind met het Ethereum-netwerk",
+      "Ververs deze pagina"
+    ]
+  },
+  "userProfile": {
+    "loading": "Profiel laden...",
+    "userNotFound": "Gebruiker niet gevonden",
+    "email": "E-mail",
+    "noEmail": "Geen e-mail opgegeven",
+    "web3Wallet": "Web3 Wallet",
+    "noWallet": "Geen Web3 wallet verbonden",
+    "lastSignIn": "Laatste Inlogmoment",
+    "never": "Nooit ingelogd",
+    "invalidDate": "Ongeldige datum",
+    "timeAgo": {
+      "seconds": "{{count}} seconde geleden",
+      "seconds_plural": "{{count}} seconden geleden",
+      "minutes": "{{count}} minuut geleden",
+      "minutes_plural": "{{count}} minuten geleden",
+      "hours": "{{count}} uur geleden",
+      "hours_plural": "{{count}} uur geleden",
+      "days": "{{count}} dag geleden",
+      "days_plural": "{{count}} dagen geleden",
+      "months": "{{count}} maand geleden",
+      "months_plural": "{{count}} maanden geleden",
+      "years": "{{count}} jaar geleden",
+      "years_plural": "{{count}} jaar geleden"
+    }
+  },
+  "rewards": {
+    "points": "Punten",
+    "level": "Niveau",
+    "pointsToNextLevel": "punten naar volgend niveau",
+    "viewGuide": "Bekijk Gids",
+    "viewGuideDesc": "Leer over blockchain-basisconcepten",
+    "completeProfile": "Voltooi Profiel",
+    "completeProfileDesc": "Vul je gebruikersprofiel in",
+    "viewed": "bekeken",
+    "notViewed": "Niet bekeken",
+    "completed": "Voltooid",
+    "incomplete": "Onvolledig",
+    "recentActivity": "Recente Activiteit",
+    "dailyLogin": "Dagelijks Inloggen",
+    "viewedGuide": "Gids Bekeken",
+    "profileCompleted": "Profiel Voltooid",
+    "noActivityYet": "Nog geen activiteit. Begin met punten verdienen!",
+    "signInPrompt": "Log in om je beloningen bij te houden",
+    "pointsDescription": "Verdien punten door acties te voltooien en bereik nieuwe niveaus!"
+  },
+  "items": {
+    "equipped_items": "Uitgeruste Items",
+    "rarities": {
+      "COMMON": "Gewoon",
+      "UNCOMMON": "Ongewoon",
+      "RARE": "Zeldzaam",
+      "EPIC": "Episch",
+      "LEGENDARY": "Legendarisch"
+    },
+    "types": {
+      "HEAD": "Hoofd",
+      "BODY": "Lichaam",
+      "ARMS": "Armen",
+      "LEGS": "Benen",
+      "WEAPON": "Wapen",
+      "SHIELD": "Schild",
+      "POWER_CORE": "Energiekern",
+      "CPU": "CPU",
+      "SENSOR": "Sensor",
+      "BATTERY": "Batterij",
+      "COOLING": "Koeling",
+      "BOOSTER": "Versterker"
+    },
+    "names": {
+      "basic-antenna": "Basis Antenne",
+      "simple-visor": "Eenvoudig Vizier",
+      "basic-cpu": "Basis CPU",
+      "metal-plate": "Metalen Plaat",
+      "basic-servo": "Basis Servo"
+    },
+    "descriptions": {
+      "basic-antenna": "Een eenvoudige antenne die de robotcommunicatie enigszins verbetert.",
+      "simple-visor": "Een basis vizier dat kleine waarnemingsverbeteringen biedt.",
+      "basic-cpu": "Een standaard verwerkingseenheid met beperkte mogelijkheden.",
+      "metal-plate": "Een eenvoudige metalen plaat die basisbescherming biedt.",
+      "basic-servo": "Een standaard servomotor voor robotbewegingen."
+    }
+  },
+  "mascots": {
+    "description": "Verzamel unieke robotmascots met verschillende vaardigheden!",
+    "training": "Training {{name}}",
+    "names": {
+      "robo-scout": "Robo Verkenner",
+      "battle-bot": "Gevechtsbot",
+      "tech-wizard": "Tech Tovenaar",
+      "heavy-tank": "Zware Tank",
+      "stealth-unit": "Sluipeenheid"
+    },
+    "descriptions": {
+      "robo-scout": "Een lichtgewicht robot met hoge behendigheid en scanvermogen.",
+      "battle-bot": "Een geharde gevechtsrobot met uitzonderlijke kracht en verdediging.",
+      "tech-wizard": "Een gespecialiseerde robot met enorme magische kracht en technische vaardigheden.",
+      "heavy-tank": "Een industriële robot met ongeëvenaarde HP en verdediging maar lage mobiliteit.",
+      "stealth-unit": "Een gespecialiseerde robot met hoge behendigheid en onzichtbaarheidsmogelijkheden."
+    }
+  }
+} 

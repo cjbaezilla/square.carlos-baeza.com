@@ -17,6 +17,7 @@ import translationPL from './locales/pl/translation.json';
 import translationUK from './locales/uk/translation.json';
 import translationAR from './locales/ar/translation.json';
 import translationIT from './locales/it/translation.json';
+import translationNL from './locales/nl/translation.json';
 
 // Resources object with all translations
 const resources = {
@@ -61,6 +62,9 @@ const resources = {
   },
   it: {
     translation: translationIT
+  },
+  nl: {
+    translation: translationNL
   }
 };
 
@@ -79,7 +83,8 @@ export const languageOptions = [
   { code: 'pl', name: 'Polski' },
   { code: 'uk', name: 'Українська' },
   { code: 'ar', name: 'العربية' },
-  { code: 'it', name: 'Italiano' }
+  { code: 'it', name: 'Italiano' },
+  { code: 'nl', name: 'Nederlands' }
 ];
 
 i18n
