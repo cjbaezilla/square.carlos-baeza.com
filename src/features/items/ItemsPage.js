@@ -897,10 +897,8 @@ const ItemsPage = () => {
 
   // Render the inventory tab
   const renderInventoryTab = () => {
-    const filteredItems = userItems.filter(item => {
-      // Filter out items that are equipped to any mascot
-      return isSignedIn && user ? !isItemEquippedState[item.instanceId] : true;
-    });
+    // No longer filter out equipped items
+    const filteredItems = userItems;
 
     // Sort items by creation date, newest first
     const sortedItems = [...filteredItems].sort((a, b) => {
@@ -951,6 +949,11 @@ const ItemsPage = () => {
             <span className="ml-2 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full">
               {sortedItems.length}
             </span>
+            {userItems.some(item => isItemEquippedState[item.instanceId]) && (
+              <span className="ml-2 text-xs text-gray-400">
+                ({Object.values(isItemEquippedState).filter(Boolean).length} {t('items.equipped', 'equipped')})
+              </span>
+            )}
           </h3>
           
           <div className="flex items-center bg-gray-800 rounded-lg border border-gray-700 p-2">
@@ -1049,20 +1052,40 @@ const ItemsPage = () => {
                   ))}
                 </div>
                 
-                {/* Equip button */}
-                <button
-                  onClick={() => handleEquipItem(item.instanceId)}
-                  disabled={isLoading || !selectedMascot}
-                  className={`w-full px-3 py-2 text-sm rounded transition-colors ${
-                    selectedMascot 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  {selectedMascot
-                    ? t('items.equip_to_mascot', 'Equip to {{name}}', { name: selectedMascot.name })
-                    : t('items.select_mascot_to_equip', 'Select a mascot to equip')}
-                </button>
+                {/* Equipped status indicator */}
+                {isItemEquippedState[item.instanceId] && (
+                  <div className="bg-blue-900/30 border border-blue-500/30 rounded-lg px-3 py-1.5 mb-3 text-xs text-blue-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {t('items.currently_equipped', 'Currently Equipped')}
+                  </div>
+                )}
+                
+                {/* Conditional button: Equip or Unequip */}
+                {isItemEquippedState[item.instanceId] ? (
+                  <button
+                    onClick={() => handleUnequipItem(item.instanceId)}
+                    disabled={isLoading}
+                    className="w-full px-3 py-2 text-sm rounded transition-colors bg-red-700 hover:bg-red-800 text-white"
+                  >
+                    {t('items.unequip', 'Unequip')}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleEquipItem(item.instanceId)}
+                    disabled={isLoading || !selectedMascot}
+                    className={`w-full px-3 py-2 text-sm rounded transition-colors ${
+                      selectedMascot 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {selectedMascot
+                      ? t('items.equip_to_mascot', 'Equip to {{name}}', { name: selectedMascot.name })
+                      : t('items.select_mascot_to_equip', 'Select a mascot to equip')}
+                  </button>
+                )}
               </div>
             );
           })}
@@ -1271,6 +1294,7 @@ const ItemsPage = () => {
                   <button 
                     className="w-full px-3 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-medium transition-colors"
                     onClick={() => handleUnequipItem(item.instanceId)}
+                    disabled={isLoading}
                   >
                     {t('items.unequip', 'Unequip')}
                   </button>
