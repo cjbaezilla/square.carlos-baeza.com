@@ -215,15 +215,29 @@ const MascotsPage = () => {
   const handleActivate = async (mascotId) => {
     if (isSignedIn && user) {
       try {
+        console.log(`Attempting to activate mascot: ${mascotId} for user: ${user.id}`);
         setIsLoading(true);
-        await MascotService.setUserActiveMascot(user.id, mascotId);
-        setActiveMascotId(mascotId);
         
-        // Show success notification
-        setNotification({
-          type: 'success',
-          message: t('mascot.activateSuccess', 'Mascot activated!')
-        });
+        // Call service to set active mascot
+        const success = await MascotService.setUserActiveMascot(user.id, mascotId);
+        
+        if (success) {
+          console.log(`Successfully activated mascot: ${mascotId}`);
+          setActiveMascotId(mascotId);
+          
+          // Show success notification
+          setNotification({
+            type: 'success',
+            message: t('mascot.activateSuccess', 'Mascot activated!')
+          });
+        } else {
+          console.error(`Failed to activate mascot: ${mascotId}`);
+          // Show error notification
+          setNotification({
+            type: 'error',
+            message: t('mascot.activateError', 'An error occurred while activating the mascot')
+          });
+        }
         
         setIsLoading(false);
         
@@ -242,6 +256,14 @@ const MascotsPage = () => {
         // Clear notification after 3 seconds
         setTimeout(() => setNotification(null), 3000);
       }
+    } else {
+      console.error('User not signed in or user object is missing');
+      setNotification({
+        type: 'error',
+        message: t('auth.sign_in_required', 'You must be signed in to perform this action')
+      });
+      
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 

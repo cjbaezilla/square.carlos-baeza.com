@@ -374,17 +374,20 @@ class MascotService {
   
   // Helper method to dispatch mascot update event
   dispatchMascotUpdatedEvent(userId, activeMascotId = null) {
-    const event = new CustomEvent(MASCOT_UPDATED_EVENT, { 
+    console.log(`Dispatching mascot updated event for user: ${userId}, active mascot ID: ${activeMascotId}`);
+    document.dispatchEvent(new CustomEvent(MASCOT_UPDATED_EVENT, {
       detail: { userId, activeMascotId }
-    });
-    document.dispatchEvent(event);
+    }));
   }
 
   // Get user's active mascot
   async getUserActiveMascot(userId) {
     try {
+      console.log(`Fetching active mascot for user: ${userId}`);
+      
       // Check if admin client is available
       if (!supabaseAdmin) {
+        console.log('Admin client not available, using regular client');
         // Fallback to regular client if admin is not available
         const { data, error } = await supabase
           .from(this.TABLE_NAME)
@@ -395,12 +398,14 @@ class MascotService {
         
         if (error) {
           if (error.code === 'PGRST116') { // No active mascot found
+            console.log('No active mascot found for user:', userId);
             return null;
           }
-          // eslint-disable-next-line no-console
           console.error('Error fetching active mascot with regular client:', error);
           return null;
         }
+        
+        console.log('Retrieved active mascot with regular client:', data);
         
         // Map database record to mascot object with full details
         const mascotTemplate = this.getMascotById(data.mascot_id);
@@ -413,6 +418,7 @@ class MascotService {
         };
       }
       
+      console.log('Using admin client to fetch active mascot');
       // Use admin client to bypass RLS
       const { data, error } = await supabaseAdmin
         .from(this.TABLE_NAME)
@@ -423,12 +429,14 @@ class MascotService {
       
       if (error) {
         if (error.code === 'PGRST116') { // No active mascot found
+          console.log('No active mascot found for user:', userId);
           return null;
         }
-        // eslint-disable-next-line no-console
         console.error('Error fetching active mascot with admin client:', error);
         return null;
       }
+      
+      console.log('Retrieved active mascot with admin client:', data);
       
       // Map database record to mascot object with full details
       const mascotTemplate = this.getMascotById(data.mascot_id);
@@ -440,7 +448,6 @@ class MascotService {
         isActive: data.is_active
       };
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Unexpected error in getUserActiveMascot:', err);
       return null;
     }
@@ -449,44 +456,80 @@ class MascotService {
   // Set user's active mascot
   async setUserActiveMascot(userId, mascotId) {
     try {
-      // First, set all mascots to inactive
-      // Use admin client to bypass RLS
+      // First, check if the admin client is available
       if (!supabaseAdmin) {
-        // eslint-disable-next-line no-console
         console.error('Admin client not available. Cannot set active mascot.');
-        return false;
+        
+        // Try with regular client as fallback
+        console.log('Attempting to use regular client as fallback for setting active mascot');
+        
+        // First, set all mascots to inactive
+        const { error: resetError } = await supabase
+          .from(this.TABLE_NAME)
+          .update({ is_active: false })
+          .eq('user_id', userId);
+        
+        if (resetError) {
+          console.error('Error resetting active mascot with regular client:', resetError);
+          return false;
+        }
+        
+        // Then set the specified mascot to active
+        const { error: activateError } = await supabase
+          .from(this.TABLE_NAME)
+          .update({ is_active: true })
+          .eq('user_id', userId)
+          .eq('mascot_id', mascotId);
+        
+        if (activateError) {
+          console.error('Error setting active mascot with regular client:', activateError);
+          return false;
+        }
+        
+        // Log success
+        console.log('Successfully set active mascot with regular client. Mascot ID:', mascotId);
+        
+        // Dispatch event to update UI
+        this.dispatchMascotUpdatedEvent(userId, mascotId);
+        
+        return true;
       }
       
+      // Use admin client to bypass RLS
+      console.log('Using admin client to set active mascot. Mascot ID:', mascotId);
+      
+      // First, set all mascots to inactive
       const { error: resetError } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .update({ is_active: false })
         .eq('user_id', userId);
       
       if (resetError) {
-        // eslint-disable-next-line no-console
         console.error('Error resetting active mascot:', resetError);
         return false;
       }
       
       // Then set the specified mascot to active
-      const { error: activateError } = await supabaseAdmin
+      const { data, error: activateError } = await supabaseAdmin
         .from(this.TABLE_NAME)
         .update({ is_active: true })
         .eq('user_id', userId)
-        .eq('mascot_id', mascotId);
+        .eq('mascot_id', mascotId)
+        .select();
       
       if (activateError) {
-        // eslint-disable-next-line no-console
         console.error('Error setting active mascot:', activateError);
         return false;
       }
+      
+      // Log the response data
+      console.log('Active mascot set successfully. Response data:', data);
       
       // Dispatch event to update UI
       this.dispatchMascotUpdatedEvent(userId, mascotId);
       
       return true;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Unexpected error in setUserActiveMascot:', err);
       return false;
     }
