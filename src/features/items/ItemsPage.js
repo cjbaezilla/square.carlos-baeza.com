@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import ItemService, { ITEM_UPDATED_EVENT, ITEM_RARITIES } from './ItemService';
@@ -127,51 +127,56 @@ const ItemsPage = () => {
     };
   }, [isSignedIn, user, selectedMascot]);
 
+  // Function to handle mascot updates - wrapped in useCallback
+  const handleMascotUpdate = useCallback(async () => {
+    if (isSignedIn && user) {
+      try {
+        // Refresh mascots list
+        const mascots = await MascotService.getUserMascots(user.id);
+        setUserMascots(mascots || []);
+        
+        // Check if the selected mascot has been updated
+        if (selectedMascot) {
+          const updatedMascot = await MascotService.getUserActiveMascot(user.id);
+          if (updatedMascot) {
+            setSelectedMascot(updatedMascot);
+            
+            // Refresh equipped items
+            const mascotItems = await ItemService.getMascotItems(user.id, updatedMascot.id);
+            setEquippedItems(mascotItems);
+            
+            // Update stats
+            setMascotStats(updatedMascot.stats);
+            setMascotTotalStats(ItemService.calculateTotalMascotStats(updatedMascot, mascotItems));
+          }
+        }
+      } catch (error) {
+        console.error('Error updating mascot data:', error);
+      }
+    }
+  }, [isSignedIn, user, selectedMascot, setUserMascots, setSelectedMascot, setEquippedItems, setMascotStats, setMascotTotalStats]);
+
   // Listen for mascot and points updates
   useEffect(() => {
-    const handleMascotUpdate = async () => {
-      if (isSignedIn && user) {
-        try {
-          // Refresh mascots list
-          const mascots = await MascotService.getUserMascots(user.id);
-          setUserMascots(mascots || []);
-          
-          // Check if the selected mascot has been updated
-          if (selectedMascot) {
-            const updatedMascot = await MascotService.getUserActiveMascot(user.id);
-            if (updatedMascot) {
-              setSelectedMascot(updatedMascot);
-              
-              // Refresh equipped items
-              const mascotItems = await ItemService.getMascotItems(user.id, updatedMascot.id);
-              setEquippedItems(mascotItems);
-              
-              // Update stats
-              setMascotStats(updatedMascot.stats);
-              setMascotTotalStats(ItemService.calculateTotalMascotStats(updatedMascot, mascotItems));
-            }
-          }
-        } catch (error) {
-          console.error('Error handling mascot update:', error);
-        }
-      }
-    };
-    
-    const handlePointsUpdate = (event) => {
-      if (isSignedIn && user && event.detail.pointsData && event.detail.pointsData[user.id]) {
-        const pointsData = event.detail.pointsData[user.id];
-        setUserPoints(pointsData.points);
-      }
-    };
+    // No longer needs function definition here - using the one defined above
     
     document.addEventListener('mascot-updated', handleMascotUpdate);
+    
+    // Also listen for points updates
+    const handlePointsUpdate = (event) => {
+      if (isSignedIn && user && event.detail.pointsData && event.detail.pointsData[user.id]) {
+        setUserPoints(event.detail.pointsData[user.id]);
+      }
+    };
+    
     document.addEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
     
+    // Clean up
     return () => {
       document.removeEventListener('mascot-updated', handleMascotUpdate);
       document.removeEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
     };
-  }, [isSignedIn, user, selectedMascot]);
+  }, [isSignedIn, user, handleMascotUpdate]); // Added handleMascotUpdate to dependencies
 
   // Handle mascot selection
   const handleSelectMascot = async (mascot) => {
@@ -256,44 +261,109 @@ const ItemsPage = () => {
 
   // Handle unequipping an item from the selected mascot
   const handleUnequipItem = async (itemInstanceId) => {
-    if (isSignedIn && user && selectedMascot) {
-      const userId = user.id;
-      const mascotId = selectedMascot.id;
+    if (!isSignedIn || !user || !selectedMascot) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const result = await ItemService.unequipItemFromMascot(
+        user.id, 
+        selectedMascot.id, 
+        itemInstanceId
+      );
       
-      try {
-        // Unequip item - now async
-        const result = await ItemService.unequipItemFromMascot(userId, mascotId, itemInstanceId);
-        
-        // Show notification
+      if (result.success) {
+        // Show success notification
         setNotification({
-          type: result.success ? 'success' : 'error',
-          message: result.message
+          type: 'success',
+          message: t('items.unequip_success', 'Item unequipped successfully!')
         });
         
-        // Hide notification after 3 seconds
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-        
-        if (result.success) {
-          // Update equipped items
-          const mascotItems = await ItemService.getMascotItems(userId, mascotId);
-          setEquippedItems(mascotItems);
-          
-          // Update total stats
-          setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
-        }
-      } catch (error) {
-        console.error('Error unequipping item:', error);
+        // Fetch updated items
+        await handleMascotUpdate();
+      } else {
         setNotification({
           type: 'error',
-          message: 'An error occurred while unequipping the item'
+          message: result.message || t('items.unequip_error', 'Failed to unequip item')
+        });
+      }
+    } catch (error) {
+      console.error('Error unequipping item:', error);
+      setNotification({
+        type: 'error',
+        message: t('items.unequip_error', 'Failed to unequip item')
+      });
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
+  
+  // Handle equipping an item to the selected mascot
+  const handleEquipItem = async (itemInstanceId) => {
+    if (!isSignedIn || !user || !selectedMascot) {
+      // If no mascot is selected, show notification asking user to select a mascot
+      setNotification({
+        type: 'info',
+        message: t('items.select_mascot_first', 'Please select a mascot first')
+      });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+    
+    // Add debugging
+    console.log('Attempting to equip item with instance ID:', itemInstanceId);
+    console.log('Selected mascot:', selectedMascot.id);
+    
+    // Find the item in userItems to verify it exists
+    const itemToEquip = userItems.find(item => item.instanceId === itemInstanceId);
+    if (!itemToEquip) {
+      console.error('Item not found in userItems array. Instance ID:', itemInstanceId);
+      console.log('Available items:', userItems.map(item => ({ id: item.id, instanceId: item.instanceId })));
+      setNotification({
+        type: 'error',
+        message: 'Item not found in local state. Please refresh the page.'
+      });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+    
+    console.log('Found item to equip:', itemToEquip);
+    setIsLoading(true);
+    
+    try {
+      const result = await ItemService.equipItemToMascot(
+        user.id, 
+        selectedMascot.id, 
+        itemInstanceId
+      );
+      
+      console.log('Equip result:', result);
+      
+      if (result.success) {
+        // Show success notification
+        setNotification({
+          type: 'success',
+          message: t('items.equip_success', 'Item equipped successfully!')
         });
         
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
+        // Fetch updated items
+        await handleMascotUpdate();
+      } else {
+        setNotification({
+          type: 'error',
+          message: result.message || t('items.equip_error', 'Failed to equip item')
+        });
       }
+    } catch (error) {
+      console.error('Error equipping item:', error);
+      setNotification({
+        type: 'error',
+        message: t('items.equip_error', 'Failed to equip item')
+      });
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -978,6 +1048,21 @@ const ItemsPage = () => {
                     ) : null
                   ))}
                 </div>
+                
+                {/* Equip button */}
+                <button
+                  onClick={() => handleEquipItem(item.instanceId)}
+                  disabled={isLoading || !selectedMascot}
+                  className={`w-full px-3 py-2 text-sm rounded transition-colors ${
+                    selectedMascot 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {selectedMascot
+                    ? t('items.equip_to_mascot', 'Equip to {{name}}', { name: selectedMascot.name })
+                    : t('items.select_mascot_to_equip', 'Select a mascot to equip')}
+                </button>
               </div>
             );
           })}

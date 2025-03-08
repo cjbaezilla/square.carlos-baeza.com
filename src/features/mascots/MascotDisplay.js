@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import ItemService, { ITEM_RARITIES, ITEM_UPDATED_EVENT } from '../items/ItemService';
 
 const StatBar = ({ label, value, maxValue = 100, color, bonus = 0 }) => {
@@ -286,12 +287,12 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
                 {t('mascots.activate', 'Activate')}
               </button>
             )}
-            <a 
-              href="#/items" 
+            <Link 
+              to="/items" 
               className="text-blue-400 text-xs hover:underline"
             >
               {t('items.manage_items', 'Manage Items')} →
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="mt-4">

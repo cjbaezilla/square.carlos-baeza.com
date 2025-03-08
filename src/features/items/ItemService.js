@@ -478,9 +478,18 @@ class ItemService {
     }
     
     try {
+      // Log the first few items for debugging
+      if (data.length > 0) {
+        console.log('Sample item from database:', data[0]);
+      }
+      
       // Transform to match the expected structure
-      return data.map(item => {
+      const formattedItems = data.map(item => {
         if (!item) return null;
+        
+        if (!item.instance_id) {
+          console.error('Missing instance_id for item:', item);
+        }
         
         return {
           id: item.item_id,
@@ -494,6 +503,11 @@ class ItemService {
           createdAt: item.created_at
         };
       }).filter(Boolean); // Remove any null items
+      
+      // Log a summary of the formatted items
+      console.log(`Formatted ${formattedItems.length} items`);
+      
+      return formattedItems;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error formatting items response:', error);
@@ -725,6 +739,7 @@ class ItemService {
   // Equip item to mascot
   async equipItemToMascot(userId, mascotId, itemInstanceId) {
     if (!userId || !mascotId || !itemInstanceId) {
+      console.error('Missing required parameters for equipItemToMascot:', { userId, mascotId, itemInstanceId });
       return {
         success: false,
         message: 'Missing required parameters'
@@ -741,24 +756,47 @@ class ItemService {
         };
       }
       
-      // Check if item exists in user's inventory
-      const { data: itemData, error: itemError } = await supabase
+      console.log('Looking for item in inventory:', { userId, itemInstanceId });
+      
+      // First, try to find the item with the admin client
+      let itemData;
+      let useAdminClient = true;
+      
+      const { data: adminItemData, error: adminItemError } = await supabaseAdmin
         .from(this.USER_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId)
-        .eq('instance_id', itemInstanceId)
-        .single();
+        .eq('instance_id', itemInstanceId);
         
-      if (itemError || !itemData) {
-        console.error('Error finding item:', itemError);
-        return {
-          success: false,
-          message: 'Item not found in inventory'
-        };
+      if (adminItemError || !adminItemData || adminItemData.length === 0) {
+        console.error('Error or no data with admin client:', adminItemError || 'No items found');
+        
+        // Try with regular client as fallback
+        console.log('Trying with regular client instead');
+        const { data: regularItemData, error: regularItemError } = await supabase
+          .from(this.USER_ITEMS_TABLE)
+          .select('*')
+          .eq('user_id', userId)
+          .eq('instance_id', itemInstanceId);
+          
+        if (regularItemError || !regularItemData || regularItemData.length === 0) {
+          console.error('Error or no data with regular client either:', regularItemError || 'No items found');
+          return {
+            success: false,
+            message: 'Item not found in inventory'
+          };
+        }
+        
+        itemData = regularItemData[0];
+        useAdminClient = false;
+        console.log('Found item with regular client:', itemData);
+      } else {
+        itemData = adminItemData[0];
+        console.log('Found item with admin client:', itemData);
       }
       
       // Check if mascot already has the maximum number of items (3)
-      const { data: equippedData, error: equippedError } = await supabase
+      const { data: equippedData, error: equippedError } = await (useAdminClient ? supabaseAdmin : supabase)
         .from(this.MASCOT_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId)
@@ -780,7 +818,7 @@ class ItemService {
       }
       
       // Check if item is already equipped to any mascot
-      const { data: existingEquipData, error: existingEquipError } = await supabase
+      const { data: existingEquipData, error: existingEquipError } = await (useAdminClient ? supabaseAdmin : supabase)
         .from(this.MASCOT_ITEMS_TABLE)
         .select('*')
         .eq('user_id', userId)
@@ -801,8 +839,9 @@ class ItemService {
         };
       }
       
-      // Equip the item - use admin client to bypass RLS
-      const { error: insertError } = await supabaseAdmin
+      // Equip the item - use admin client to bypass RLS if available
+      const client = useAdminClient ? supabaseAdmin : supabase;
+      const { error: insertError } = await client
         .from(this.MASCOT_ITEMS_TABLE)
         .insert({
           user_id: userId,
@@ -843,10 +882,10 @@ class ItemService {
         }
       };
     } catch (err) {
-      console.error('Error equipping item to mascot:', err);
+      console.error('Unexpected error in equipItemToMascot:', err);
       return {
         success: false,
-        message: 'An error occurred while equipping the item'
+        message: 'An unexpected error occurred'
       };
     }
   }
