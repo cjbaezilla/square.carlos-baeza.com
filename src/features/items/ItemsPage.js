@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import ItemService, { ITEM_UPDATED_EVENT, ITEM_RARITIES } from './ItemService';
@@ -20,6 +20,7 @@ const ItemsPage = () => {
   const [newItem, setNewItem] = useState(null);
   const [mascotStats, setMascotStats] = useState(null);
   const [mascotTotalStats, setMascotTotalStats] = useState(null);
+  const pointsTimerRef = useRef(null);
 
   // Load user's items and mascots
   useEffect(() => {
@@ -54,6 +55,35 @@ const ItemsPage = () => {
       
       setIsLoading(false);
     }
+  }, [isSignedIn, user]);
+
+  // Add a new useEffect for updating points every 5 seconds
+  useEffect(() => {
+    const fetchUserPoints = async () => {
+      if (isSignedIn && user) {
+        try {
+          const userData = await PointsService.getUserPoints(user.id);
+          if (userData && userData.points !== undefined) {
+            setUserPoints(userData.points);
+          }
+        } catch (error) {
+          console.error('Error fetching user points:', error);
+        }
+      }
+    };
+
+    // Initial fetch
+    fetchUserPoints();
+
+    // Set up interval to fetch points every 5 seconds
+    pointsTimerRef.current = setInterval(fetchUserPoints, 5000);
+
+    // Clean up interval on component unmount
+    return () => {
+      if (pointsTimerRef.current) {
+        clearInterval(pointsTimerRef.current);
+      }
+    };
   }, [isSignedIn, user]);
 
   // Listen for item updates

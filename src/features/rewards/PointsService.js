@@ -115,6 +115,7 @@ class PointsService {
   // Get user's points data
   async getUserPoints(userId) {
     try {
+      // Make sure we're getting fresh data from Supabase
       const { data, error } = await supabase
         .from(this.TABLE_NAME)
         .select('*')
