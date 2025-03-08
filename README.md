@@ -102,3 +102,89 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Project Structure
+
+Below is a hierarchical tree view of the project directories and their main functions:
+
+```
+square.carlos-baeza.com/
+├── public/                     # Static public assets
+│   ├── index.html              # Main HTML template
+│   ├── favicon.jpg             # Site favicon
+│   ├── manifest.json           # Web app manifest
+│   └── robots.txt              # Robot rules
+├── src/                        # Source code
+│   ├── App.js                  # Main application component
+│   ├── index.js                # Application entry point
+│   ├── components/             # Shared UI components
+│   │   ├── MetaMaskSign.js     # MetaMask integration UI
+│   │   └── BlockchainGuide.js  # Guide for blockchain concepts
+│   ├── db/                     # Database schema definitions
+│   │   ├── create_user_items_table.sql         # Items table schema
+│   │   ├── create_user_mascots_table.sql       # Mascots table schema
+│   │   ├── create_user_badges_table.sql        # Badges table schema
+│   │   └── create_user_points_table.sql        # Points table schema
+│   ├── features/               # Feature modules
+│   │   ├── auth/               # Authentication module
+│   │   │   ├── MetaMaskSign.js              # MetaMask authentication
+│   │   │   ├── BlockchainGuide.js           # Blockchain guide
+│   │   │   └── ProtectedRoute.js            # Route protection component
+│   │   ├── badges/             # Badge system
+│   │   │   ├── BadgeService.js              # Service for managing badges
+│   │   │   │   ├── BADGES                   # Badge definitions
+│   │   │   │   ├── getBadges()              # Get user badges
+│   │   │   │   ├── awardBadge()             # Award badge to user
+│   │   │   │   ├── hasBadge()               # Check if user has badge
+│   │   │   │   └── removeBadge()            # Remove badge from user
+│   │   │   ├── BadgeDisplay.js              # Badge display components
+│   │   │   ├── BadgesPage.js                # Page to view/manage badges
+│   │   │   └── TestBadges.js                # Test badge functionality
+│   │   ├── items/              # Item system
+│   │   │   ├── ItemService.js               # Service for managing items
+│   │   │   │   ├── ITEMS                    # Item definitions
+│   │   │   │   ├── getUserItems()           # Get user's items
+│   │   │   │   ├── purchaseRandomItem()     # Purchase random item
+│   │   │   │   ├── equipItem()              # Equip item to mascot
+│   │   │   │   └── unequipItem()            # Unequip item from mascot
+│   │   │   ├── ItemsPage.js                 # Page to view/manage items
+│   │   │   └── README.md                    # Items system documentation
+│   │   ├── mascots/            # Mascot system
+│   │   │   ├── MascotService.js             # Service for managing mascots
+│   │   │   │   ├── MASCOTS                  # Mascot definitions
+│   │   │   │   ├── getUserMascots()         # Get user's mascots
+│   │   │   │   ├── purchaseMascot()         # Purchase a mascot
+│   │   │   │   ├── getUserActiveMascot()    # Get user's active mascot
+│   │   │   │   ├── setUserActiveMascot()    # Set active mascot
+│   │   │   │   └── addMascotExperience()    # Add experience to mascot
+│   │   │   ├── MascotsPage.js               # Page to view/manage mascots
+│   │   │   ├── MascotProfile.js             # Mascot profile component
+│   │   │   └── MascotDisplay.js             # Mascot display component
+│   │   └── rewards/            # Rewards/points system
+│   │       ├── PointsService.js             # Service for managing points
+│   │       │   ├── POINT_VALUES             # Point value definitions
+│   │       │   ├── getUserPoints()          # Get user points
+│   │       │   ├── addPoints()              # Add points to user
+│   │       │   ├── calculateLevel()         # Calculate user level
+│   │       │   └── awardPointsForAction()   # Award points for actions
+│   │       ├── UserRewardsPage.js           # Page to view/manage rewards
+│   │       └── PointsBadge.js               # Points display component
+│   ├── shared/                # Shared utilities
+│   │   ├── utils/              # Utility functions and helpers
+│   │   ├── router/             # Routing configuration
+│   │   └── components/         # Shared UI components
+│   └── store/                 # State management
+│       └── slices/             # Redux store slices
+└── package.json               # Project dependencies and scripts
+```
+
+Each feature module follows a consistent pattern with:
+- Service files that contain core functionality and data management
+- Page components for user interface
+- Supporting components and utilities
+
+The application is built with React and uses Supabase for backend services. The main features include:
+- A robot mascot system with different rarity classes
+- An item system for equipping and enhancing mascots
+- A badge system to reward user achievements
+- A points system to track user progress and enable purchases
