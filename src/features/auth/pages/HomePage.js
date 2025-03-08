@@ -11,27 +11,21 @@ import { ItemService } from '../../items';
 const HomePage = () => {
   const { t } = useTranslation();
   const { user, isSignedIn } = useUser();
-  const [userMascots, setUserMascots] = useState([]);
-  const [activeMascot, setActiveMascot] = useState(null);
+  const [userMascots] = useState([]);
+  const [activeMascot] = useState(null);
   const [userItems, setUserItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   
   // Fetch data when component mounts
   useEffect(() => {
     const fetchData = async () => {
       if (isSignedIn && user) {
         try {
-          setIsLoading(true);
-          
           // Get user's items from Supabase
           const items = await ItemService.getUserItems(user.id);
           setUserItems(items || []);
-          
-          setIsLoading(false);
         } catch (error) {
           console.error('Error fetching data for HomePage:', error);
           setUserItems([]);
-          setIsLoading(false);
         }
       }
     };

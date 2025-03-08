@@ -7,7 +7,7 @@ import { Navigation, LanguageSelector } from './shared/components';
 import AppRouter from './shared/router/AppRouter';
 import { MascotService } from './features/mascots';
 import { MASCOT_UPDATED_EVENT } from './features/mascots/MascotService';
-import { ItemService, ensureUserHasSampleItems } from './features/items';
+import { ItemService } from './features/items';
 import { ITEM_UPDATED_EVENT } from './features/items/ItemService';
 import svgStyles from './shared/utils/svgStyles';
 

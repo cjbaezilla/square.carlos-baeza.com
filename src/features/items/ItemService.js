@@ -3,7 +3,7 @@
  * Service for managing item system with Supabase persistence
  */
 
-import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
+import supabase from '../../shared/utils/supabaseClient';
 import PointsService from '../rewards/PointsService';
 
 // Custom event for item updates
@@ -397,7 +397,7 @@ class ItemService {
     
     try {
       // Check if user has any items
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from(this.USER_ITEMS_TABLE)
         .select('id')
         .eq('user_id', userId)
@@ -478,7 +478,7 @@ class ItemService {
       };
       
       // Insert into Supabase
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from(this.USER_ITEMS_TABLE)
         .insert(itemInstance)
         .select();

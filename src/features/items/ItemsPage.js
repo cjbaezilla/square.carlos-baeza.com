@@ -253,49 +253,6 @@ const ItemsPage = () => {
     }
   };
 
-  // Handle equipping an item to the selected mascot
-  const handleEquipItem = async (itemInstanceId) => {
-    if (isSignedIn && user && selectedMascot) {
-      const userId = user.id;
-      const mascotId = selectedMascot.id;
-      
-      try {
-        // Equip item - now async
-        const result = await ItemService.equipItemToMascot(userId, mascotId, itemInstanceId);
-        
-        // Show notification
-        setNotification({
-          type: result.success ? 'success' : 'error',
-          message: result.message
-        });
-        
-        // Hide notification after 3 seconds
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-        
-        if (result.success) {
-          // Update equipped items
-          const mascotItems = await ItemService.getMascotItems(userId, mascotId);
-          setEquippedItems(mascotItems);
-          
-          // Update total stats
-          setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
-        }
-      } catch (error) {
-        console.error('Error equipping item:', error);
-        setNotification({
-          type: 'error',
-          message: 'An error occurred while equipping the item'
-        });
-        
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-      }
-    }
-  };
-
   // Handle unequipping an item from the selected mascot
   const handleUnequipItem = async (itemInstanceId) => {
     if (isSignedIn && user && selectedMascot) {
