@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
-import BadgeService, { BADGES } from './BadgeService';
+import BadgeService, { BADGES, BADGE_UPDATED_EVENT } from './BadgeService';
 import { Badge } from './BadgeDisplay';
 
 // Component for testing badge awarding
@@ -9,6 +9,47 @@ const TestBadges = () => {
   const { user, isLoaded } = useUser();
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
+  const [badgeData, setBadgeData] = useState([]);
+  const [userBadgeIds, setUserBadgeIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Fetch user badges
+  const fetchUserBadges = async (userId) => {
+    if (!userId) return;
+    
+    setIsLoading(true);
+    try {
+      const badges = await BadgeService.getUserBadges(userId);
+      setBadgeData(badges);
+      setUserBadgeIds(badges.map(badge => badge.id));
+    } catch (error) {
+      console.error('Error fetching user badges:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Load badges on component mount
+  useEffect(() => {
+    if (isLoaded && user) {
+      fetchUserBadges(user.id);
+    }
+  }, [isLoaded, user]);
+  
+  // Listen for badge updates
+  useEffect(() => {
+    const handleBadgeUpdate = (event) => {
+      if (user && event.detail.userId === user.id) {
+        fetchUserBadges(user.id);
+      }
+    };
+    
+    document.addEventListener(BADGE_UPDATED_EVENT, handleBadgeUpdate);
+    
+    return () => {
+      document.removeEventListener(BADGE_UPDATED_EVENT, handleBadgeUpdate);
+    };
+  }, [user]);
   
   if (!isLoaded || !user) {
     return (
@@ -21,8 +62,11 @@ const TestBadges = () => {
   const userId = user.id;
   
   // Handle awarding a badge
-  const handleAwardBadge = (badgeId) => {
-    const result = BadgeService.awardBadge(userId, badgeId);
+  const handleAwardBadge = async (badgeId) => {
+    setIsLoading(true);
+    const result = await BadgeService.awardBadge(userId, badgeId);
+    setIsLoading(false);
+    
     if (result) {
       setMessage(`Badge "${BADGES[badgeId.toUpperCase()]?.name}" has been awarded!`);
     } else {
@@ -36,8 +80,11 @@ const TestBadges = () => {
   };
   
   // Handle removing a badge
-  const handleRemoveBadge = (badgeId) => {
-    const result = BadgeService.removeBadge(userId, badgeId);
+  const handleRemoveBadge = async (badgeId) => {
+    setIsLoading(true);
+    const result = await BadgeService.removeBadge(userId, badgeId);
+    setIsLoading(false);
+    
     if (result) {
       setMessage(`Badge "${BADGES[badgeId.toUpperCase()]?.name}" has been removed.`);
     } else {
@@ -49,10 +96,6 @@ const TestBadges = () => {
       setMessage('');
     }, 3000);
   };
-  
-  // Get list of badges this user has
-  const userBadges = BadgeService.getUserBadges(userId);
-  const userBadgeIds = userBadges.map(badge => badge.id);
   
   // Helper function to check if user has a badge
   const hasBadge = (badgeId) => {
@@ -67,6 +110,12 @@ const TestBadges = () => {
       {message && (
         <div className="mb-4 p-3 bg-blue-900 text-white rounded-md">
           {message}
+        </div>
+      )}
+      
+      {isLoading && (
+        <div className="mb-4 p-3 bg-blue-800 text-white rounded-md">
+          Loading...
         </div>
       )}
       
@@ -88,9 +137,9 @@ const TestBadges = () => {
               <div className="flex space-x-2 mt-auto">
                 <button
                   onClick={() => handleAwardBadge(badge.id)}
-                  disabled={hasBadge(badge.id)}
+                  disabled={hasBadge(badge.id) || isLoading}
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    hasBadge(badge.id)
+                    hasBadge(badge.id) || isLoading
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   }`}
@@ -100,9 +149,9 @@ const TestBadges = () => {
                 
                 <button
                   onClick={() => handleRemoveBadge(badge.id)}
-                  disabled={!hasBadge(badge.id)}
+                  disabled={!hasBadge(badge.id) || isLoading}
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    !hasBadge(badge.id)
+                    !hasBadge(badge.id) || isLoading
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       : 'bg-red-600 hover:bg-red-700 text-white'
                   }`}

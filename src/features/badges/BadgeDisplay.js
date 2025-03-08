@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import BadgeService from './BadgeService';
+import React, { useState, useEffect, useCallback } from 'react';
+import BadgeService, { BADGE_UPDATED_EVENT } from './BadgeService';
 import { useTranslation } from 'react-i18next';
 
 // Size classes object moved outside to be accessible by both components
@@ -42,19 +42,61 @@ const Badge = ({ badge, size = 'md', showTooltip = true }) => {
 // Component to display all badges for a user
 const BadgeDisplay = ({ userId, size = 'md', showEmpty = true, limit = null, className = '' }) => {
   const [badges, setBadges] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   
-  useEffect(() => {
-    if (userId) {
-      const userBadges = BadgeService.getUserBadges(userId);
+  // Use useCallback to memoize the fetchBadges function
+  const fetchBadges = useCallback(async () => {
+    if (!userId) return;
+    
+    setLoading(true);
+    try {
+      const userBadges = await BadgeService.getUserBadges(userId);
       // Map badge objects to their details
       const badgeDetails = userBadges.map(badge => ({
         ...BadgeService.getBadgeDetails(badge.id),
         dateAwarded: badge.dateAwarded
       })).filter(Boolean);
       setBadges(badgeDetails);
+    } catch (error) {
+      console.error('Error fetching badges:', error);
+    } finally {
+      setLoading(false);
     }
   }, [userId]);
+  
+  useEffect(() => {
+    fetchBadges();
+    
+    // Listen for badge update events
+    const handleBadgeUpdate = (event) => {
+      if (event.detail.userId === userId) {
+        fetchBadges();
+      }
+    };
+    
+    document.addEventListener(BADGE_UPDATED_EVENT, handleBadgeUpdate);
+    
+    return () => {
+      document.removeEventListener(BADGE_UPDATED_EVENT, handleBadgeUpdate);
+    };
+  }, [userId, fetchBadges]);
+  
+  // If loading, show a loading state
+  if (loading) {
+    return (
+      <div className={`${className}`}>
+        <div className="flex flex-wrap gap-2">
+          {[...Array(limit || 3).keys()].map((i) => (
+            <div 
+              key={i} 
+              className={`${sizeClasses[size] || sizeClasses.md} bg-gray-700 animate-pulse rounded-full`}
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   
   // If no badges and not showing empty state
   if (badges.length === 0 && !showEmpty) {

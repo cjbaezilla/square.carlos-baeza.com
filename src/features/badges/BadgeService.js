@@ -1,6 +1,7 @@
 import React from 'react';
 import i18next from 'i18next';
 import PointsService from '../rewards/PointsService';
+import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 
 // Badge definitions with metadata - using translation keys
 export const BADGES = {
@@ -100,14 +101,39 @@ export const BADGES = {
   },
 };
 
+// Event for badge updates
+export const BADGE_UPDATED_EVENT = 'badge_updated';
+
 // Class to manage user badges
 class BadgeService {
+  static TABLE_NAME = 'user_badges';
+
   // Get badges for a user
-  static getUserBadges(userId) {
+  static async getUserBadges(userId) {
     if (!userId) return [];
     
-    const storedBadges = localStorage.getItem(`user_badges_${userId}`);
-    return storedBadges ? JSON.parse(storedBadges) : [];
+    try {
+      // Query Supabase for user badges
+      // Use regular client here since users should only see their own badges
+      const { data, error } = await supabase
+        .from(this.TABLE_NAME)
+        .select('*')
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Error fetching user badges:', error);
+        return [];
+      }
+      
+      // Transform to the expected format
+      return data.map(badge => ({
+        id: badge.badge_id,
+        dateAwarded: badge.date_awarded
+      }));
+    } catch (err) {
+      console.error('Unexpected error in getUserBadges:', err);
+      return [];
+    }
   }
 
   // Add the isValidBadgeId method
@@ -122,52 +148,131 @@ class BadgeService {
       return false;
     }
 
-    // Check if user already has this badge
-    if (this.hasBadge(userId, badgeId)) {
-      return false; // User already has the badge
-    }
-
-    const userBadges = this.getUserBadges(userId);
-    userBadges.push({
-      id: badgeId,
-      dateAwarded: new Date().toISOString()
-    });
-
-    // Save updated badges
-    localStorage.setItem(`user_badges_${userId}`, JSON.stringify(userBadges));
-
     try {
+      // Check if user already has this badge using direct query
+      const hasExistingBadge = await this.hasBadge(userId, badgeId);
+      if (hasExistingBadge) {
+        console.log(`User ${userId} already has badge ${badgeId}`);
+        return true; // Consider it a success since the user has the badge
+      }
+
+      // Use admin client to bypass RLS for insert operations
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Cannot award badge.');
+        return false;
+      }
+      
+      // Insert into Supabase
+      const { error } = await supabaseAdmin
+        .from(this.TABLE_NAME)
+        .insert({
+          user_id: userId,
+          badge_id: badgeId,
+          date_awarded: new Date().toISOString()
+        });
+      
+      if (error) {
+        // Handle duplicate key error specifically
+        if (error.code === '23505') {
+          console.log(`Badge ${badgeId} already exists for user ${userId}`);
+          return true; // Consider it a success since the badge exists
+        }
+        
+        console.error('Error awarding badge:', error);
+        return false;
+      }
+      
+      // Dispatch event for UI updates
+      document.dispatchEvent(new CustomEvent(BADGE_UPDATED_EVENT, {
+        detail: { userId }
+      }));
+
       // Award points for earning a badge (async)
       await PointsService.awardBadgePoints(userId);
+      
+      return true;
     } catch (error) {
-      console.error('Error awarding badge points:', error);
+      console.error('Error awarding badge:', error);
+      return false;
     }
-
-    return true;
   }
 
   // Check if a user has a specific badge
-  static hasBadge(userId, badgeId) {
+  static async hasBadge(userId, badgeId) {
     if (!userId || !badgeId) return false;
     
-    const userBadges = this.getUserBadges(userId);
-    // Check if the user has a badge with the given ID
-    return userBadges.some(badge => badge.id === badgeId);
+    try {
+      // Use admin client for more reliable badge checking
+      const client = supabaseAdmin || supabase;
+      
+      // Query Supabase for the specific badge
+      const { data, error } = await client
+        .from(this.TABLE_NAME)
+        .select('badge_id')
+        .eq('user_id', userId)
+        .eq('badge_id', badgeId);
+      
+      if (error) {
+        console.error('Error checking for badge:', error);
+        return false;
+      }
+      
+      return Array.isArray(data) && data.length > 0;
+    } catch (err) {
+      console.error('Unexpected error in hasBadge:', err);
+      return false;
+    }
   }
 
   // Remove a badge from a user
-  static removeBadge(userId, badgeId) {
+  static async removeBadge(userId, badgeId) {
     if (!userId || !badgeId) return false;
     
-    const userBadges = this.getUserBadges(userId);
-    const updatedBadges = userBadges.filter(badge => badge.id !== badgeId);
-    
-    if (updatedBadges.length !== userBadges.length) {
-      localStorage.setItem(`user_badges_${userId}`, JSON.stringify(updatedBadges));
+    try {
+      // Use admin client to bypass RLS for delete operations
+      if (!supabaseAdmin) {
+        console.error('Admin client not available. Cannot remove badge.');
+        return false;
+      }
+      
+      // Delete from Supabase
+      const { error } = await supabaseAdmin
+        .from(this.TABLE_NAME)
+        .delete()
+        .eq('user_id', userId)
+        .eq('badge_id', badgeId);
+      
+      if (error) {
+        console.error('Error removing badge:', error);
+        return false;
+      }
+      
+      // Dispatch event for UI updates
+      document.dispatchEvent(new CustomEvent(BADGE_UPDATED_EVENT, {
+        detail: { userId }
+      }));
+      
       return true;
+    } catch (err) {
+      console.error('Unexpected error in removeBadge:', err);
+      return false;
     }
+  }
+
+  // Clear all localStorage data for badges (transitional method)
+  static clearLocalStorageBadges() {
+    // Get all localStorage keys
+    const keys = Object.keys(localStorage);
     
-    return false;
+    // Filter badge-related keys
+    const badgeKeys = keys.filter(key => key.startsWith('user_badges_'));
+    
+    // Remove each badge key
+    badgeKeys.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    return badgeKeys.length;
   }
 
   // Get badge details by ID
@@ -212,6 +317,101 @@ class BadgeService {
     
     // Additional logic for other badges would go here
     // For example, you could track user interactions and award badges accordingly
+  }
+
+  // Migrate user badges from localStorage to Supabase
+  static async migrateBadgesToSupabase(userId) {
+    if (!userId) return { success: false, message: 'No user ID provided' };
+    
+    try {
+      // Get badges from localStorage
+      const localStorageKey = `user_badges_${userId}`;
+      const storedBadges = localStorage.getItem(localStorageKey);
+      
+      if (!storedBadges) {
+        return { success: true, message: 'No badges to migrate for this user' };
+      }
+      
+      const userBadges = JSON.parse(storedBadges);
+      if (!Array.isArray(userBadges) || userBadges.length === 0) {
+        return { success: true, message: 'No badges to migrate for this user' };
+      }
+      
+      // Add badges to Supabase
+      const badgesToInsert = userBadges.map(badge => ({
+        user_id: userId,
+        badge_id: badge.id,
+        date_awarded: badge.dateAwarded || new Date().toISOString()
+      }));
+      
+      // Use admin client to bypass RLS for migration
+      if (!supabaseAdmin) {
+        return { success: false, message: 'Admin client not available. Cannot migrate badges.' };
+      }
+      
+      // Individually insert each badge to handle duplicates better
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const badge of badgesToInsert) {
+        try {
+          // Check if badge already exists
+          const { data, error: checkError } = await supabaseAdmin
+            .from(this.TABLE_NAME)
+            .select('id')
+            .eq('user_id', badge.user_id)
+            .eq('badge_id', badge.badge_id);
+            
+          if (checkError) {
+            console.error('Error checking badge existence:', checkError);
+            errorCount++;
+            continue;
+          }
+          
+          // Skip if badge already exists
+          if (data && data.length > 0) {
+            console.log(`Badge ${badge.badge_id} already exists for user ${badge.user_id}`);
+            successCount++;
+            continue;
+          }
+          
+          // Insert the badge
+          const { error: insertError } = await supabaseAdmin
+            .from(this.TABLE_NAME)
+            .insert(badge);
+            
+          if (insertError) {
+            if (insertError.code === '23505') {
+              // Duplicate key error - consider it a success since badge exists
+              console.log(`Badge ${badge.badge_id} already exists for user ${badge.user_id}`);
+              successCount++;
+            } else {
+              console.error('Error inserting badge:', insertError);
+              errorCount++;
+            }
+          } else {
+            successCount++;
+          }
+        } catch (err) {
+          console.error('Error processing badge:', err);
+          errorCount++;
+        }
+      }
+      
+      // Only remove from localStorage if all badges were processed
+      if (errorCount === 0) {
+        localStorage.removeItem(localStorageKey);
+      }
+      
+      return { 
+        success: true, 
+        message: `Successfully migrated ${successCount} badges to Supabase` +
+                 (errorCount > 0 ? ` (${errorCount} errors)` : '')
+      };
+    } catch (err) {
+      console.error('Unexpected error in migrateBadgesToSupabase:', err);
+      return { success: false, message: 'Unexpected error during migration' };
+    }
   }
 }
 
