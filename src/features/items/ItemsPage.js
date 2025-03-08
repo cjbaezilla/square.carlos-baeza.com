@@ -1001,8 +1001,13 @@ const ItemsPage = () => {
   // Show loading spinner while data is being fetched
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-48">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      <div className="p-6 bg-gray-800 rounded-lg animate-pulse">
+        <div className="h-8 bg-gray-700 rounded mb-6 w-1/3"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="bg-gray-700 p-4 rounded-lg h-40"></div>
+          ))}
+        </div>
       </div>
     );
   }
