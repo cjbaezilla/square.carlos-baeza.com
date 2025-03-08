@@ -10,7 +10,7 @@ const BadgesPage = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('earned');
   const [showTestPanel, setShowTestPanel] = useState(false);
-  const [userBadgeData, setUserBadgeData] = useState([]);
+  /* const [userBadgeData, setUserBadgeData] = useState([]); */
   const [userBadgeIds, setUserBadgeIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [migrationStatus, setMigrationStatus] = useState(null);
@@ -29,7 +29,6 @@ const BadgesPage = () => {
       const badges = await BadgeService.getUserBadges(userId);
       console.log(`BadgesPage: Received ${badges.length} badges:`, badges);
       
-      setUserBadgeData(badges);
       setUserBadgeIds(badges.map(badge => badge.id));
     } catch (error) {
       console.error('Error fetching user badges:', error);

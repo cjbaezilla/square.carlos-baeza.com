@@ -9,7 +9,7 @@ const TestBadges = () => {
   const { user, isLoaded } = useUser();
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
-  const [badgeData, setBadgeData] = useState([]);
+  /* const [badgeData, setBadgeData] = useState([]); */
   const [userBadgeIds, setUserBadgeIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -20,7 +20,6 @@ const TestBadges = () => {
     setIsLoading(true);
     try {
       const badges = await BadgeService.getUserBadges(userId);
-      setBadgeData(badges);
       setUserBadgeIds(badges.map(badge => badge.id));
     } catch (error) {
       console.error('Error fetching user badges:', error);

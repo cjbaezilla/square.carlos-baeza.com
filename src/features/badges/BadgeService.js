@@ -451,7 +451,7 @@ class BadgeService {
         console.log('Attempting to use regular client instead...');
         
         // Check if we can at least query the table
-        const { data: testData, error: testError } = await supabase
+        const { /* data: testData, */ error: testError } = await supabase
           .from(this.TABLE_NAME)
           .select('*')
           .limit(1);
@@ -480,7 +480,7 @@ class BadgeService {
       if (tableError) {
         console.error('Error checking if table exists:', tableError);
         // Try a simpler approach - just query the table and see if it exists
-        const { data: testData, error: testError } = await supabaseAdmin
+        const { /* data: testData, */ error: testError } = await supabaseAdmin
           .from(this.TABLE_NAME)
           .select('*')
           .limit(1);
@@ -568,7 +568,7 @@ class BadgeService {
           console.error('Error in table creation process:', error);
           
           // Fall back to a simple query to check if the table got created anyway
-          const { data: checkData, error: checkError } = await supabaseAdmin
+          const { /* data: checkData, */ error: checkError } = await supabaseAdmin
             .from(this.TABLE_NAME)
             .select('*')
             .limit(1);
