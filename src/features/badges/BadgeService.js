@@ -340,13 +340,9 @@ class BadgeService {
   static async migrateBadgesToSupabase(userId) {
     if (!userId) return { success: false, message: 'No user ID provided' };
     
-    try {
-      // Removed localStorage migration code
-      return { success: true, message: 'localStorage references have been removed' };
-    } catch (error) {
-      console.error('Error in badge migration:', error);
-      return { success: false, message: 'Error during migration process' };
-    }
+    // Method kept but emptied as localStorage references are removed
+    console.log('localStorage references have been removed');
+    return { success: true, message: 'localStorage references have been removed' };
   }
 
   // Verify and initialize user_badges table if needed
