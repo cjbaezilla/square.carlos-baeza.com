@@ -129,7 +129,7 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
         />
         <div>
           <div className="font-medium text-sm text-gray-300">
-            {activeMascot.name}
+            {t(`mascots.names.${activeMascot.id}`, activeMascot.name)}
           </div>
           <div className="text-xs text-gray-400">
             {t('mascot.level', 'Level')} {activeMascot.level} 
@@ -151,7 +151,7 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
           dangerouslySetInnerHTML={{ __html: activeMascot.svg }}
         />
         <div>
-          <h2 className="text-xl font-bold text-gray-100">{activeMascot.name}</h2>
+          <h2 className="text-xl font-bold text-gray-100">{t(`mascots.names.${activeMascot.id}`, activeMascot.name)}</h2>
           <div className="text-sm text-gray-400 capitalize">{activeMascot.rarity} Class</div>
           {activeMascot.level && (
             <div className="text-sm text-green-400 mt-1">

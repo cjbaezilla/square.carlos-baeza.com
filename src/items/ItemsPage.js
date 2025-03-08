@@ -312,7 +312,7 @@ const ItemsPage = () => {
                   style={{ backgroundColor: `${rarity.color}20`, color: rarity.color, border: `1px solid ${rarity.color}40` }}
                 >
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: rarity.color }}></span>
-                  <span>{rarity.name}</span>
+                  <span>{t(`items.rarities.${rarity.name}`, rarity.name)}</span>
                   <span className="opacity-70">{rarity.weight}%</span>
                 </div>
               ))}
@@ -486,21 +486,21 @@ const ItemsPage = () => {
                 className="absolute -top-2 -right-2 px-3 py-1 rounded-full text-xs font-bold animate-pulse"
                 style={{ backgroundColor: rarityInfo.color, color: '#111' }}
               >
-                {rarityInfo.name}
+                {t(`items.rarities.${rarityInfo.name}`, rarityInfo.name)}
               </div>
             </div>
             
             <div className="mb-6">
               <div className="text-2xl font-bold mb-1" style={{ color: rarityInfo.color }}>
-                {newItem.name}
+                {t(`items.names.${newItem.id}`, newItem.name)}
               </div>
               
               <div className="inline-block px-3 py-1 rounded-lg text-sm mb-2 bg-gray-800 text-gray-300">
-                {newItem.type}
+                {t(`items.types.${newItem.type}`, newItem.type)}
               </div>
               
               <div className="text-gray-400 mb-5 text-sm">
-                {newItem.description}
+                {t(`items.descriptions.${newItem.id}`, newItem.description)}
               </div>
             </div>
             
@@ -645,7 +645,7 @@ const ItemsPage = () => {
                 />
                 
                 <div className="text-lg font-bold mb-1 truncate" style={{ color: rarityInfo.color }}>
-                  {item.name}
+                  {t(`items.names.${item.id}`, item.name)}
                 </div>
                 
                 <div className="flex items-center mb-2">
@@ -656,15 +656,15 @@ const ItemsPage = () => {
                       color: rarityInfo.color
                     }}
                   >
-                    {rarityInfo.name}
+                    {t(`items.rarities.${rarityInfo.name}`, rarityInfo.name)}
                   </span>
                   <span className="text-xs text-gray-400 ml-2">
-                    {item.type}
+                    {t(`items.types.${item.type}`, item.type)}
                   </span>
                 </div>
                 
                 <div className="text-xs text-gray-300 mb-3 flex-grow">
-                  {item.description}
+                  {t(`items.descriptions.${item.id}`, item.description)}
                 </div>
                 
                 <div className="flex flex-wrap gap-1.5 text-xs mb-3">
@@ -852,15 +852,15 @@ const ItemsPage = () => {
                 />
                 
                 <div className="text-lg font-bold mb-1" style={{ color: rarityInfo.color }}>
-                  {item.name}
+                  {t(`items.names.${item.id}`, item.name)}
                 </div>
                 
                 <div className="text-xs text-gray-400 mb-1">
-                  {rarityInfo.name} {item.type}
+                  {t(`items.rarities.${rarityInfo.name}`, rarityInfo.name)} {t(`items.types.${item.type}`, item.type)}
                 </div>
                 
                 <div className="text-xs text-gray-300 mb-2 flex-grow">
-                  {item.description}
+                  {t(`items.descriptions.${item.id}`, item.description)}
                 </div>
                 
                 <div className="flex flex-wrap gap-1.5 text-xs mb-3">

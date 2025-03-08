@@ -148,7 +148,7 @@ const MascotsPage = () => {
     setNotification({
       type: 'success',
       message: t('mascot.trainingSuccess', 'Training complete! {{name}} gained {{exp}} experience.', {
-        name: trainingMascot.name,
+        name: t(`mascots.names.${trainingMascot.id}`, trainingMascot.name),
         exp: experienceGained
       })
     });
@@ -311,7 +311,7 @@ const MascotsPage = () => {
                         />
                         <div>
                           <div className="font-medium text-gray-200">
-                            {userMascots.find(m => m.id === activeMascotId).name}
+                            {t(`mascots.names.${activeMascotId}`, userMascots.find(m => m.id === activeMascotId).name)}
                           </div>
                           <div className="text-xs text-gray-400">
                             {t('mascot.level', 'Level')} {userMascots.find(m => m.id === activeMascotId).level}
@@ -497,13 +497,8 @@ const MascotsPage = () => {
                           dangerouslySetInnerHTML={{ __html: mascot.svg }}
                         />
                         <div>
-                          <div className="font-medium text-gray-200">{mascot.name}</div>
-                          <div className="text-sm text-green-400">
-                            {t('mascot.level', 'Level')} {mascot.level}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {t('mascot.exp', 'EXP')}: {mascot.experience % 100}/100
-                          </div>
+                          <div className="font-medium text-gray-200">{t(`mascots.names.${mascot.id}`, mascot.name)}</div>
+                          <div className="text-xs text-gray-400">{t(`mascots.descriptions.${mascot.id}`, mascot.description)}</div>
                         </div>
                       </div>
                       
@@ -582,7 +577,7 @@ const MascotsPage = () => {
                                 className="h-8 w-8 flex-shrink-0 mr-3"
                                 dangerouslySetInnerHTML={{ __html: mascot.svg }}
                               />
-                              <div className="text-sm font-medium text-gray-200">{mascot.name}</div>
+                              <div className="text-sm font-medium text-gray-200">{t(`mascots.names.${mascot.id}`, mascot.name)}</div>
                               {mascot.id === activeMascotId && (
                                 <span className="ml-2 px-2 py-0.5 text-xs rounded bg-green-700 text-white">
                                   {t('mascot.active', 'Active')}
@@ -653,7 +648,7 @@ const MascotsPage = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-75">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full shadow-xl border border-gray-700">
             <h3 className="text-xl font-bold text-purple-400 mb-4">
-              {t('mascot.training', 'Training {{name}}', { name: trainingMascot.name })}
+              {t('mascot.training', 'Training {{name}}', { name: t(`mascots.names.${trainingMascot.id}`, trainingMascot.name) })}
             </h3>
             
             <div className="flex justify-center my-6">

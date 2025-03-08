@@ -291,7 +291,8 @@
     "trainingDescription": "Entrenar a tu mascota aumentará su experiencia y nivel, haciéndola más fuerte.",
     "trainingReward": "Ganarás {{points}} puntos por completar esta sesión de entrenamiento.",
     "cancel": "Cancelar",
-    "completeTraining": "Completar Entrenamiento"
+    "completeTraining": "Completar Entrenamiento",
+    "manage": "Gestionar mascotas"
   },
   "mascots": {
     "stats": "Estadísticas de Mascota",
@@ -306,7 +307,21 @@
     "description": "Colecciona y entrena mascotas robot",
     "active_mascot": "Mascota Activa",
     "manage": "Gestionar mascotas",
-    "get_mascots": "Obtener mascotas"
+    "get_mascots": "Obtener mascotas",
+    "names": {
+      "robo-scout": "Explorador Robótico",
+      "battle-bot": "Robot de Batalla",
+      "tech-wizard": "Mago Tecnológico",
+      "heavy-tank": "Tanque Pesado",
+      "stealth-unit": "Unidad Sigilosa"
+    },
+    "descriptions": {
+      "robo-scout": "Un robot ligero con alta agilidad y capacidades de escaneo.",
+      "battle-bot": "Un robot curtido en batalla con excepcional poder y defensa.",
+      "tech-wizard": "Un robot especializado con tremendo poder mágico y habilidades tecnológicas.",
+      "heavy-tank": "Un robot industrial con HP y defensa inigualables pero baja movilidad.",
+      "stealth-unit": "Un robot especializado con alta agilidad y capacidades de invisibilidad."
+    }
   },
   "items": {
     "equipped": "objetos equipados",
@@ -351,7 +366,58 @@
     "robot_items": "Objetos Robot",
     "description": "Colecciona objetos especiales para mejorar tus mascotas",
     "manage": "Gestionar todos los objetos",
-    "get_items": "Obtener objetos"
+    "get_items": "Obtener objetos",
+    "names": {
+      "basic-antenna": "Antena Básica",
+      "simple-visor": "Visor Simple",
+      "basic-cpu": "CPU Básica",
+      "metal-plate": "Placa de Metal",
+      "basic-servo": "Servo Básico",
+      "rubber-wheels": "Ruedas de Goma",
+      "basic-battery": "Batería Básica",
+      "metal-arm": "Brazo Metálico",
+      "simple-fan": "Ventilador Simple",
+      "small-hammer": "Martillo Pequeño",
+      "reinforced-plate": "Placa Reforzada",
+      "advanced-sensor": "Sensor Avanzado",
+      "power-cell": "Celda de Energía"
+    },
+    "descriptions": {
+      "basic-antenna": "Una antena simple que mejora ligeramente la comunicación del robot.",
+      "simple-visor": "Un visor básico que proporciona mejoras perceptivas menores.",
+      "basic-cpu": "Una unidad de procesamiento estándar con capacidades limitadas.",
+      "metal-plate": "Una placa de metal simple que proporciona protección básica.",
+      "basic-servo": "Un motor servo estándar para movimiento robótico.",
+      "rubber-wheels": "Ruedas de goma simples para movilidad básica.",
+      "basic-battery": "Una celda de energía estándar con capacidad limitada.",
+      "metal-arm": "Un brazo mecánico básico con articulaciones simples.",
+      "simple-fan": "Un ventilador básico para regulación de temperatura.",
+      "small-hammer": "Una herramienta simple para reparaciones básicas y combate.",
+      "reinforced-plate": "Una placa de armadura reforzada con mayor durabilidad.",
+      "advanced-sensor": "Equipo sensorial mejorado para una mejor percepción.",
+      "power-cell": "Almacenamiento de energía de mayor capacidad con eficiencia mejorada."
+    },
+    "types": {
+      "Head": "Cabeza",
+      "Body": "Cuerpo",
+      "Arms": "Brazos",
+      "Legs": "Piernas",
+      "Weapon": "Arma",
+      "Shield": "Escudo",
+      "Power Core": "Núcleo de Poder",
+      "CPU": "CPU",
+      "Sensor": "Sensor",
+      "Battery": "Batería",
+      "Cooling": "Refrigeración",
+      "Booster": "Potenciador"
+    },
+    "rarities": {
+      "Common": "Común",
+      "Uncommon": "Poco Común",
+      "Rare": "Raro",
+      "Epic": "Épico",
+      "Legendary": "Legendario"
+    }
   },
   "blockchain": {
     "tools": "Herramientas Blockchain"

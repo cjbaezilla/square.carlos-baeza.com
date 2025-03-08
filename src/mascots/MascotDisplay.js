@@ -137,9 +137,9 @@ const MascotDisplay = ({ mascot, isOwned = false, isActive = false, onPurchase, 
             </div>
           )}
           
-          <h3 className="text-lg font-semibold text-gray-100">{mascot.name}</h3>
+          <h3 className="text-lg font-semibold text-gray-100">{t(`mascots.names.${mascot.id}`, mascot.name)}</h3>
           <div className="text-xs text-gray-400 capitalize mb-1">{mascot.rarity} Class</div>
-          <p className="text-sm text-gray-300">{mascot.description}</p>
+          <p className="text-sm text-gray-300">{t(`mascots.descriptions.${mascot.id}`, mascot.description)}</p>
         </div>
         
         {showStats && (
