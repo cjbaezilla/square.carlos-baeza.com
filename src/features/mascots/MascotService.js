@@ -176,6 +176,64 @@ export const MASCOTS = [
           <path d="M20 44 L12 52 M44 44 L52 52" stroke="#8e44ad" stroke-dasharray="2 1" />
           <circle cx="32" cy="16" r="4" stroke="#8e44ad" fill="#a569bd" />
         </svg>`
+  },
+  {
+    id: 'cyber-sentinel',
+    name: 'Cyber Sentinel',
+    description: 'A highly advanced security robot with enhanced perception and tactical capabilities.',
+    price: 280,
+    stats: { hp: 65, mp: 75, agility: 8, power: 6, defense: 8 },
+    rarity: 'epic',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <path d="M20 10 L44 10 L40 24 L24 24 Z" stroke="#9b59b6" fill="#d7bde2" />
+          <rect x="22" y="24" width="20" height="24" rx="2" stroke="#9b59b6" fill="#d7bde2" />
+          <circle cx="29" cy="32" r="3" stroke="#9b59b6" fill="#f4ecf7" />
+          <circle cx="35" cy="32" r="3" stroke="#9b59b6" fill="#f4ecf7" />
+          <path d="M22 48 L26 56 L38 56 L42 48" stroke="#9b59b6" fill="#d7bde2" />
+          <line x1="22" y1="40" x2="42" y2="40" stroke="#9b59b6" />
+          <path d="M16 32 L22 28 M48 32 L42 28" stroke="#9b59b6" />
+          <path d="M32 10 L32 4" stroke="#9b59b6" />
+          <circle cx="32" cy="4" r="2" stroke="#9b59b6" fill="#f4ecf7" />
+        </svg>`
+  },
+  {
+    id: 'chrono-titan',
+    name: 'Chrono Titan',
+    description: 'A colossal robot that can manipulate time and space, with unparalleled power and defense.',
+    price: 600,
+    stats: { hp: 110, mp: 95, agility: 6, power: 12, defense: 11 },
+    rarity: 'legendary',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <path d="M20 8 L44 8 L42 20 L22 20 Z" stroke="#f39c12" fill="#fef5e7" />
+          <rect x="16" y="20" width="32" height="24" rx="2" stroke="#f39c12" fill="#fef5e7" />
+          <circle cx="27" cy="28" r="4" stroke="#f39c12" fill="#fdebd0" />
+          <circle cx="37" cy="28" r="4" stroke="#f39c12" fill="#fdebd0" />
+          <path d="M20 44 L28 58 L36 58 L44 44" stroke="#f39c12" fill="#fef5e7" />
+          <rect x="10" y="26" width="6" height="12" rx="1" stroke="#f39c12" fill="#fef5e7" />
+          <rect x="48" y="26" width="6" height="12" rx="1" stroke="#f39c12" fill="#fef5e7" />
+          <path d="M32 8 L32 2" stroke="#f39c12" />
+          <circle cx="32" cy="2" r="1" stroke="#f39c12" fill="#e74c3c" />
+          <path d="M20 36 L44 36" stroke="#f39c12" />
+          <path d="M24 20 C24 16 32 12 32 4 32 12 40 16 40 20" stroke="#f39c12" stroke-dasharray="2 1" />
+        </svg>`
+  },
+  {
+    id: 'utility-droid',
+    name: 'Utility Droid',
+    description: 'A simple but reliable worker robot designed for everyday tasks and basic support functions.',
+    price: 40,
+    stats: { hp: 25, mp: 30, agility: 5, power: 4, defense: 3 },
+    rarity: 'common',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-width="2">
+          <rect x="18" y="14" width="28" height="22" rx="2" stroke="#95a5a6" fill="#d5dbdb" />
+          <circle cx="28" cy="22" r="3" stroke="#95a5a6" fill="#ecf0f1" />
+          <circle cx="36" cy="22" r="3" stroke="#95a5a6" fill="#ecf0f1" />
+          <rect x="26" y="36" width="12" height="14" rx="1" stroke="#95a5a6" fill="#d5dbdb" />
+          <line x1="26" y1="43" x2="38" y2="43" stroke="#95a5a6" />
+          <path d="M18 26 L12 30 M46 26 L52 30" stroke="#95a5a6" />
+          <line x1="32" y1="14" x2="32" y2="10" stroke="#95a5a6" />
+          <circle cx="32" cy="9" r="1" stroke="#95a5a6" fill="#ecf0f1" />
+        </svg>`
   }
 ];
 
