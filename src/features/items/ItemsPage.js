@@ -332,6 +332,18 @@ const ItemsPage = () => {
     );
   };
 
+  // Helper function to sort mascots with active one first
+  const sortMascots = (mascots) => {
+    if (!Array.isArray(mascots) || !selectedMascot) return mascots;
+    
+    return [...mascots].sort((a, b) => {
+      // Place the selected/active mascot first
+      if (a.id === selectedMascot.id) return -1;
+      if (b.id === selectedMascot.id) return 1;
+      return 0;
+    });
+  };
+
   // Render the item shop tab
   const renderShopTab = () => (
     <div className="mb-4">
@@ -878,7 +890,7 @@ const ItemsPage = () => {
               }}
             >
               <option value="">{t('items.select_mascot_prompt', '-- Select a mascot --')}</option>
-              {Array.isArray(userMascots) && userMascots.map(mascot => (
+              {Array.isArray(userMascots) && sortMascots(userMascots).map(mascot => (
                 <option key={mascot.id} value={mascot.id}>{mascot.name}</option>
               ))}
             </select>
@@ -1004,7 +1016,7 @@ const ItemsPage = () => {
               }}
             >
               <option value="">{t('items.select_mascot_prompt', '-- Select a mascot --')}</option>
-              {Array.isArray(userMascots) && userMascots.map(mascot => (
+              {Array.isArray(userMascots) && sortMascots(userMascots).map(mascot => (
                 <option key={mascot.id} value={mascot.id}>{mascot.name}</option>
               ))}
             </select>

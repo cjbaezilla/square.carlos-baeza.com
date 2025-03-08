@@ -220,7 +220,7 @@ export const MASCOTS = [
   {
     id: 'utility-droid',
     name: 'Utility Droid',
-    description: 'A simple but reliable worker robot designed for everyday tasks and basic support functions.',
+    description: 'A simple but reliable worker robot for everyday tasks.',
     price: 40,
     stats: { hp: 25, mp: 30, agility: 5, power: 4, defense: 3 },
     rarity: 'common',
@@ -238,7 +238,7 @@ export const MASCOTS = [
   {
     id: 'nano-assembler',
     name: 'Nano Assembler',
-    description: 'A microscale robot capable of incredible precision engineering and self-replication.',
+    description: 'A microscale robot capable of incredible precision and self-replication.',
     price: 80,
     stats: { hp: 15, mp: 50, agility: 9, power: 3, defense: 2 },
     rarity: 'common',

@@ -31,7 +31,17 @@ const MascotsPage = () => {
           // eslint-disable-next-line no-console
           console.log('MascotsPage: Loading data for user', userId);
           
-          // Get all available mascots first for comparison
+          // Get user's active mascot first
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Fetching active mascot...');
+          const activeMascot = await MascotService.getUserActiveMascot(userId);
+          // eslint-disable-next-line no-console
+          console.log('MascotsPage: Active mascot:', activeMascot);
+          if (activeMascot) {
+            setActiveMascotId(activeMascot.id);
+          }
+          
+          // Get all available mascots for comparison
           const allMascots = MascotService.getAllMascots();
           // eslint-disable-next-line no-console
           console.log('MascotsPage: Available mascots in catalog:', allMascots.length);
@@ -44,16 +54,6 @@ const MascotsPage = () => {
           // eslint-disable-next-line no-console
           console.log('MascotsPage: User has', mascots.length, 'mascots:', mascots);
           setUserMascots(mascots);
-          
-          // Get user's active mascot
-          // eslint-disable-next-line no-console
-          console.log('MascotsPage: Fetching active mascot...');
-          const activeMascot = await MascotService.getUserActiveMascot(userId);
-          // eslint-disable-next-line no-console
-          console.log('MascotsPage: Active mascot:', activeMascot);
-          if (activeMascot) {
-            setActiveMascotId(activeMascot.id);
-          }
           
           // Get user's points
           // eslint-disable-next-line no-console
@@ -562,7 +562,14 @@ const MascotsPage = () => {
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {Array.isArray(userMascots) && userMascots.map(mascot => (
+                      {Array.isArray(userMascots) && [...userMascots]
+                        .sort((a, b) => {
+                          // Place the active mascot first
+                          if (a.id === activeMascotId) return -1;
+                          if (b.id === activeMascotId) return 1;
+                          return 0;
+                        })
+                        .map(mascot => (
                         <div key={mascot.id} className="relative">
                           <MascotDisplay
                             mascot={mascot}
@@ -718,7 +725,14 @@ const MascotsPage = () => {
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Array.isArray(userMascots) && userMascots.map(mascot => (
+                  {Array.isArray(userMascots) && [...userMascots]
+                    .sort((a, b) => {
+                      // Place the active mascot first
+                      if (a.id === activeMascotId) return -1;
+                      if (b.id === activeMascotId) return 1;
+                      return 0;
+                    })
+                    .map(mascot => (
                     <div key={mascot.id} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 cursor-pointer transition-colors"
                       onClick={() => handleTrainMascot(mascot)}
                     >
@@ -800,7 +814,14 @@ const MascotsPage = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-600">
-                      {Array.isArray(userMascots) && userMascots.map((mascot) => (
+                      {Array.isArray(userMascots) && [...userMascots]
+                        .sort((a, b) => {
+                          // Place the active mascot first
+                          if (a.id === activeMascotId) return -1;
+                          if (b.id === activeMascotId) return 1;
+                          return 0;
+                        })
+                        .map((mascot) => (
                         <tr key={mascot.id} className={mascot.id === activeMascotId ? 'bg-blue-900/20' : ''}>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center">
