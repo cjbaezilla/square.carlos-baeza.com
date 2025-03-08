@@ -5,6 +5,7 @@
 
 import supabase, { supabaseAdmin } from '../../shared/utils/supabaseClient';
 import PointsService from '../rewards/PointsService';
+import ServiceBase from '../../shared/utils/ServiceBase';
 
 // Custom event for item updates
 export const ITEM_UPDATED_EVENT = 'item-updated';
@@ -338,8 +339,9 @@ export const generateRandomItem = () => {
 };
 
 // Item System Class
-class ItemService {
+class ItemService extends ServiceBase {
   constructor() {
+    super();
     this.USER_ITEMS_TABLE = 'user_items';
     this.MASCOT_ITEMS_TABLE = 'mascot_equipped_items';
     
@@ -347,13 +349,13 @@ class ItemService {
     this.clearLocalStorageData();
   }
   
-  // Clean all localStorage data for items
+  // Clear any legacy localStorage data
   clearLocalStorageData() {
     // localStorage references removed
     console.log('localStorage references have been removed');
   }
   
-  // Verify tables exist
+  // Verify tables exist in Supabase
   async verifyTables() {
     try {
       console.log('Verifying item tables...');
@@ -388,80 +390,49 @@ class ItemService {
     }
   }
   
-  // Initialize user items data if not exists - now just returns a promise
+  // Initialize user data (if not already initialized)
   async initUserItemsData(userId) {
     if (!userId) {
-      console.error('initUserItemsData called with no userId');
-      return null;
+      return this.handleError(new Error('Invalid userId'), 'initUserItemsData', false);
     }
     
     try {
-      // Check if user has any items
-      const { error } = await supabase
-        .from(this.USER_ITEMS_TABLE)
-        .select('id')
-        .eq('user_id', userId)
-        .limit(1);
-        
-      if (error) {
-        console.error('Error checking if user has items:', error);
-        return null;
+      // Check if user already has items data
+      const userItems = await this.fetchData(this.USER_ITEMS_TABLE, { user_id: userId });
+      
+      // If user already has items data, no need to initialize
+      if (userItems && userItems.length > 0) {
+        return true;
       }
       
-      // If user has no items, return empty inventory structure
-      return {
-        inventory: []
-      };
+      // Give the user some starter items
+      const starterItems = this.getSampleItems();
+      
+      for (const item of starterItems) {
+        await this.addItemToUserInventory(userId, item);
+      }
+      
+      return true;
     } catch (err) {
-      console.error('Error initializing user items data:', err);
-      return { inventory: [] };
+      return this.handleError(err, 'initUserItemsData', false);
     }
   }
   
-  // Get user's items
+  // Get items owned by a user
   async getUserItems(userId) {
     if (!userId) {
-      console.error('getUserItems called with no userId');
-      return [];
+      return this.handleError(new Error('Invalid userId'), 'getUserItems', []);
     }
     
     try {
-      // Check if admin client is available
-      if (!supabaseAdmin) {
-        console.error('Admin client not available. Check environment variables.');
-        // Try with regular client as fallback
-        const { data, error } = await supabase
-          .from(this.USER_ITEMS_TABLE)
-          .select('*')
-          .eq('user_id', userId);
-          
-        if (error) {
-          console.error('Error getting user items with regular client:', error);
-          return [];
-        }
-        
-        return this.formatItemsResponse(data);
-      }
-      
-      // Use admin client to bypass RLS
-      const { data, error } = await supabaseAdmin
-        .from(this.USER_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId);
-        
-      if (error) {
-        console.error('Error getting user items with admin client:', error);
-        return [];
-      }
-      
-      return this.formatItemsResponse(data);
+      const items = await this.fetchData(this.USER_ITEMS_TABLE, { user_id: userId });
+      return this.formatItemsResponse(items);
     } catch (err) {
-      console.error('Error getting user items:', err);
-      return [];
+      return this.handleError(err, 'getUserItems', []);
     }
   }
   
-  // Helper method to format items response
+  // Format items data returned from the database
   formatItemsResponse(data) {
     // Ensure data is valid
     if (!data) {
@@ -515,80 +486,60 @@ class ItemService {
     }
   }
   
-  // Add item to user's inventory
+  // Add an item to a user's inventory
   async addItemToUserInventory(userId, item) {
     if (!userId || !item) {
-      console.error('Invalid parameters for addItemToUserInventory:', userId, item);
-      return null;
+      return {
+        success: false,
+        message: 'Missing required parameters'
+      };
     }
     
     try {
-      // Create a unique instance ID
-      const instanceId = `${item.id}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      // Generate a unique instance ID
+      const instanceId = `${item.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
       
-      // Create the item instance
-      const itemInstance = {
+      // Create item data object
+      const itemData = {
         user_id: userId,
-        item_id: item.id,
         instance_id: instanceId,
+        item_id: item.id,
         name: item.name,
         description: item.description,
         type: item.type,
         rarity: item.rarity,
         stats: item.stats,
-        svg: item.svg
+        svg: item.svg,
+        created_at: new Date().toISOString()
       };
       
-      // Use supabaseAdmin to bypass row-level security policies
-      // Only using this for item operations to ensure proper inventory management
-      if (!supabaseAdmin) {
-        console.error('Admin client not available. Check environment variables.');
-        return null;
+      // Add item to database
+      const result = await this.insertData(this.USER_ITEMS_TABLE, itemData);
+      
+      if (!result.success) {
+        return result;
       }
       
-      // Insert into Supabase and get the result
-      const { data, error } = await supabaseAdmin
-        .from(this.USER_ITEMS_TABLE)
-        .insert(itemInstance)
-        .select();
-        
-      if (error) {
-        console.error('Error adding item to inventory:', error);
-        return null;
-      }
+      // Dispatch event
+      this.dispatchEvent(ITEM_UPDATED_EVENT, { userId });
       
-      if (!data || data.length === 0) {
-        console.error('No data returned after inserting item to inventory');
-        return null;
-      }
-      
-      // Dispatch event for UI updates
-      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-        detail: { 
-          userId,
-          timestamp: Date.now()
-        }
-      });
-      document.dispatchEvent(event);
-      
-      // Return the newly created item in the expected format
       return {
-        id: item.id,
-        instanceId,
-        name: item.name,
-        description: item.description,
-        type: item.type,
-        rarity: item.rarity,
-        stats: item.stats,
-        svg: item.svg
+        success: true,
+        message: `${item.name} added to your inventory!`,
+        item: {
+          ...item,
+          instanceId
+        }
       };
     } catch (err) {
-      console.error('Error adding item to inventory:', err);
-      return null;
+      return {
+        success: false,
+        message: 'Failed to add item to inventory'
+      };
     }
   }
   
-  // Purchase a random item for user
+  // Purchase a random item with points
   async purchaseRandomItem(userId) {
     if (!userId) {
       console.error('purchaseRandomItem called with no userId');
@@ -674,31 +625,15 @@ class ItemService {
   // Get mascot equipped items
   async getMascotItems(userId, mascotId) {
     if (!userId || !mascotId) {
-      // eslint-disable-next-line no-console
-      console.error('getMascotItems called with invalid parameters:', userId, mascotId);
-      return Promise.resolve([]);
+      return this.handleError(new Error('Invalid parameters'), 'getMascotItems', []);
     }
     
     try {
-      // Check if admin client is available
-      if (!supabaseAdmin) {
-        // eslint-disable-next-line no-console
-        console.error('Admin client not available. Check environment variables.');
-        return Promise.resolve([]);
-      }
-      
-      // Get equipped item instances from the join table - use admin client
-      const { data: equippedData, error: equippedError } = await supabaseAdmin
-        .from(this.MASCOT_ITEMS_TABLE)
-        .select('item_instance_id')
-        .eq('user_id', userId)
-        .eq('mascot_id', mascotId);
-        
-      if (equippedError) {
-        // eslint-disable-next-line no-console
-        console.error('Error getting equipped items:', equippedError);
-        return [];
-      }
+      // Get equipped item instances from the join table
+      const equippedData = await this.fetchData(
+        this.MASCOT_ITEMS_TABLE, 
+        { user_id: userId, mascot_id: mascotId }
+      );
       
       if (!equippedData || equippedData.length === 0) {
         return [];
@@ -707,39 +642,32 @@ class ItemService {
       // Get the instance IDs
       const itemInstanceIds = equippedData.map(entry => entry.item_instance_id);
       
-      // Get the actual items - use admin client
-      const { data: itemsData, error: itemsError } = await supabaseAdmin
-        .from(this.USER_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId)
-        .in('instance_id', itemInstanceIds);
-        
-      if (itemsError) {
-        // eslint-disable-next-line no-console
-        console.error('Error getting item details:', itemsError);
-        return [];
-      }
+      // Get the actual items
+      const itemsData = await this.fetchData(
+        this.USER_ITEMS_TABLE, 
+        { user_id: userId }
+      );
       
       if (!itemsData) {
-        // eslint-disable-next-line no-console
-        console.warn('No item data returned for mascot:', mascotId);
         return [];
       }
       
+      // Filter items by instance IDs
+      const equippedItems = itemsData.filter(item => 
+        itemInstanceIds.includes(item.instance_id)
+      );
+      
       // Use the helper method to format the response
-      const formattedItems = this.formatItemsResponse(itemsData);
+      const formattedItems = this.formatItemsResponse(equippedItems);
       return Array.isArray(formattedItems) ? formattedItems : [];
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error getting mascot items:', err);
-      return [];
+      return this.handleError(err, 'getMascotItems', []);
     }
   }
   
   // Equip item to mascot
   async equipItemToMascot(userId, mascotId, itemInstanceId) {
     if (!userId || !mascotId || !itemInstanceId) {
-      console.error('Missing required parameters for equipItemToMascot:', { userId, mascotId, itemInstanceId });
       return {
         success: false,
         message: 'Missing required parameters'
@@ -747,125 +675,59 @@ class ItemService {
     }
     
     try {
-      // Check if admin client is available
-      if (!supabaseAdmin) {
-        console.error('Admin client not available. Check environment variables.');
+      // Find the item in the user's inventory
+      const userItems = await this.fetchData(
+        this.USER_ITEMS_TABLE,
+        { user_id: userId }
+      );
+      
+      const itemData = userItems.find(item => item.instance_id === itemInstanceId);
+      
+      if (!itemData) {
         return {
           success: false,
-          message: 'Service unavailable'
+          message: 'Item not found in inventory'
         };
-      }
-      
-      console.log('Looking for item in inventory:', { userId, itemInstanceId });
-      
-      // First, try to find the item with the admin client
-      let itemData;
-      let useAdminClient = true;
-      
-      const { data: adminItemData, error: adminItemError } = await supabaseAdmin
-        .from(this.USER_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId)
-        .eq('instance_id', itemInstanceId);
-        
-      if (adminItemError || !adminItemData || adminItemData.length === 0) {
-        console.error('Error or no data with admin client:', adminItemError || 'No items found');
-        
-        // Try with regular client as fallback
-        console.log('Trying with regular client instead');
-        const { data: regularItemData, error: regularItemError } = await supabase
-          .from(this.USER_ITEMS_TABLE)
-          .select('*')
-          .eq('user_id', userId)
-          .eq('instance_id', itemInstanceId);
-          
-        if (regularItemError || !regularItemData || regularItemData.length === 0) {
-          console.error('Error or no data with regular client either:', regularItemError || 'No items found');
-          return {
-            success: false,
-            message: 'Item not found in inventory'
-          };
-        }
-        
-        itemData = regularItemData[0];
-        useAdminClient = false;
-        console.log('Found item with regular client:', itemData);
-      } else {
-        itemData = adminItemData[0];
-        console.log('Found item with admin client:', itemData);
       }
       
       // Check if mascot already has the maximum number of items (3)
-      const { data: equippedData, error: equippedError } = await (useAdminClient ? supabaseAdmin : supabase)
-        .from(this.MASCOT_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId)
-        .eq('mascot_id', mascotId);
-        
-      if (equippedError) {
-        console.error('Error checking equipped items:', equippedError);
-        return {
-          success: false,
-          message: 'Error checking equipped items'
-        };
-      }
+      const equippedItems = await this.fetchData(
+        this.MASCOT_ITEMS_TABLE,
+        { user_id: userId, mascot_id: mascotId }
+      );
       
-      if (equippedData && equippedData.length >= 3) {
+      if (equippedItems && equippedItems.length >= 3) {
         return {
           success: false,
           message: 'Mascot already has the maximum number of items equipped (3)'
         };
       }
       
-      // Check if item is already equipped to any mascot
-      const { data: existingEquipData, error: existingEquipError } = await (useAdminClient ? supabaseAdmin : supabase)
-        .from(this.MASCOT_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId)
-        .eq('item_instance_id', itemInstanceId);
-        
-      if (existingEquipError) {
-        console.error('Error checking if item is already equipped:', existingEquipError);
+      // First check if this item is already equipped on this mascot
+      const alreadyEquipped = equippedItems.some(
+        entry => entry.item_instance_id === itemInstanceId
+      );
+      
+      if (alreadyEquipped) {
         return {
           success: false,
-          message: 'Error checking if item is already equipped'
+          message: 'This item is already equipped on this mascot'
         };
       }
       
-      if (existingEquipData && existingEquipData.length > 0) {
-        return {
-          success: false,
-          message: 'Item is already equipped to another mascot'
-        };
-      }
+      // Equip the item
+      const result = await this.insertData(this.MASCOT_ITEMS_TABLE, {
+        user_id: userId,
+        mascot_id: mascotId,
+        item_instance_id: itemInstanceId
+      });
       
-      // Equip the item - use admin client to bypass RLS if available
-      const client = useAdminClient ? supabaseAdmin : supabase;
-      const { error: insertError } = await client
-        .from(this.MASCOT_ITEMS_TABLE)
-        .insert({
-          user_id: userId,
-          mascot_id: mascotId,
-          item_instance_id: itemInstanceId
-        });
-        
-      if (insertError) {
-        console.error('Error equipping item:', insertError);
-        return {
-          success: false,
-          message: 'Error equipping item to mascot'
-        };
+      if (!result.success) {
+        return result;
       }
       
       // Dispatch event
-      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-        detail: { 
-          userId,
-          mascotId,
-          timestamp: Date.now()
-        }
-      });
-      document.dispatchEvent(event);
+      this.dispatchEvent(ITEM_UPDATED_EVENT, { userId });
       
       return {
         success: true,
@@ -882,7 +744,6 @@ class ItemService {
         }
       };
     } catch (err) {
-      console.error('Unexpected error in equipItemToMascot:', err);
       return {
         success: false,
         message: 'An unexpected error occurred'
@@ -900,63 +761,45 @@ class ItemService {
     }
     
     try {
-      // Check if admin client is available
-      if (!supabaseAdmin) {
-        console.error('Admin client not available. Check environment variables.');
+      // Check if item is equipped
+      const equippedItems = await this.fetchData(
+        this.MASCOT_ITEMS_TABLE,
+        { 
+          user_id: userId, 
+          mascot_id: mascotId,
+          item_instance_id: itemInstanceId
+        }
+      );
+      
+      if (!equippedItems || equippedItems.length === 0) {
         return {
           success: false,
-          message: 'Service unavailable'
+          message: 'This item is not equipped on this mascot'
         };
       }
       
-      // Get the item details first for the success message
-      const { data: itemData, error: itemError } = await supabase
-        .from(this.USER_ITEMS_TABLE)
-        .select('*')
-        .eq('user_id', userId)
-        .eq('instance_id', itemInstanceId)
-        .single();
-        
-      if (itemError) {
-        console.error('Error getting item details:', itemError);
-        return {
-          success: false,
-          message: 'Error getting item details'
-        };
-      }
+      // Unequip the item
+      const result = await this.deleteData(
+        this.MASCOT_ITEMS_TABLE,
+        {
+          user_id: userId,
+          mascot_id: mascotId,
+          item_instance_id: itemInstanceId
+        }
+      );
       
-      // Delete the equipment relationship - use admin client to bypass RLS
-      const { error: deleteError } = await supabaseAdmin
-        .from(this.MASCOT_ITEMS_TABLE)
-        .delete()
-        .eq('user_id', userId)
-        .eq('mascot_id', mascotId)
-        .eq('item_instance_id', itemInstanceId);
-        
-      if (deleteError) {
-        console.error('Error unequipping item:', deleteError);
-        return {
-          success: false,
-          message: 'Error unequipping item from mascot'
-        };
+      if (!result.success) {
+        return result;
       }
       
       // Dispatch event
-      const event = new CustomEvent(ITEM_UPDATED_EVENT, { 
-        detail: { 
-          userId,
-          mascotId,
-          timestamp: Date.now()
-        }
-      });
-      document.dispatchEvent(event);
+      this.dispatchEvent(ITEM_UPDATED_EVENT, { userId });
       
       return {
         success: true,
-        message: `${itemData.name} has been unequipped from your mascot`,
+        message: 'Item unequipped successfully'
       };
     } catch (err) {
-      console.error('Error unequipping item from mascot:', err);
       return {
         success: false,
         message: 'An error occurred while unequipping the item'
@@ -1018,7 +861,7 @@ class ItemService {
     }
   }
   
-  // Check if an item is equipped to any mascot
+  // Check if an item is equipped on any mascot
   async isItemEquipped(userId, itemInstanceId) {
     if (!userId || !itemInstanceId) return false;
     
@@ -1048,7 +891,7 @@ class ItemService {
     }
   }
   
-  // Get value of an item based on rarity
+  // Get the point value for an item (for selling)
   getItemValue(item) {
     const rarityValues = {
       'COMMON': 10,
@@ -1061,7 +904,7 @@ class ItemService {
     return rarityValues[item.rarity] || 0;
   }
   
-  // Get sample items for display
+  // Get a sample set of items for new users
   getSampleItems() {
     // Return one item of each rarity for display purposes
     return ITEMS.filter((item, index, array) => {
@@ -1071,7 +914,7 @@ class ItemService {
     });
   }
 
-  // Create a random item instance for testing only
+  // Create a random item instance
   createRandomItemInstance() {
     const item = generateRandomItem();
     

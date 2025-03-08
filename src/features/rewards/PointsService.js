@@ -3,7 +3,7 @@
  * Service for managing user points system with Supabase persistence
  */
 
-import supabase from '../../shared/utils/supabaseClient';
+import ServiceBase from '../../shared/utils/ServiceBase';
 
 // Points awarded for different actions
 export const POINT_VALUES = {
@@ -18,11 +18,11 @@ export const POINT_VALUES = {
 export const POINTS_UPDATED_EVENT = 'points-updated';
 
 // Points System Class
-class PointsService {
+class PointsService extends ServiceBase {
   constructor() {
-    this.pointsKey = 'user_points_data'; // Keep this for backward compatibility
-    this.actionsKey = 'user_completed_actions'; // Keep this for backward compatibility
-    this.TABLE_NAME = 'user_points';
+    super();
+    this.USER_POINTS_TABLE = 'user_points';
+    // Remove the separate actions table since it doesn't exist
     
     // Clean up localStorage on initialization - reference removed
     this.clearLocalStorageData();
@@ -36,217 +36,185 @@ class PointsService {
 
   // Initialize user points data if not exists
   async initUserData(userId) {
-    // Check if user already exists in the database
-    const { data, error } = await supabase
-      .from(this.TABLE_NAME)
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('Error checking for user in database:', error);
+    if (!userId) {
+      return this.handleError(new Error('Invalid userId'), 'initUserData', null);
     }
     
-    // If user doesn't exist, create entry
-    if (!data) {
-      const userData = {
-        user_id: userId,
-        points: 0,
-        level: 1,
-        last_login: null,
-        completed_actions: {}
-      };
+    try {
+      // Check if user already exists in the database
+      const userData = await this.fetchData(this.USER_POINTS_TABLE, { user_id: userId });
       
-      const { error: insertError } = await supabase
-        .from(this.TABLE_NAME)
-        .insert(userData);
+      // If user doesn't exist, create entry
+      if (!userData || userData.length === 0) {
+        // Insert new user data
+        const newUserData = {
+          user_id: userId,
+          points: 0,
+          level: 1,
+          completed_actions: {} // Store completed actions in the same table
+        };
         
-      if (insertError) {
-        console.error('Error creating user points data:', insertError);
+        const result = await this.insertData(this.USER_POINTS_TABLE, newUserData);
+        if (!result.success) {
+          return this.handleError(new Error(result.message), 'initUserData', null);
+        }
+        
+        return this.formatUserData(newUserData);
       }
       
-      return userData;
+      return this.formatUserData(userData[0]);
+    } catch (err) {
+      return this.handleError(err, 'initUserData', null);
     }
-    
-    return this.formatUserData(data);
   }
 
-  // Format database data to match the expected format
+  // Format user data from DB to application format
   formatUserData(dbData) {
+    if (!dbData) return null;
+    
     return {
-      points: dbData.points,
-      level: dbData.level,
-      lastLogin: dbData.last_login
+      userId: dbData.user_id,
+      points: dbData.points || 0,
+      level: dbData.level || 1
     };
   }
 
-  // Get points data for all users - Only needed for compatibility with old events
+  // Get all points data (admin only)
   async getAllPointsData() {
-    const { data, error } = await supabase
-      .from(this.TABLE_NAME)
-      .select('*');
-    
-    if (error) {
-      console.error('Error fetching all points data:', error);
-      return {};
+    try {
+      const data = await this.fetchData(this.USER_POINTS_TABLE);
+      
+      return data.map(this.formatUserData).filter(Boolean);
+    } catch (err) {
+      return this.handleError(err, 'getAllPointsData', []);
+    }
+  }
+
+  // Dispatch points updated event
+  dispatchPointsUpdatedEvent(userData, userId) {
+    this.dispatchEvent(POINTS_UPDATED_EVENT, {
+      userId, 
+      userData,
+      timestamp: Date.now()
+    });
+  }
+
+  // Get user's points
+  async getUserPoints(userId) {
+    if (!userId) {
+      return this.handleError(new Error('Invalid userId'), 'getUserPoints', null);
     }
     
-    // Convert to the old format for backward compatibility
-    const formattedData = {};
-    data.forEach(user => {
-      formattedData[user.user_id] = this.formatUserData(user);
-    });
-    
-    return formattedData;
-  }
-
-  // Trigger a points update event
-  dispatchPointsUpdatedEvent(userData, userId) {
-    // Format for backward compatibility with event listeners
-    const pointsData = {};
-    pointsData[userId] = userData;
-    
-    const event = new CustomEvent(POINTS_UPDATED_EVENT, { 
-      detail: { pointsData }
-    });
-    document.dispatchEvent(event);
-  }
-
-  // Get user's points data
-  async getUserPoints(userId) {
     try {
-      // Make sure we're getting fresh data from Supabase
-      const { data, error } = await supabase
-        .from(this.TABLE_NAME)
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      // Initialize data if it doesn't exist
+      await this.initUserData(userId);
       
-      if (error) {
-        // If no data, initialize user
-        if (error.code === 'PGRST116') { // No data found
-          return await this.initUserData(userId);
-        }
-        
-        console.error('Error fetching user points:', error);
-        return null;
+      // Get user's points
+      const userData = await this.fetchData(this.USER_POINTS_TABLE, { user_id: userId });
+      
+      if (!userData || userData.length === 0) {
+        return { points: 0, level: 1 };
       }
       
-      return this.formatUserData(data);
+      return { 
+        points: userData[0].points || 0, 
+        level: userData[0].level || 1 
+      };
     } catch (err) {
-      console.error('Unexpected error in getUserPoints:', err);
-      return null;
+      return this.handleError(err, 'getUserPoints', { points: 0, level: 1 });
     }
   }
 
   // Get completed actions for a user
   async getUserCompletedActions(userId) {
+    if (!userId) {
+      return this.handleError(new Error('Invalid userId'), 'getUserCompletedActions', {});
+    }
+    
     try {
-      const { data, error } = await supabase
-        .from(this.TABLE_NAME)
-        .select('completed_actions')
-        .eq('user_id', userId)
-        .single();
+      // Get actions from the user_points table
+      const userData = await this.fetchData(this.USER_POINTS_TABLE, { user_id: userId });
       
-      if (error) {
-        console.error('Error fetching user completed actions:', error);
+      if (!userData || userData.length === 0) {
         return {};
       }
       
-      return data.completed_actions || {};
+      return userData[0].completed_actions || {};
     } catch (err) {
-      console.error('Unexpected error in getUserCompletedActions:', err);
-      return {};
+      return this.handleError(err, 'getUserCompletedActions', {});
     }
   }
 
-  // Update completed actions for a user
+  // Save user's completed actions
   async saveUserCompletedActions(userId, actionsData) {
+    if (!userId) {
+      return this.handleError(new Error('Invalid userId'), 'saveUserCompletedActions', false);
+    }
+    
     try {
-      const { error } = await supabase
-        .from(this.TABLE_NAME)
-        .update({ completed_actions: actionsData })
-        .eq('user_id', userId);
+      // Update completed_actions in the user_points table
+      const result = await this.updateData(
+        this.USER_POINTS_TABLE,
+        { user_id: userId },
+        { completed_actions: actionsData }
+      );
       
-      if (error) {
-        console.error('Error updating user completed actions:', error);
-      }
+      return result.success;
     } catch (err) {
-      console.error('Unexpected error in saveUserCompletedActions:', err);
+      return this.handleError(err, 'saveUserCompletedActions', false);
     }
   }
 
-  // Add points to user account
-  async addPoints(userId, amount, actionType) {
+  // Add points to user
+  async addPoints(userId, amount, actionType = 'OTHER') {
+    if (!userId || typeof amount !== 'number' || amount <= 0) {
+      return this.handleError(
+        new Error(`Invalid parameters: userId=${userId}, amount=${amount}`), 
+        'addPoints', 
+        { points: 0, level: 1 }
+      );
+    }
+    
     try {
-      // Get current points
-      const { data, error } = await supabase
-        .from(this.TABLE_NAME)
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      // Initialize data if it doesn't exist
+      await this.initUserData(userId);
       
-      if (error) {
-        if (error.code === 'PGRST116') { // No data found
-          await this.initUserData(userId);
-          return this.addPoints(userId, amount, actionType); // Try again after init
-        }
-        
-        console.error('Error fetching user points for update:', error);
-        return {
-          success: false,
-          message: 'Failed to fetch user points',
-          error: error
-        };
-      }
+      // Get current points
+      const { points: currentPoints, level: currentLevel } = await this.getUserPoints(userId);
       
       // Calculate new points and level
-      const newPoints = data.points + amount;
+      const newPoints = currentPoints + amount;
       const newLevel = this.calculateLevel(newPoints);
       
-      // Update database
-      const { data: updatedData, error: updateError } = await supabase
-        .from(this.TABLE_NAME)
-        .update({ 
+      // Update in database
+      const result = await this.updateData(
+        this.USER_POINTS_TABLE,
+        { user_id: userId },
+        { 
           points: newPoints, 
           level: newLevel 
-        })
-        .eq('user_id', userId)
-        .select('*')
-        .single();
-        
-      if (updateError) {
-        console.error('Error updating user points:', updateError);
-        return {
-          success: false,
-          message: 'Failed to update user points',
-          error: updateError
-        };
+        }
+      );
+      
+      if (!result.success) {
+        return this.handleError(new Error(result.message), 'addPoints', { points: currentPoints, level: currentLevel });
       }
       
-      const userData = this.formatUserData(updatedData);
+      // Create result object
+      const userData = {
+        points: newPoints,
+        level: newLevel,
+        pointsAdded: amount,
+        levelUp: newLevel > currentLevel,
+        actionType
+      };
       
-      // Dispatch event for UI update
+      // Dispatch event
       this.dispatchPointsUpdatedEvent(userData, userId);
       
-      // Record action if specified
-      if (actionType) {
-        await this.recordCompletedAction(userId, actionType);
-      }
-      
-      return {
-        success: true,
-        userData: userData,
-        pointsAdded: amount,
-        newTotal: newPoints
-      };
+      return userData;
     } catch (err) {
-      console.error('Unexpected error in addPoints:', err);
-      return {
-        success: false,
-        message: 'Unexpected error adding points',
-        error: err
-      };
+      return this.handleError(err, 'addPoints', { points: 0, level: 1 });
     }
   }
 
@@ -276,16 +244,14 @@ class PointsService {
       await this.saveUserCompletedActions(userId, actions);
       return true;
     } catch (err) {
-      console.error('Unexpected error in recordCompletedAction:', err);
-      return false;
+      return this.handleError(err, 'recordCompletedAction', false);
     }
   }
 
   // Calculate user level based on points
   calculateLevel(points) {
-    // Simple level calculation: level = points / 50 + 1 (rounded down)
-    // So 0-49 points = level 1, 50-99 = level 2, etc.
-    return Math.floor(points / 50) + 1;
+    // Simple formula: level = 1 + Math.floor(points / 100)
+    return 1 + Math.floor(points / 100);
   }
 
   // Award points for different actions if they haven't been awarded already
@@ -314,7 +280,7 @@ class PointsService {
     return await this.awardPointsForAction(userId, 'COMPLETE_PROFILE', true);
   }
 
-  // Award points for viewing a guide
+  // Award points for viewing guides
   async awardGuideViewPoints(userId) {
     return await this.awardPointsForAction(userId, 'VIEW_GUIDE');
   }
@@ -324,7 +290,7 @@ class PointsService {
     return await this.awardPointsForAction(userId, 'EARN_BADGE');
   }
 
-  // Award points for training a mascot
+  // Award points for training mascots
   async awardMascotTrainingPoints(userId) {
     return await this.awardPointsForAction(userId, 'TRAIN_MASCOT');
   }

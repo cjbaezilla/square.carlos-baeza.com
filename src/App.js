@@ -20,12 +20,12 @@ function App() {
   const [userItems, setUserItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Fetch and update items - extracted as a separate function to reuse
+  // Fetch and update items
   const fetchAndUpdateItems = useCallback(async () => {
     if (isSignedIn && user) {
       try {
         setIsLoading(true);
-        // Force initialization of user items data structure if it doesn't exist
+        // Initialize user items data if needed
         await ItemService.initUserItemsData(user.id);
         
         // Get user's items
@@ -52,13 +52,23 @@ function App() {
     if (isSignedIn && user) {
       try {
         setIsLoading(true);
+        
         // Get user's mascots
         const mascots = await MascotService.getUserMascots(user.id);
         setUserMascots(mascots);
         
         // Get user's active mascot
         const active = await MascotService.getUserActiveMascot(user.id);
-        setActiveMascot(active);
+        
+        // If there's no active mascot but the user has mascots, set the first one as active
+        if (!active && mascots && mascots.length > 0) {
+          await MascotService.setUserActiveMascot(user.id, mascots[0].id);
+          const newActive = await MascotService.getUserActiveMascot(user.id);
+          setActiveMascot(newActive);
+        } else {
+          setActiveMascot(active);
+        }
+        
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching mascots:', error);
@@ -78,9 +88,9 @@ function App() {
           await ItemService.verifyTables();
           
           // Fetch items
-          fetchAndUpdateItems();
+          await fetchAndUpdateItems();
           
-          // Fetch mascots and items
+          // Fetch mascots
           await fetchAndUpdateMascots();
         } catch (error) {
           console.error('Error loading user data:', error);
@@ -132,13 +142,8 @@ function App() {
   // Listen for item updates
   useEffect(() => {
     const handleItemUpdate = async (event) => {
-      if (isSignedIn && user) {
-        try {
-          // Fetch updated items
-          await fetchAndUpdateItems();
-        } catch (error) {
-          console.error('Error handling item update:', error);
-        }
+      if (isSignedIn && user && event.detail.userId === user.id) {
+        await fetchAndUpdateItems();
       }
     };
     
