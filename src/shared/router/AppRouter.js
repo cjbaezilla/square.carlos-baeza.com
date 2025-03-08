@@ -1,23 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
-import HomePage from '../pages/HomePage';
-import BadgesPage from '../pages/BadgesPage';
-import RewardsPage from '../pages/RewardsPage';
-import MascotsPage from '../pages/MascotsPage';
-import ItemsPage from '../pages/ItemsPage';
-
-// Protected route component
-const ProtectedRoute = ({ children }) => {
-  return (
-    <>
-      <SignedIn>{children}</SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </>
-  );
-};
+import { HomePage, ProtectedRoute } from '../../features/auth';
+import { BadgesPage } from '../../features/badges';
+import { RewardsPage } from '../../features/rewards';
+import { MascotsPage } from '../../features/mascots';
+import { ItemsPage } from '../../features/items';
 
 const AppRouter = ({ userMascots, activeMascot, userItems }) => {
   return (

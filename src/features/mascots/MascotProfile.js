@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import MascotService, { MASCOT_UPDATED_EVENT } from './MascotService';
 import ItemService, { ITEM_UPDATED_EVENT, ITEM_RARITIES } from '../items/ItemService';
 
@@ -245,16 +246,16 @@ const MascotProfile = ({ mascot: propMascot = null, small = false }) => {
           <p className="text-gray-400 text-sm">
             This mascot doesn't have any items equipped.
           </p>
-          <a href="#/items" className="text-blue-400 text-sm hover:underline mt-2 inline-block">
+          <Link to="/items" className="text-blue-400 text-sm hover:underline mt-2 inline-block">
             {t('items.equip_items', 'Equip Items')} →
-          </a>
+          </Link>
         </div>
       )}
       
       <div className="flex justify-end">
-        <a href="#/items" className="text-blue-400 hover:underline text-sm">
+        <Link to="/items" className="text-blue-400 hover:underline text-sm">
           {t('items.manage_items', 'Manage Items')} →
-        </a>
+        </Link>
       </div>
     </div>
   );

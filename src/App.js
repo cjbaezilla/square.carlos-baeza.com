@@ -3,52 +3,13 @@ import { BrowserRouter } from 'react-router-dom';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import './App.css';
-import Navigation from './components/Navigation';
-import LanguageSelector from './components/LanguageSelector';
-import AppRouter from './router/AppRouter';
-import MascotService, { MASCOT_UPDATED_EVENT } from './mascots/MascotService';
-import ItemService, { ITEM_UPDATED_EVENT } from './items/ItemService';
-
-// Custom CSS in JSX for ensuring SVGs are visible
-const svgStyles = {
-  '.item-svg-container svg': {
-    width: '100%',
-    height: '100%',
-    stroke: 'currentColor',
-    strokeWidth: '2px',
-    minWidth: '24px',
-    minHeight: '24px'
-  },
-  '.item-svg-container svg *': {
-    stroke: 'currentColor',
-    strokeWidth: '2px'
-  }
-};
-
-// Helper function to ensure user has some sample items if empty
-const ensureUserHasSampleItems = (userId) => {
-  const items = ItemService.getUserItems(userId);
-  console.log('Current user items before ensuring samples:', items);
-  
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    console.log('User has no items, adding samples...');
-    // Add a few sample items if the user doesn't have any
-    const sampleItems = ItemService.getSampleItems();
-    console.log('Sample items generated:', sampleItems);
-    
-    if (sampleItems && Array.isArray(sampleItems) && sampleItems.length > 0) {
-      for (let i = 0; i < Math.min(3, sampleItems.length); i++) {
-        console.log('Adding sample item to inventory:', sampleItems[i]);
-        ItemService.addItemToUserInventory(userId, sampleItems[i]);
-      }
-      
-      const updatedItems = ItemService.getUserItems(userId);
-      console.log('Updated items after adding samples:', updatedItems);
-      return updatedItems;
-    }
-  }
-  return items;
-};
+import { Navigation, LanguageSelector } from './shared/components';
+import AppRouter from './shared/router/AppRouter';
+import { MascotService } from './features/mascots';
+import { MASCOT_UPDATED_EVENT } from './features/mascots/MascotService';
+import { ItemService, ensureUserHasSampleItems } from './features/items';
+import { ITEM_UPDATED_EVENT } from './features/items/ItemService';
+import svgStyles from './shared/utils/svgStyles';
 
 function App() {
   // eslint-disable-next-line no-unused-vars

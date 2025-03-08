@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import BadgeDisplay from '../badges/BadgeDisplay';
-import BadgeService from '../badges/BadgeService';
-import PointsService from '../rewards/PointsService';
-import PointsBadge from '../rewards/PointsBadge';
+import BadgeDisplay from '../../features/badges/BadgeDisplay';
+import BadgeService from '../../features/badges/BadgeService';
+import PointsService from '../../features/rewards/PointsService';
+import PointsBadge from '../../features/rewards/PointsBadge';
 
 const UserProfileCard = () => {
   const { user, isLoaded } = useUser();
