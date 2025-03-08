@@ -492,7 +492,7 @@ const MascotsPage = () => {
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {userMascots.map(mascot => (
+                      {Array.isArray(userMascots) && userMascots.map(mascot => (
                         <div key={mascot.id} className="relative">
                           <MascotDisplay
                             mascot={mascot}
@@ -565,7 +565,7 @@ const MascotsPage = () => {
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {userMascots.map(mascot => (
+                  {Array.isArray(userMascots) && userMascots.map(mascot => (
                     <div key={mascot.id} className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 cursor-pointer transition-colors"
                       onClick={() => handleTrainMascot(mascot)}
                     >
@@ -647,7 +647,7 @@ const MascotsPage = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-600">
-                      {userMascots.map((mascot) => (
+                      {Array.isArray(userMascots) && userMascots.map((mascot) => (
                         <tr key={mascot.id} className={mascot.id === activeMascotId ? 'bg-blue-900/20' : ''}>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center">

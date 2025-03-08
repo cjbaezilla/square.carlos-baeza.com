@@ -24,37 +24,48 @@ const ItemsPage = () => {
 
   // Load user's items and mascots
   useEffect(() => {
-    if (isSignedIn && user) {
-      const userId = user.id;
-      
-      // Get user's items
-      const items = ItemService.getUserItems(userId);
-      setUserItems(items);
-      
-      // Get user's mascots
-      const mascots = MascotService.getUserMascots(userId);
-      setUserMascots(mascots);
-      
-      // Get user's active mascot
-      const activeMascot = MascotService.getUserActiveMascot(userId);
-      if (activeMascot) {
-        setSelectedMascot(activeMascot);
-        
-        // Get items equipped to the active mascot
-        const mascotItems = ItemService.getMascotItems(userId, activeMascot.id);
-        setEquippedItems(mascotItems);
-        
-        // Calculate base and total stats
-        setMascotStats(activeMascot.stats);
-        setMascotTotalStats(ItemService.calculateTotalMascotStats(activeMascot, mascotItems));
+    const loadData = async () => {
+      if (isSignedIn && user) {
+        try {
+          setIsLoading(true);
+          const userId = user.id;
+          
+          // Get user's items
+          const items = ItemService.getUserItems(userId);
+          setUserItems(items);
+          
+          // Get user's mascots - using await for async call
+          const mascots = await MascotService.getUserMascots(userId);
+          setUserMascots(mascots || []); // Ensure it's an array even if null/undefined is returned
+          
+          // Get user's active mascot - using await for async call
+          const activeMascot = await MascotService.getUserActiveMascot(userId);
+          if (activeMascot) {
+            setSelectedMascot(activeMascot);
+            
+            // Get items equipped to the active mascot
+            const mascotItems = ItemService.getMascotItems(userId, activeMascot.id);
+            setEquippedItems(mascotItems);
+            
+            // Calculate base and total stats
+            setMascotStats(activeMascot.stats);
+            setMascotTotalStats(ItemService.calculateTotalMascotStats(activeMascot, mascotItems));
+          }
+          
+          // Get user's points
+          const userData = await PointsService.getUserPoints(userId);
+          setUserPoints(userData.points);
+          
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error loading data:', error);
+          setUserMascots([]); // Ensure userMascots is an array in case of error
+          setIsLoading(false);
+        }
       }
-      
-      // Get user's points
-      const userData = PointsService.getUserPoints(userId);
-      setUserPoints(userData.points);
-      
-      setIsLoading(false);
-    }
+    };
+    
+    loadData();
   }, [isSignedIn, user]);
 
   // Add a new useEffect for updating points every 5 seconds
@@ -100,41 +111,78 @@ const ItemsPage = () => {
         if (selectedMascot && event.detail.mascotId === selectedMascot.id) {
           const mascotItems = ItemService.getMascotItems(userId, selectedMascot.id);
           setEquippedItems(mascotItems);
+          
+          // Recalculate total stats
           setMascotTotalStats(ItemService.calculateTotalMascotStats(selectedMascot, mascotItems));
         }
       }
     };
     
-    // Listen for points updates
-    const handlePointsUpdate = (event) => {
-      if (isSignedIn && user) {
-        const userData = PointsService.getUserPoints(user.id);
-        setUserPoints(userData.points);
-      }
-    };
-    
     document.addEventListener(ITEM_UPDATED_EVENT, handleItemUpdate);
-    document.addEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
     
     return () => {
       document.removeEventListener(ITEM_UPDATED_EVENT, handleItemUpdate);
+    };
+  }, [isSignedIn, user, selectedMascot]);
+
+  // Listen for mascot and points updates
+  useEffect(() => {
+    const handleMascotUpdate = async () => {
+      if (isSignedIn && user) {
+        try {
+          // Refresh mascots list
+          const mascots = await MascotService.getUserMascots(user.id);
+          setUserMascots(mascots || []);
+          
+          // Check if the selected mascot has been updated
+          if (selectedMascot) {
+            const updatedMascot = await MascotService.getUserActiveMascot(user.id);
+            if (updatedMascot) {
+              setSelectedMascot(updatedMascot);
+              
+              // Refresh equipped items
+              const mascotItems = ItemService.getMascotItems(user.id, updatedMascot.id);
+              setEquippedItems(mascotItems);
+              
+              // Update stats
+              setMascotStats(updatedMascot.stats);
+              setMascotTotalStats(ItemService.calculateTotalMascotStats(updatedMascot, mascotItems));
+            }
+          }
+        } catch (error) {
+          console.error('Error handling mascot update:', error);
+        }
+      }
+    };
+    
+    const handlePointsUpdate = (event) => {
+      if (isSignedIn && user && event.detail.pointsData && event.detail.pointsData[user.id]) {
+        const pointsData = event.detail.pointsData[user.id];
+        setUserPoints(pointsData.points);
+      }
+    };
+    
+    document.addEventListener('mascot-updated', handleMascotUpdate);
+    document.addEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
+    
+    return () => {
+      document.removeEventListener('mascot-updated', handleMascotUpdate);
       document.removeEventListener(POINTS_UPDATED_EVENT, handlePointsUpdate);
     };
   }, [isSignedIn, user, selectedMascot]);
 
   // Handle mascot selection
-  const handleSelectMascot = (mascot) => {
-    setSelectedMascot(mascot);
-    
-    if (isSignedIn && user && mascot) {
-      const mascotItems = ItemService.getMascotItems(user.id, mascot.id);
+  const handleSelectMascot = async (mascot) => {
+    if (isSignedIn && user) {
+      setSelectedMascot(mascot);
+      
+      const userId = user.id;
+      const mascotItems = ItemService.getMascotItems(userId, mascot.id);
       setEquippedItems(mascotItems);
+      
+      // Update stats
       setMascotStats(mascot.stats);
       setMascotTotalStats(ItemService.calculateTotalMascotStats(mascot, mascotItems));
-    } else {
-      setEquippedItems([]);
-      setMascotStats(null);
-      setMascotTotalStats(null);
     }
   };
 
@@ -629,7 +677,7 @@ const ItemsPage = () => {
               }}
             >
               <option value="">{t('items.select_mascot_prompt', '-- Select a mascot --')}</option>
-              {userMascots.map(mascot => (
+              {Array.isArray(userMascots) && userMascots.map(mascot => (
                 <option key={mascot.id} value={mascot.id}>{mascot.name}</option>
               ))}
             </select>
@@ -783,7 +831,7 @@ const ItemsPage = () => {
               }}
             >
               <option value="">{t('items.select_mascot_prompt', '-- Select a mascot --')}</option>
-              {userMascots.map(mascot => (
+              {Array.isArray(userMascots) && userMascots.map(mascot => (
                 <option key={mascot.id} value={mascot.id}>{mascot.name}</option>
               ))}
             </select>
@@ -800,51 +848,51 @@ const ItemsPage = () => {
             {mascotStats && mascotTotalStats && (
               <>
                 <div className="bg-gray-900 p-2 rounded text-center">
-                  <div className="text-gray-300 text-xs mb-1">HP</div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-xs text-gray-400 mb-1">{t('items.stats.hp', 'HP')}</div>
+                  <div className="text-lg font-bold text-gray-100">
                     {mascotTotalStats.hp}
                     {statDifferences.hp > 0 && (
-                      <span className="text-xs text-green-400 ml-1">+{statDifferences.hp}</span>
+                      <span className="text-green-400 text-xs ml-1">(+{statDifferences.hp})</span>
                     )}
                   </div>
                 </div>
                 
                 <div className="bg-gray-900 p-2 rounded text-center">
-                  <div className="text-gray-300 text-xs mb-1">MP</div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-xs text-gray-400 mb-1">{t('items.stats.mp', 'MP')}</div>
+                  <div className="text-lg font-bold text-gray-100">
                     {mascotTotalStats.mp}
                     {statDifferences.mp > 0 && (
-                      <span className="text-xs text-green-400 ml-1">+{statDifferences.mp}</span>
+                      <span className="text-green-400 text-xs ml-1">(+{statDifferences.mp})</span>
                     )}
                   </div>
                 </div>
                 
                 <div className="bg-gray-900 p-2 rounded text-center">
-                  <div className="text-gray-300 text-xs mb-1">AGI</div>
-                  <div className="text-lg font-bold text-white">
-                    {mascotTotalStats.agility}
-                    {statDifferences.agility > 0 && (
-                      <span className="text-xs text-green-400 ml-1">+{statDifferences.agility}</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-gray-900 p-2 rounded text-center">
-                  <div className="text-gray-300 text-xs mb-1">PWR</div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-xs text-gray-400 mb-1">{t('items.stats.power', 'Power')}</div>
+                  <div className="text-lg font-bold text-gray-100">
                     {mascotTotalStats.power}
                     {statDifferences.power > 0 && (
-                      <span className="text-xs text-green-400 ml-1">+{statDifferences.power}</span>
+                      <span className="text-green-400 text-xs ml-1">(+{statDifferences.power})</span>
                     )}
                   </div>
                 </div>
                 
                 <div className="bg-gray-900 p-2 rounded text-center">
-                  <div className="text-gray-300 text-xs mb-1">DEF</div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-xs text-gray-400 mb-1">{t('items.stats.defense', 'Defense')}</div>
+                  <div className="text-lg font-bold text-gray-100">
                     {mascotTotalStats.defense}
                     {statDifferences.defense > 0 && (
-                      <span className="text-xs text-green-400 ml-1">+{statDifferences.defense}</span>
+                      <span className="text-green-400 text-xs ml-1">(+{statDifferences.defense})</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="bg-gray-900 p-2 rounded text-center">
+                  <div className="text-xs text-gray-400 mb-1">{t('items.stats.agility', 'Agility')}</div>
+                  <div className="text-lg font-bold text-gray-100">
+                    {mascotTotalStats.agility}
+                    {statDifferences.agility > 0 && (
+                      <span className="text-green-400 text-xs ml-1">(+{statDifferences.agility})</span>
                     )}
                   </div>
                 </div>

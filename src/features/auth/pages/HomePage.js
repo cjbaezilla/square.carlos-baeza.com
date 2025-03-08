@@ -6,8 +6,11 @@ import { MetaMaskSign, BlockchainGuide } from '..';
 import { MascotProfile } from '../../mascots';
 import { PointsBadge } from '../../rewards';
 
-const HomePage = ({ userMascots, activeMascot, userItems }) => {
+const HomePage = ({ userMascots = [], activeMascot, userItems }) => {
   const { t } = useTranslation();
+  
+  // Ensure userMascots is an array
+  const mascots = Array.isArray(userMascots) ? userMascots : [];
 
   return (
     <div className="mb-8">
@@ -57,12 +60,12 @@ const HomePage = ({ userMascots, activeMascot, userItems }) => {
         <div className="bg-gray-900 p-4 rounded-lg shadow">
           <h3 className="text-xl font-semibold mb-3 text-gray-200">{t('mascots.your_mascots', 'Your Mascots')}</h3>
           <p className="text-gray-400 mb-2">
-            {userMascots.length > 0 
-              ? `${t('mascots.you_have', 'You have')} ${userMascots.length} ${userMascots.length === 1 ? t('mascots.mascot', 'mascot') : t('mascots.mascots', 'mascots')}`
+            {mascots.length > 0 
+              ? `${t('mascots.you_have', 'You have')} ${mascots.length} ${mascots.length === 1 ? t('mascots.mascot', 'mascot') : t('mascots.mascots', 'mascots')}`
               : t('mascots.description', 'Collect and train robot mascots')}
           </p>
           
-          {userMascots.length > 0 ? (
+          {mascots.length > 0 ? (
             <div className="flex flex-col items-center my-2">
               {activeMascot ? (
                 <>
@@ -77,16 +80,16 @@ const HomePage = ({ userMascots, activeMascot, userItems }) => {
                 </>
               ) : (
                 <div className="flex flex-wrap justify-center gap-2">
-                  {userMascots.slice(0, 3).map(mascot => (
+                  {mascots.slice(0, 3).map(mascot => (
                     <div 
                       key={mascot.id}
                       className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center p-1"
                       dangerouslySetInnerHTML={{ __html: mascot.svg }}
                     />
                   ))}
-                  {userMascots.length > 3 && (
+                  {mascots.length > 3 && (
                     <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">+{userMascots.length - 3}</span>
+                      <span className="text-gray-400 text-sm">+{mascots.length - 3}</span>
                     </div>
                   )}
                 </div>
